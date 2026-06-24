@@ -47,7 +47,6 @@ package-lock.json
 # Logs
 *.log
 
-# Binary deliverables (track via Git LFS or upload separately)
-# SLIDES.pdf
-# demo-video.mp4
 .obsidian/
+.temp/
+.tmp/
