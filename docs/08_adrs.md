@@ -11,7 +11,7 @@
 |---|---|---|---|
 | ADR-001 | Compute target — EKS over ECS / Lambda | Accepted | 2026-06-24 |
 | ADR-002 | Data storage — DynamoDB cho incident state + idempotency | Accepted | 2026-06-24 |
-| ADR-003 | CI/CD strategy — CodePipeline + ArgoCD | Accepted | 2026-06-24 |
+| ADR-003 | CI/CD strategy — GitHub Actions + ArgoCD | Accepted | 2026-06-25 |
 | ADR-004 | Observability stack — Prometheus + Loki + CloudWatch | Proposed | — |
 | ADR-005 | Security baseline — IAM least-privilege + Secrets Manager | Proposed | — |
 | ADR-006 | Cost trade-off — On-demand vs Reserved cho demo | Proposed | — |
@@ -60,33 +60,31 @@
   - ✅ DynamoDB conditional write hỗ trợ idempotency key pattern tự nhiên — tránh race condition khi retry.
   - ⚠️ Không có complex SQL query — chỉ query theo key/GSI. Đủ cho use case audit trail đơn giản của TF1, nhưng nếu cần analytics phức tạp sau này phải export sang S3 + Athena.
   - ⚠️ Hot partition nếu nhiều incident cùng `tenant_id` trong thời gian ngắn — mitigate bằng `incident_id` là UUID random làm hash key, tránh partition skew.
-- **Alternatives considered**:
-  - *RDS PostgreSQL*: Bị loại vì tốn công quản trị và chi phí chạy instance cố định quá cao cho workload thưa thớt của demo.
-  - *S3 + Athena*: Bị loại vì Athena có độ trễ truy vấn cao (vài giây), không đáp ứng được yêu cầu kiểm tra trùng lặp thời gian thực khi xử lý alert.
-  - *Redis / ElastiCache*: Bị loại vì quản lý persistence phức tạp và tốn thêm chi phí duy trì cụm cache.
 
 ---
 
-## ADR-003 — CI/CD strategy: CodePipeline + ArgoCD
+## ADR-003 — CI/CD strategy: GitHub Actions + ArgoCD
 
 - **Status**: Accepted
-- **Date**: 2026-06-24
-- **Context**: 
-  Cần xây dựng quy trình tự động hóa CI/CD để build container, chạy test, quét bảo mật và deploy lên EKS. Quy trình phải tuân thủ nguyên tắc GitOps (trạng thái cluster đồng bộ với Git), hỗ trợ rollback tức thì và giảm thiểu rủi ro khi deploy phiên bản mới (bad deployment).
-  
-- **Decision**: 
-  Chọn **AWS CodePipeline cho CI** (build, test, scan, push image lên ECR) và **ArgoCD cho CD** (GitOps deploy lên EKS). Chiến lược triển khai ứng dụng: **Canary Deployment** (10% $\rightarrow$ 50% $\rightarrow$ 100% traffic) sử dụng **Argo Rollouts** cho AI Engine.
-  
+- **Date**: 2026-06-25
+- **Context**: CDO-05 cần một CI/CD pipeline để build container image, chạy test, scan security và deploy lên EKS cluster. Cần phân biệt rõ hai phần: CI (build/test/scan) và CD (deploy lên K8s). Pipeline phải hỗ trợ GitOps để đảm bảo trạng thái cluster luôn sync với Git, có rollback nhanh khi cần và drift detection.
+- **Decision**: Chọn **GitHub Actions** cho phần CI (build + test + scan + push image lên ECR) và **ArgoCD** cho phần CD (GitOps deploy lên EKS). Hai công cụ đảm nhận vai trò tách biệt: GitHub Actions lo phần build pipeline; ArgoCD lo phần sync K8s manifest từ Git vào cluster. Deploy strategy: **canary** — 10% traffic trước, quan sát error rate và latency, sau đó tăng lên 50% rồi 100%.
 - **Consequence**:
-  - ✅ **Phân tách rõ ràng CI/CD**: CodePipeline không cần biết thông tin EKS cluster, ArgoCD tự động đồng bộ từ Git. Ranh giới bảo mật sạch sẽ.
-  - ✅ **Ngăn ngừa lỗi triển khai**: Argo Rollouts tự động phân tích metrics (error rate > 1% hoặc latency > 800ms) để tự động dừng và rollback Canary (< 30 giây), giảm thiểu tối đa vùng ảnh hưởng lỗi (blast radius).
-  - ✅ **Tự động đồng bộ và Self-healing**: ArgoCD tự động phát hiện sai lệch (drift) giữa cluster và Git, tự động đưa cluster về trạng thái chuẩn trong Git.
-  - ⚠️ **Độ phức tạp tăng**: Cấu hình Canary (Argo Rollouts, Ingress weight) phức tạp hơn Rolling Update tiêu chuẩn và tiêu tốn một lượng nhỏ tài nguyên trong EKS cho ArgoCD Controller.
-
+  - ✅ Phân tách rõ CI và CD — GitHub Actions không cần biết cluster kubeconfig, ArgoCD không cần biết build logic. Boundary sạch, dễ debug.
+  - ✅ GitHub Actions cực kỳ linh hoạt, hỗ trợ kho Action Marketplace phong phú (dễ dàng tích hợp các bước test, scan Trivy/Snyk, push ECR).
+  - ✅ Bảo mật cao nhờ tích hợp AWS OIDC Federation — GitHub Actions gọi AWS services (ECR, etc.) thông qua IAM Role tạm thời (OIDC), không cần lưu trữ static Access Key nhạy cảm trong GitHub Secrets.
+  - ✅ ArgoCD đã học trong W10, team quen cách dùng — không mất thời gian học mới trong W11-W12.
+  - ✅ GitOps với ArgoCD đảm bảo cluster state luôn có source of truth trong Git — rollback chỉ cần revert Git commit, ArgoCD tự sync.
+  - ✅ ArgoCD drift detection tự phát hiện khi cluster state lệch khỏi Git — daily drift report về Slack.
+  - ✅ Canary deploy giảm blast radius khi deploy có lỗi — error rate > 1% hoặc p99 latency > 800ms thì auto-abort và rollback.
+  - ⚠️ Cần kết nối từ bên ngoài (GitHub runner) vào AWS ECR — giải quyết bằng IAM OIDC role để tránh rủi ro credential.
+  - ⚠️ ArgoCD cần thêm một workload trong cluster — tốn resource nhỏ (~200MB RAM) nhưng không đáng kể.
+  - ⚠️ Canary deploy phức tạp hơn rolling update — cần Argo Rollouts hoặc Ingress weight config. Trade-off chấp nhận được vì team đã học Argo Rollouts trong W9.
 - **Alternatives considered**:
-  - *GitHub Actions + ArgoCD*: Tốt, nhưng CodePipeline tận dụng tốt hơn cơ chế IAM OIDC native trong hệ sinh thái AWS của dự án.
-  - *CodePipeline all-in (không dùng ArgoCD)*: Bị loại vì thiếu tính năng GitOps, tự động phát hiện drift và cơ chế tự động rollback của Argo Rollouts.
-  - *Blue-Green Deployment*: Bị loại vì yêu cầu chạy song song gấp đôi tài nguyên (Blue và Green), vượt quá ngân sách demo ($100–150).
+  - **AWS CodePipeline (CI) + ArgoCD (CD)**: Native hoàn toàn trong AWS ecosystem. Bị loại vì CodePipeline kém linh hoạt hơn GitHub Actions, viết script phức tạp hơn, thời gian build chậm hơn và team ít quen thuộc hơn so với GitHub Actions.
+  - **GitHub Actions + Flux (thay ArgoCD)**: Flux cũng là GitOps tool tốt. Bị loại vì team đã học ArgoCD trong W10, chuyển sang Flux mất thêm thời gian học trong W11-W12.
+  - **GitHub Actions all-in (CI + CD)**: GitHub Actions có thể deploy thẳng lên EKS qua kubectl/Helm. Bị loại vì không có GitOps model, không có drift detection, rollback phức tạp hơn và cần cung cấp kubeconfig trực tiếp cho GitHub Actions (tăng rủi ro bảo mật).
+  - **Blue-green deploy (thay Canary)**: Blue-green đơn giản hơn canary — chỉ cần switch ALB target group. Bị loại vì cần chạy double resource (blue + green) cùng lúc — tốn cost trong demo budget $100–150. Canary tiết kiệm hơn, chỉ tăng traffic dần.
 
 ---
 
