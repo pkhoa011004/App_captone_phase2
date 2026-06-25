@@ -37,43 +37,147 @@ Từ ngữ cảnh đề tài, nhóm em rút ra các yêu cầu kỹ thuật cho 
 
 ## 3. Differentiation angle (KEY)
 
-### Angle chọn: K8s-heavy / EKS-native
+### Angle chọn: **K8s-heavy / EKS-native AIOps Platform**
 
-Nhóm em chọn EKS vì dự án Triage Hub của TF1 không đơn thuần chỉ là bài toán host container thông thường. Đây là bài toán xây dựng nền tảng **chẩn đoán sự cố bằng AI (AI incident triage)** đòi hỏi gom tất cả các yếu tố: metric, log, alert, thông tin deploy, trạng thái runtime và siêu dữ liệu (metadata) của tenant/service/env về cùng một mô hình nhất quán để AI có thể phân tích nguyên nhân gốc rễ (RCA). ECS tuy có chi phí rẻ hơn và vận hành đơn giản hơn để host container, nhưng TF1 cần một nền tảng thực thụ phục vụ cho nhu cầu AIOps chứ không chỉ tìm giải pháp lưu trữ rẻ nhất (cheapest hosting).
+Nhóm chọn **EKS-native** không phải vì Lambda hoặc ECS không làm được, mà vì bài toán TF1 Triage Hub không đơn thuần là bài toán host một container hay chạy một function theo event. Đây là bài toán xây dựng một nền tảng AIOps cần gom nhiều lớp dữ liệu vận hành gồm alert, metric, log, deploy metadata, runtime state và ownership mapping về cùng một mô hình metadata nhất quán để AI có thể phân tích RCA theo đúng phạm vi `tenant_id + service + env + time_window`.
 
-### 3.1 Ecosystem thống nhất cho AIOps
+Vì vậy, hướng của nhóm không phải là “cheapest hosting”, mà là **production-like AIOps platform**: workload chạy trên Kubernetes, observability nằm gần workload, metadata được chuẩn hóa bằng Kubernetes labels/annotations, alert đi qua pipeline có retry/DLQ, và AI Engine chỉ được truy vấn context trong phạm vi được kiểm soát.
 
-**Yêu cầu bài toán**: Việc phân tích nguyên nhân gốc rễ bằng AI (RCA) đòi hỏi rất nhiều loại ngữ cảnh (context) khác nhau: xu hướng của metric, mẫu log (log pattern), tín hiệu alert, trạng thái runtime, thông tin về các thay đổi deploy gần đây và siêu dữ liệu tenant/service/env. Tất cả các thành phần này phải được liên kết chặt chẽ với nhau.
+### 3.1 Vì sao không chọn Lambda làm trục chính?
 
-**EKS giải quyết như thế nào**: Kubernetes cung cấp một hệ sinh thái (ecosystem) cực kỳ đồng bộ và thống nhất:
-- Prometheus Operator + ServiceMonitor + PrometheusRule: thu thập metric và tạo alert.
-- Alertmanager: phát tín hiệu alert hoặc cảnh báo bất thường (anomaly signal).
-- ArgoCD + GitOps: quản lý quá trình deployment và lưu trữ siêu dữ liệu về các thay đổi gần đây (recent change metadata).
-- Namespace/label/annotation: gắn siêu dữ liệu tenant, service, env một cách tự nhiên.
-- RBAC + NetworkPolicy: kiểm soát quyền truy cập chặt chẽ và thực thi cô lập (isolation).
-- Deployment/Pod/Event: cung cấp ngữ cảnh về trạng thái runtime của ứng dụng.
+Lambda vẫn rất phù hợp cho các bước ngắn, stateless và event-driven. Trong thiết kế của nhóm, Lambda nên được dùng ở **alert ingestion layer**:
 
-Điểm thuyết phục nhất chính là **sự nhất quán của metadata (metadata consistency)**: cùng một bộ siêu dữ liệu (`tenant_id`, `service`, `env`, `namespace`, `deployment`, `version`) được sử dụng xuyên suốt từ ứng dụng (workload), metric, log, alert, quy trình deployment cho đến ngữ cảnh runtime.
+```text
+Alertmanager → Ingest Lambda → SQS
+```
 
-ECS hoàn toàn có thể làm được các chức năng tự do tương tự, nhưng nhà phát triển sẽ phải tự gắn kết nhiều mảnh ghép rời rạc (ECS task metadata, CloudWatch, EventBridge, ALB target group, siêu dữ liệu từ CI/CD, quy chuẩn tagging tự quy định) -> làm tăng đáng kể lượng code kết nối tùy biến (custom glue) khi xây dựng ngữ cảnh cho AIOps.
+Ingest Lambda chỉ cần nhận webhook, validate incident seed, normalize event, tạo `incident_id/correlation_id/idempotency_key`, rồi push message vào SQS. Đây là phần Lambda làm rất tốt.
 
-### 3.2 Observability gần workload hơn
+Tuy nhiên, **full AI Engine/RCA workflow** không chỉ là xử lý một event đơn giản. Nó cần nhận incident seed, query Prometheus/Loki/CloudWatch theo tenant/service/env/time-window, lấy deploy metadata nếu có, build context/evidence, chạy RCA, tính confidence, sinh report, rồi trả Slack/Jira payload. Các bước này phụ thuộc dữ liệu lẫn nhau: RCA cần metrics/logs/deploy evidence, report cần RCA result, Slack/Jira payload cần summary/report cuối cùng.
 
-**Yêu cầu bài toán**: AI tuyệt đối không được phép thực hiện truy vấn trên toàn bộ hệ thống mà không có sự kiểm soát. CDO phải cung cấp dữ liệu quan sát dưới dạng truy cập có giới hạn rõ ràng (bounded access theo tenant_id + service + env + time_window). AIOps sẽ lấy tập dữ liệu giới hạn đó để chuẩn hóa (normalize), phân khung thời gian (window), thiết lập baseline, phát hiện bất thường (detect anomaly) và tiến hành RCA.
+Nếu nhét toàn bộ workflow này vào một Lambda thì vẫn làm được cho MVP nhỏ, nhưng trade-off không tốt: latency query observability có thể không ổn định, time window có thể rộng, log volume có thể lớn, external call như Slack/Jira có thể timeout/rate-limit, và nếu fail ở bước cuối thì retry có thể làm chạy lại nhiều bước trước đó. Khi đó vẫn phải bổ sung state/idempotency để biết bước nào đã xong, artifact nào đã sinh ra, Slack/Jira đã gửi chưa.
 
-**EKS giải quyết như thế nào**: Vì các ứng dụng chạy trực tiếp trên Kubernetes, các thông tin metric/log/trạng thái runtime được liên kết trực tiếp và tự nhiên với siêu dữ liệu của workload. AIOps dễ dàng thực hiện các truy vấn giới hạn theo đúng tiêu chí `tenant_id + service + env + time_window` - một yêu cầu bắt buộc của TF1. EKS giúp chuẩn hóa quy trình observability quanh workload mượt mà hơn nhờ tận dụng namespace, label, annotation, cơ chế service discovery, trạng thái deployment cũng như các tài nguyên giám sát CRD.
+Nếu tách thành nhiều Lambda thì sẽ phát sinh orchestration: Lambda fetch metrics, Lambda fetch logs, Lambda fetch deploy metadata, Lambda RCA, Lambda report, Lambda notify. Lúc này cần thêm Step Functions để điều phối, DynamoDB để lưu workflow state/idempotency, S3 để lưu context/report artifacts, và thiết kế retry/resume cho từng bước. Cách này khả thi, nhưng độ phức tạp orchestration tăng lên và không còn đơn giản hơn container worker.
 
-### 3.3 Trade-off chấp nhận
+Vì vậy, nhóm chọn hướng:
 
-Nhóm em hoàn toàn chấp nhận **chi phí và độ phức tạp vận hành cao hơn so với ECS hoặc mô hình serverless**:
-- Phải tự thiết lập và quản lý cụm EKS, các nhóm node (node group), bộ điều hướng ingress, phân quyền RBAC, chính sách NetworkPolicy và toàn bộ hệ thống giám sát (monitoring stack).
-- Chi phí cơ bản ban đầu (baseline cost) cao hơn đáng kể (bao gồm chi phí quản lý EKS control plane $73/tháng + chi phí cho các node group chạy liên tục).
+```text
+Alertmanager
+→ Ingest Lambda
+→ SQS Incident Queue
+→ TF1 Worker / AI Engine chạy container
+→ RCA report
+→ Slack/Jira payload
+→ DynamoDB incident_state
+```
 
-Tuy nhiên, những đánh đổi này là hoàn toàn xứng đáng vì mục tiêu của TF1 là phải chứng minh được năng lực thiết kế và xây dựng một nền tảng thực thụ bao gồm: nền tảng runtime, hệ thống observability, telemetry nhận diện tenant, cơ chế giới hạn quyền truy cập dữ liệu (bounded data access), quy trình xử lý sự cố (incident workflow) và tích hợp AI. Giải pháp serverless vẫn có thể được ứng dụng ở các lớp phụ trợ (như gửi thông báo workflow, lưu audit trail), nhưng không thể đóng vai trò làm trục kiến trúc chính.
+Tóm lại: **Lambda tốt cho nhận alert, container tốt cho xử lý incident nhiều bước**.
 
-### Win axis
+### 3.2 Vì sao không chỉ chọn ECS/Fargate?
 
-**Ecosystem + Observability + Production Realism** - tận dụng tối đa sức mạnh từ hệ sinh thái Kubernetes để xây dựng hệ thống chẩn đoán sự cố bằng AI tiệm cận với môi trường production thực tế.
+ECS Fargate là lựa chọn rất hợp lý nếu mục tiêu chính là giảm độ phức tạp vận hành. ECS giúp chạy container đơn giản hơn EKS, không cần quản lý nhiều Kubernetes resource, không cần vận hành ingress controller, RBAC, NetworkPolicy, CRD hay GitOps controller. Nếu chỉ cần chạy TF1 API service và background processor thì ECS/Fargate là trade-off rất mạnh.
+
+Tuy nhiên, nhóm chọn EKS vì angle của nhóm là **K8s-native AIOps platform**, không chỉ là container hosting. Với TF1, giá trị lớn nhất nằm ở việc chuẩn hóa runtime metadata và observability context. Kubernetes cung cấp sẵn một mô hình rất phù hợp để gắn metadata vào workload:
+
+```text
+namespace      → tenant/env boundary
+labels         → tenant_id, service, env, version, team
+annotations    → runbook, owner, deploy metadata
+ServiceAccount → identity/IAM boundary
+Deployment/Pod → runtime state
+Event          → runtime/change signal
+```
+
+Khi Prometheus/Loki/OTel thu metrics/logs, các Kubernetes labels này có thể đi kèm telemetry. Điều đó giúp AIOps query context đúng scope theo `tenant_id + service + env + time_window`, thay vì phải tự ghép nhiều nguồn metadata rời rạc.
+
+ECS cũng làm được bằng task metadata, CloudWatch, EventBridge, tagging convention và CI/CD metadata. Nhưng khi bài toán cần liên kết workload, log, metric, alert rule, deployment state và runtime state, ECS thường cần nhiều custom glue hơn. EKS cho nhóm một mô hình nhất quán hơn để xây AIOps context.
+
+### 3.3 EKS ecosystem phù hợp với AIOps hơn
+
+EKS mở ra một hệ sinh thái rất tự nhiên cho bài toán này:
+
+- **Prometheus Operator / ServiceMonitor / PrometheusRule**: thu metric và định nghĩa alert gần workload.
+    
+- **Alertmanager**: grouping, dedup, inhibition và route alert.
+    
+- **Loki / Promtail / Grafana Alloy / OTel Collector**: thu log/trace/metric theo Kubernetes metadata.
+    
+- **Argo CD / GitOps**: quản lý deployment và tạo nguồn deploy metadata rõ ràng.
+    
+- **Argo Rollouts**: hỗ trợ canary/rollback và tạo tín hiệu thay đổi release.
+    
+- **RBAC / ServiceAccount / IRSA**: kiểm soát quyền truy cập giữa workload và AWS service.
+    
+- **NetworkPolicy**: giới hạn luồng truy cập giữa namespace/service.
+    
+- **HPA / KEDA**: scale API/worker theo CPU, queue depth hoặc custom metric.
+    
+- **Namespace / labels / annotations**: chuẩn hóa tenant/service/env/version/owner/runbook.
+    
+
+Điểm mạnh nhất của EKS trong bài này là **metadata consistency**. Cùng một bộ metadata có thể đi xuyên suốt:
+
+```text
+Workload
+→ Metrics
+→ Logs
+→ Alert
+→ Deploy metadata
+→ Runtime state
+→ AIOps context query
+→ RCA report
+```
+
+Đây là lợi thế quan trọng cho một hệ thống AI incident triage, vì chất lượng RCA phụ thuộc rất lớn vào việc context có đúng scope, đúng service, đúng tenant và đúng time window hay không.
+
+### 3.4 Alert reliability: event-driven nhưng không serverless-first
+
+Nhóm vẫn tận dụng serverless ở đúng chỗ. Alert là critical signal nên không nên xử lý trực tiếp kiểu fire-and-forget. Pipeline cần có buffer, retry, DLQ, replay và idempotency.
+
+Thiết kế đề xuất:
+
+```text
+Alertmanager
+→ Ingest Lambda
+→ SQS Incident Queue
+→ AIOps Worker trên EKS
+→ TF1 AI Engine/RCA
+→ Slack/Jira integration
+→ DynamoDB incident_state
+→ S3 audit/report artifact nếu cần
+```
+
+Trong đó:
+
+```text
+SQS = buffer, retry, DLQ, replay
+DynamoDB = incident_state, idempotency, correlation, resume workflow
+S3 = context/report/audit artifact
+CloudWatch/Grafana = monitor chính incident pipeline
+```
+
+DynamoDB không chỉ để chống duplicate. Nó còn giúp biết incident đang ở bước nào, alert nào đã merge vào incident, Slack/Jira đã tạo chưa, lần retry trước fail ở đâu, và workflow có thể resume từ đúng bước lỗi thay vì chạy lại toàn bộ.
+
+### 3.5 Trade-off chấp nhận
+
+Nhóm chấp nhận EKS có chi phí và độ phức tạp vận hành cao hơn ECS/Fargate hoặc serverless-first:
+
+- Có baseline cost cho EKS control plane và node group.
+    
+- Cần quản lý Kubernetes resource, ingress, RBAC, NetworkPolicy, autoscaling và observability stack.
+    
+- Cần discipline về labels/annotations để tránh metadata bị lệch.
+    
+- Debug có thể phức tạp hơn vì liên quan cả Kubernetes layer và AWS layer.
+    
+
+Tuy nhiên, trade-off này phù hợp với mục tiêu của nhóm: xây một nền tảng AIOps gần production, có observability-native, metadata consistency, GitOps, runtime context, isolation và incident workflow đáng tin cậy.
+
+### 3.6 Win axis
+
+**Ecosystem + Metadata Consistency + Observability + Production Realism**
+
+EKS giúp nhóm khác biệt ở chỗ không chỉ chạy AI Engine, mà xây được một nền tảng để AI Engine có context tốt hơn: metric/log/deploy/runtime metadata được chuẩn hóa, query được giới hạn theo tenant/service/env/window, alert event có retry/DLQ, incident state có idempotency/resume, và toàn bộ pipeline có observability riêng.
 
 ### Locked T3 W11
 
