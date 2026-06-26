@@ -13,10 +13,14 @@ infra/
 │   ├── observability/                # CloudWatch Log Groups, Metric Alarms, SNS topics
 │   └── tenant-provision/             # Per-tenant: K8s namespace, IRSA role, DB partition key
 └── environments/
-    ├── dev/                          # Dev root module (replicas=1, t3.medium)
-    │   ├── main.tf                   # Gọi modules/ với dev-specific vars
-    │   ├── terraform.tfvars          # Dev values
-    │   └── backend.tf                # key = "dev/terraform.tfstate"
+    ├── sandbox/                      # Sandbox root module (replicas=1, t3.medium)
+    │   ├── main.tf                   # Gọi modules/ với sandbox-specific vars
+    │   ├── terraform.tfvars          # Sandbox values
+    │   └── backend.tf                # key = "sandbox/terraform.tfstate"
+    ├── staging/                      # Staging root module (replicas=2, m5.large)
+    │   ├── main.tf                   # Gọi modules/ với staging-specific vars
+    │   ├── terraform.tfvars          # Staging values
+    │   └── backend.tf                # key = "staging/terraform.tfstate"
     └── prod/                         # Prod root module (replicas=3, m5.large)
         ├── main.tf
         ├── terraform.tfvars
@@ -27,7 +31,7 @@ infra/
 
 | Concern | Approach |
 |---|---|
-| Remote state | S3 per-environment (`dev/terraform.tfstate`, `prod/terraform.tfstate`) |
+| Remote state | S3 per-environment (`sandbox/terraform.tfstate`, `staging/terraform.tfstate`, `prod/terraform.tfstate`) |
 | Locking | DynamoDB (`tf1-cdo05-tflock`, hash key = `LockID`) |
 | Encryption | SSE-S3 + bucket policy deny unencrypted transport |
 | Versioning | S3 versioning ON — rollback bằng `terraform state pull` từ version cũ |
@@ -41,7 +45,7 @@ Tất cả AWS resources tuân theo pattern:
 tf1-cdo05-{env}-{component}-{resource}
 ```
 
-Ví dụ: `tf1-cdo05-prod-eks-cluster`, `tf1-cdo05-dev-vpc`, `tf1-cdo05-prod-audit-dynamodb`
+Ví dụ: `tf1-cdo05-prod-eks-cluster`, `tf1-cdo05-sandbox-vpc`, `tf1-cdo05-staging-vpc`
 
 ## Prerequisites
 
@@ -53,7 +57,7 @@ Ví dụ: `tf1-cdo05-prod-eks-cluster`, `tf1-cdo05-dev-vpc`, `tf1-cdo05-prod-aud
 ## Usage
 
 ```bash
-# Từ environment directory (vd: infra/environments/dev/)
+# Từ environment directory (vd: infra/environments/sandbox/)
 terraform init
 terraform plan -out=tfplan
 terraform apply tfplan

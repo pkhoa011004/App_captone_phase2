@@ -10,15 +10,15 @@
 
 ## Quick Links
 
-| Document | Mô tả | Pack |
-|---|---|---|
-| [Requirements Analysis](docs/01_requirements_analysis.md) | Phân tích yêu cầu, NFRs, constraints | #1 |
-| [Infra Design](docs/02_infra_design.md) | Kiến trúc hạ tầng, multi-tenant, component table | #1 |
-| [Security Design](docs/03_security_design.md) | Network security, IAM, secret management | #1 |
-| [Deployment Design](docs/04_deployment_design.md) | CI/CD, GitOps, deployment strategy, observability | #1 |
-| [Cost Analysis](docs/05_cost_analysis.md) | Chi phí per-tenant, budget tracking | #1 → #2 |
-| [Test & Eval Report](docs/07_test_eval_report.md) | Kết quả test, chaos response evidence | #2 |
-| [ADRs](docs/08_adrs.md) | Architecture Decision Records | #1 + #2 |
+| Document                                                  | Mô tả                                             | Pack    |
+| --------------------------------------------------------- | ------------------------------------------------- | ------- |
+| [Requirements Analysis](docs/01_requirements_analysis.md) | Phân tích yêu cầu, NFRs, constraints              | #1      |
+| [Infra Design](docs/02_infra_design.md)                   | Kiến trúc hạ tầng, multi-tenant, component table  | #1      |
+| [Security Design](docs/03_security_design.md)             | Network security, IAM, secret management          | #1      |
+| [Deployment Design](docs/04_deployment_design.md)         | CI/CD, GitOps, deployment strategy, observability | #1      |
+| [Cost Analysis](docs/05_cost_analysis.md)                 | Chi phí per-tenant, budget tracking               | #1 → #2 |
+| [Test & Eval Report](docs/07_test_eval_report.md)         | Kết quả test, chaos response evidence             | #2      |
+| [ADRs](docs/08_adrs.md)                                   | Architecture Decision Records                     | #1 + #2 |
 
 ---
 
@@ -43,7 +43,8 @@ xbrain-capstone-cdo5/
 │   │   ├── observability/       #   CloudWatch Log Groups, Metric Alarms, SNS
 │   │   └── tenant-provision/    #   Per-tenant: namespace, IRSA role, DB partition
 │   └── environments/            # Per-env root modules gọi vào modules/
-│       ├── dev/                 #   Dev config (replicas=1, t3.medium)
+│       ├── sandbox/             #   Sandbox config (replicas=1, t3.medium)
+│       ├── staging/             #   Staging config (replicas=2, m5.large)
 │       └── prod/                #   Prod config (replicas=3, m5.large)
 │
 ├── manifests/                   # Kubernetes manifests (Kustomize + ArgoCD)
@@ -52,7 +53,8 @@ xbrain-capstone-cdo5/
 │   │   ├── platform-service/    #   Deployment, Service, HPA
 │   │   └── ai-engine/           #   Argo Rollout (Canary), Service, HPA
 │   └── overlays/                # Per-env Kustomize patches
-│       ├── dev/                 #   Dev patches (replicas, resource limits)
+│       ├── sandbox/             #   Sandbox patches (replicas, resource limits)
+│       ├── staging/             #   Staging patches (replicas, resource limits)
 │       └── prod/                #   Prod patches (replicas, resource limits)
 │
 ├── scripts/                     # Utility scripts (bootstrap, helpers)
@@ -64,33 +66,34 @@ xbrain-capstone-cdo5/
 
 ### Conventions
 
-| Concern | Pattern | Mô tả |
-|---|---|---|
-| IaC | **Terraform module/env** | `modules/` chứa logic tái sử dụng, `environments/{env}/` chứa root module + tfvars riêng |
-| K8s manifests | **Kustomize base/overlay** | `base/` chứa shared YAML, `overlays/{env}/` patch per-env |
-| CD | **ArgoCD App-of-Apps** | 1 root Application quản lý nhiều child apps theo sync waves |
-| CI | **GitHub Actions** | 3 pipeline tách biệt: Infra, Platform App, ArgoCD CD |
-| Naming | `tf1-cdo05-{env}-{component}-{resource}` | Tất cả AWS resources tuân theo pattern này |
+| Concern       | Pattern                                  | Mô tả                                                                                    |
+| ------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------- |
+| IaC           | **Terraform module/env**                 | `modules/` chứa logic tái sử dụng, `environments/{env}/` chứa root module + tfvars riêng |
+| K8s manifests | **Kustomize base/overlay**               | `base/` chứa shared YAML, `overlays/{env}/` patch per-env                                |
+| CD            | **ArgoCD App-of-Apps**                   | 1 root Application quản lý nhiều child apps theo sync waves                              |
+| CI            | **GitHub Actions**                       | 3 pipeline tách biệt: Infra, Platform App, ArgoCD CD                                     |
+| Naming        | `tf1-cdo05-{env}-{component}-{resource}` | Tất cả AWS resources tuân theo pattern này                                               |
 
 ### Environments
 
-| Env | Infra | Manifests | Branch | Deploy |
-|---|---|---|---|---|
-| **Dev** | `infra/environments/dev/` | `manifests/overlays/dev/` | `develop` | Auto on merge |
-| **Prod** | `infra/environments/prod/` | `manifests/overlays/prod/` | `main` | Manual approve |
-
-> **Note**: Budget capstone giới hạn 2 env. Dev đóng vai trò staging — test xong trên dev, merge vào main = deploy prod.
+| Env         | Infra                         | Manifests                     | Branch                             | Deploy                        |
+| ----------- | ----------------------------- | ----------------------------- | ---------------------------------- | ----------------------------- |
+| **Sandbox** | `infra/environments/sandbox/` | `manifests/overlays/sandbox/` | `feat/*`, `bugfix/*`               | Auto on push                  |
+| **Staging** | `infra/environments/staging/` | `manifests/overlays/staging/` | `develop`, `release/*`, `hotfix/*` | Auto on push/merge            |
+| **Prod**    | `infra/environments/prod/`    | `manifests/overlays/prod/`    | `main`                             | Auto-plan on PR, Manual apply |
 
 ---
 
 ## Checkpoint Checklist
 
 ### Progress #1 — EOD T4 W11 (light)
+
 - [ ] `01_requirements_analysis.md` (draft)
 - [ ] `02_infra_design.md` (draft + angle declared + multi-tenant approach)
 - [ ] `08_adrs.md` (≥2 ADR cho key decisions)
 
 ### Evidence Pack #1 ⭐ — EOD T6 W11
+
 - [ ] `01_requirements_analysis.md`
 - [ ] `02_infra_design.md` (with multi-tenant approach)
 - [ ] `03_security_design.md` (draft)
@@ -100,10 +103,12 @@ xbrain-capstone-cdo5/
 - [ ] Base infra (VPC + cluster + observability) chạy được
 
 ### Progress #2 — EOD T2 W12 (light)
+
 - [ ] AI engine integration started
 - [ ] Tenant onboarding flow draft
 
 ### Evidence Pack #2 ⭐ — EOD T4 W12 (code freeze 18h)
+
 - [ ] All docs final
 - [ ] `05_cost_analysis.md` **measured**
 - [ ] `07_test_eval_report.md` **new** với chaos response evidence

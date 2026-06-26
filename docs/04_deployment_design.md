@@ -10,7 +10,7 @@
 
 - **IaC tool**: Terraform v1.9+ (HCL) - justify: Declarative, mature AWS provider, có state drift detection mạnh, plan-before-apply workflow phù hợp cho capstone approval gate. Dễ review hơn so với CDK hay CloudFormation.
 - **State backend**: S3 bucket (`tf1-cdo05-tfstate`) + DynamoDB lock (`tf1-cdo05-tflock`) tại `ap-southeast-1`.
-- **Modular structure**: shared modules (networking, eks, data-store...) + environment-specific roots (`environments/dev`, `environments/prod`).
+- **Modular structure**: shared modules (networking, eks, data-store...) + environment-specific roots (`environments/sandbox`, `environments/staging`, `environments/prod`).
 
 ### 1.2 Module structure
 
@@ -23,18 +23,19 @@ infra/
 │   ├── tenant-provision/  # per-tenant resources (Namespace, Role, DB key)
 │   └── observability/     # CloudWatch Log Groups, Metric Alarms, SNS topics
 ├── environments/
-│   ├── dev/               # Gọi modules/ với dev-specific vars
+│   ├── sandbox/           # Gọi modules/ với sandbox-specific vars
+│   ├── staging/           # Gọi modules/ với staging-specific vars
 │   └── prod/              # Gọi modules/ với prod-specific vars
 └── README.md
 ```
 
 ### 1.3 State management
 
-- Remote state per environment: `dev/terraform.tfstate`, `prod/terraform.tfstate`.
+- Remote state per environment: `sandbox/terraform.tfstate`, `staging/terraform.tfstate`, `prod/terraform.tfstate`.
 - State lock via DynamoDB (`tf1-cdo05-tflock`, hash key = `LockID`) với Consistent Read.
-- Plan-on-PR + apply-on-merge gate: 
+- Plan-on-PR + apply-on-merge gate:
   - `terraform plan` tự động chạy và comment trên PR.
-  - Tự động apply trên dev khi merge, cần manual approve cho prod.
+  - Tự động apply trên sandbox khi push, tự động apply trên staging khi merge, cần manual approve cho prod.
 
 ## 2. CI/CD pipeline
 
@@ -46,20 +47,20 @@ infra/
 PR opened ──► Build ──► Test ──► Scan ──► Plan ──► Review ──► Merge ──► Apply ──► Smoke test
 ```
 
-| Stage | Tool | What it does | Quality gate |
-|---|---|---|---|
-| Build | GitHub Actions | Compile + container build (Build once, promote everywhere) | Build success |
-| Test | pytest / Jest | Unit + integration tests, Contract schema validation | Coverage ≥ 70%, Pass 100% |
-| Scan | Trivy + Gitleaks | Image vuln + dependency CVE + secret scan | No CRITICAL/HIGH, 0 secrets |
-| Plan | Terraform plan | Preview infra change | Plan review success |
-| Apply | ArgoCD / Terraform | Deploy K8s manifests / deploy infra | Healthy & Synced / Apply success |
-| Smoke | Custom script | K8s Job health check post-deploy / policy validation | All endpoints 200, valid response |
+| Stage | Tool               | What it does                                               | Quality gate                      |
+| ----- | ------------------ | ---------------------------------------------------------- | --------------------------------- |
+| Build | GitHub Actions     | Compile + container build (Build once, promote everywhere) | Build success                     |
+| Test  | pytest / Jest      | Unit + integration tests, Contract schema validation       | Coverage ≥ 70%, Pass 100%         |
+| Scan  | Trivy + Gitleaks   | Image vuln + dependency CVE + secret scan                  | No CRITICAL/HIGH, 0 secrets       |
+| Plan  | Terraform plan     | Preview infra change                                       | Plan review success               |
+| Apply | ArgoCD / Terraform | Deploy K8s manifests / deploy infra                        | Healthy & Synced / Apply success  |
+| Smoke | Custom script      | K8s Job health check post-deploy / policy validation       | All endpoints 200, valid response |
 
 ### 2.2 Branch strategy
 
 - `main` = production-ready (Deploy to Prod namespace, manual approval required).
-- `develop` = integration (Deploy to Dev namespace, auto-sync).
-- `feature/*` = feature branches (Chỉ chạy CI check và Preview env, không deploy cố định).
+- `develop`, `release/*`, `hotfix/*` = integration / pre-prod (Deploy to Staging namespace, auto-sync).
+- `feat/*`, `bugfix/*` = feat/fix branches (Deploy to Sandbox namespace, auto-sync).
 - PR required for merge to `main` + approval, strict status checks (Trivy scan, test coverage).
 
 ## 3. GitOps
@@ -71,17 +72,17 @@ PR opened ──► Build ──► Test ──► Scan ──► Plan ──►
 
 ### 3.2 Sync waves
 
-| Wave | Components |
-|---|---|
-| 0 | Namespaces, RBAC, ExternalSecrets, ConfigMaps |
-| 1 | Platform Service (Deployment, Service, HPA) |
-| 2 | AI Engine (Argo Rollout Canary, Secrets, NetworkPolicy) |
-| 3 | Worker (AIOps Worker - Cần AI Engine URL sẵn sàng) |
-| 4 | Observability (Prometheus, Grafana, CloudWatch Agent) |
+| Wave | Components                                              |
+| ---- | ------------------------------------------------------- |
+| 0    | Namespaces, RBAC, ExternalSecrets, ConfigMaps           |
+| 1    | Platform Service (Deployment, Service, HPA)             |
+| 2    | AI Engine (Argo Rollout Canary, Secrets, NetworkPolicy) |
+| 3    | Worker (AIOps Worker - Cần AI Engine URL sẵn sàng)      |
+| 4    | Observability (Prometheus, Grafana, CloudWatch Agent)   |
 
 ### 3.3 Drift detection
 
-- ArgoCD auto-sync with prune enabled cho môi trường dev. Disabled cho prod để tránh xoá nhầm resource.
+- ArgoCD auto-sync with prune enabled cho môi trường sandbox và staging. Disabled cho prod để tránh xoá nhầm resource.
 - Poll Git repo mỗi 3 phút, phát hiện drift và self-heal về Git state (ghi đè thay đổi thủ công từ `kubectl`).
 - Daily drift report cho Terraform và manual approval cho destructive change qua `terraform plan`.
 
@@ -105,12 +106,11 @@ PR opened ──► Build ──► Test ──► Scan ──► Plan ──►
 
 ## 5. Environment separation
 
-| Env | Purpose | Account / Namespace | Auto-deploy |
-|---|---|---|---|
-| Dev | Dev experimentation & Staging | `triage-hub-dev` | On merge to `develop` |
-| Prod | Real tenant traffic (Demo capstone) | `triage-hub-prod` | On merge to `main` + manual approval |
-
-*(Ghi chú: Thu gọn xuống 2 môi trường do giới hạn budget capstone $100-150 / 2 tuần).*
+| Env     | Purpose                             | Account / Namespace  | Auto-deploy                                   |
+| ------- | ----------------------------------- | -------------------- | --------------------------------------------- |
+| Sandbox | Dev experimentation                 | `triage-hub-sandbox` | On push to `feature/*`, `bugfix/*`            |
+| Staging | Pre-prod integration                | `triage-hub-staging` | On push to `develop`, `release/*`, `hotfix/*` |
+| Prod    | Real tenant traffic (Demo capstone) | `triage-hub-prod`    | On merge to `main` + manual approval          |
 
 ## 6. Secrets in pipeline
 
@@ -133,13 +133,13 @@ Total time target: < 30 min.
 
 ## 8. Observability stack
 
-| Component | Tool |
-|---|---|
-| Metrics | Prometheus (in-cluster) / CloudWatch |
-| Logs | Fluent Bit → CloudWatch Logs / S3 cho cold storage |
-| Traces | OpenTelemetry → AWS X-Ray |
-| Dashboards | Grafana (SLO, cost tracking, AI health) |
-| Alerts | Prometheus Alertmanager → SNS → Slack |
+| Component  | Tool                                               |
+| ---------- | -------------------------------------------------- |
+| Metrics    | Prometheus (in-cluster) / CloudWatch               |
+| Logs       | Fluent Bit → CloudWatch Logs / S3 cho cold storage |
+| Traces     | OpenTelemetry → AWS X-Ray                          |
+| Dashboards | Grafana (SLO, cost tracking, AI health)            |
+| Alerts     | Prometheus Alertmanager → SNS → Slack              |
 
 ## 9. Open questions
 

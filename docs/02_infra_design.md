@@ -1,183 +1,183 @@
-# Infrastructure Design - Task Force 1 · CDO 5
+# Thiết kế Hạ tầng - Task Force 1 · CDO 5
 
-## 1. Architecture diagram
+## 1. Sơ đồ kiến trúc
 
 ```text
-User / Load Generator
+User / Load Generator (Người dùng / Bộ tạo tải)
         │
         ▼
-Application Load Balancer
+Application Load Balancer (Bộ cân bằng tải ứng dụng)
         │
         ▼
-Demo App Workloads on EKS
+Demo App Workloads on EKS (Workload ứng dụng Demo trên EKS)
         │
-        ├── metrics
+        ├── metrics (thông số)
         │      ▼
         │   Prometheus
         │      ▼
         │   PrometheusRule
         │
-        ├── logs
+        ├── logs (nhật ký)
         │      ▼
         │   Loki
         │
-        └── dashboards
+        └── dashboards (bảng điều khiển)
                ▼
             Grafana
 ```
 
-## 1.1 Main incident flow
+## 1.1 Luồng xử lý sự cố chính (Main incident flow)
 
 ```text
 PrometheusRule
         │
         ▼
 Alertmanager
-Grouping / Inhibition / Silence / Repeat interval
+Gom nhóm / Ngăn chặn / Tắt tiếng / Khoảng thời gian lặp lại
         │
         ▼
-Ingest Lambda
-Validate + Normalize alert webhook
+Ingest Lambda (Lambda tiếp nhận)
+Xác thực + Chuẩn hóa webhook cảnh báo
         │
         ▼
-SQS FIFO Raw Alert Queue
-Durable alert buffer
+SQS FIFO Raw Alert Queue (Hàng đợi SQS FIFO cảnh báo thô)
+Bộ đệm cảnh báo bền vững (Durable alert buffer)
         │
         ▼
-CDO Incident Correlator Worker on EKS
-Deduplicate + Correlate alert events
+CDO Incident Correlator Worker on EKS (Worker tương quan sự cố CDO trên EKS)
+Loại bỏ trùng lặp + Tương quan các sự kiện cảnh báo
         │
         ▼
 AI Engine / RCA
-Query Prometheus/Loki + perform RCA
+Truy vấn Prometheus/Loki + thực hiện RCA
         │
         ▼
-Integration Lambda / CDO Integration Layer
-Create / update Slack and Jira
+Integration Lambda / CDO Integration Layer (Lambda/Lớp tích hợp CDO)
+Tạo / cập nhật Slack và Jira
         │
         ▼
 Slack / Jira
-Human-facing incident notification and tracking
+Thông báo và theo dõi sự cố hướng tới người vận hành (Human-facing)
 ```
 
-## 1.2 Shared state and artifact stores
+## 1.2 Trạng thái chia sẻ và kho lưu trữ artifact (Shared state and artifact stores)
 
-DynamoDB and S3 are not linear components in the main data path. They are shared stores used by multiple components in the incident pipeline.
+DynamoDB và S3 không phải là các thành phần tuyến tính trong luồng dữ liệu chính. Chúng là các kho lưu trữ chia sẻ được sử dụng bởi nhiều thành phần trong pipeline xử lý sự cố.
 
 ```text
-                         ┌──────────────────────────────┐
-                         │ DynamoDB incident_state       │
-                         │ State / Idempotency / Status  │
-                         │ Workflow progress / Pointers  │
-                         └──────────────────────────────┘
-                                      ▲
-                                      │ read/write
-        ┌─────────────────────────────┼─────────────────────────────┐
-        │                             │                             │
-Ingest Lambda              CDO Correlator Worker          Integration Lambda
-write ingest state         read/write workflow state      read/write Jira/Slack state
-write queue state          write AI status                write integration status
-optional S3 URI pointer    write S3 URI pointers          write S3 URI pointers
+                         ┌──────────────────────────────────────────┐
+                         │ DynamoDB incident_state                  │
+                         │ Trạng thái / Idempotency / Tình trạng    │
+                         │ Tiến trình workflow / Các con trỏ        │
+                         └──────────────────────────────────────────┘
+                                              ▲
+                                              │ read/write (đọc/ghi)
+        ┌─────────────────────────────────────┼─────────────────────────────────────┐
+        │                                     │                                     │
+Ingest Lambda                      CDO Correlator Worker                 Integration Lambda
+ghi trạng thái tiếp nhận           đọc/ghi trạng thái workflow           đọc/ghi trạng thái Jira/Slack
+ghi trạng thái hàng đợi            ghi trạng thái AI                     ghi trạng thái tích hợp
+tùy chọn con trỏ S3 URI            ghi các con trỏ S3 URI                ghi các con trỏ S3 URI
 ```
 
 ```text
-                         ┌──────────────────────────────┐
-                         │ S3 Incident Artifact Store    │
-                         │ Payloads / Evidence / Reports│
-                         │ Replay / Audit material       │
-                         └──────────────────────────────┘
-                                      ▲
-                                      │ put/read object
-        ┌─────────────────────────────┼─────────────────────────────┐
-        │                             │                             │
-Ingest Lambda              CDO Correlator Worker          AI Engine
-optional raw alert          grouped alerts                context used
-payload snapshot            incident context              evidence used
-                             AI request/response           RCA output
-
-                                      │
-                                      ▼
-                              Integration Lambda
-                              Jira/Slack request
-                              Jira/Slack response
+                         ┌──────────────────────────────────────────┐
+                         │ S3 Incident Artifact Store               │
+                         │ Payloads / Minh chứng / Báo cáo          │
+                         │ Tài liệu Replay / Kiểm toán (Audit)      │
+                         └──────────────────────────────────────────┘
+                                              ▲
+                                              │ put/read object (đẩy/đọc đối tượng)
+        ┌─────────────────────────────────────┼─────────────────────────────────────┐
+        │                                     │                                     │
+Ingest Lambda                      CDO Correlator Worker                 AI Engine
+tùy chọn snapshot                  các cảnh báo đã gom nhóm              ngữ cảnh đã sử dụng
+payload cảnh báo thô               ngữ cảnh sự cố                        minh chứng đã sử dụng
+                                   yêu cầu/phản hồi AI                   kết quả RCA
+                                              
+                                              │
+                                              ▼
+                                      Integration Lambda
+                                      yêu cầu Jira/Slack
+                                      phản hồi Jira/Slack
 ```
 
-Core rule:
+Quy tắc cốt lõi:
 
 ```text
-DynamoDB tracks workflow state and idempotency.
-S3 stores incident artifacts and evidence.
-DynamoDB stores pointers to S3 objects, not full reports or large payloads.
+DynamoDB theo dõi trạng thái workflow và tính idempotency (tránh xử lý trùng lặp).
+S3 lưu trữ các artifact và minh chứng sự cố.
+DynamoDB lưu trữ các con trỏ (pointers) tới đối tượng S3, không lưu trực tiếp báo cáo đầy đủ hoặc các payload lớn.
 ```
 
-When a component creates an artifact:
+Khi một thành phần tạo ra một artifact:
 
 ```text
-1. The component creates an artifact.
-2. The component writes the artifact to S3.
-3. The component updates DynamoDB with the S3 URI and artifact status.
+1. Thành phần tạo ra artifact.
+2. Thành phần ghi artifact đó vào S3.
+3. Thành phần cập nhật DynamoDB với URI S3 và tình trạng của artifact.
 ```
 
-Example:
+Ví dụ:
 
 ```text
-CDO Correlator Worker creates rca_report.json
-→ PutObject to S3
-→ Update DynamoDB:
+CDO Correlator Worker tạo ra rca_report.json
+→ PutObject lên S3
+→ Cập nhật DynamoDB:
    report.status = STORED
    report_s3_uri = s3://incident-artifacts/{tenant_id}/{service}/{incident_id}/rca_report.json
 ```
 
-## 1.3 Caption
+## 1.3 Chú giải (Caption)
 
-This architecture uses Amazon EKS as the main runtime platform for the demo application, the CDO Incident Correlator Worker, and the Kubernetes-native observability stack. User traffic enters through an Application Load Balancer and reaches demo workloads running inside EKS.
+Kiến trúc này sử dụng Amazon EKS làm nền tảng runtime chính cho ứng dụng demo, CDO Incident Correlator Worker và stack observability native với Kubernetes. Traffic từ người dùng truy cập thông qua Application Load Balancer (ALB) và đi tới các workload demo chạy bên trong EKS.
 
-The application emits metrics and logs. Metrics are stored in Prometheus, logs are stored in Loki, and Grafana is used for dashboard and investigation. PrometheusRule evaluates metrics and fires alerts when abnormal conditions are detected.
+Ứng dụng phát sinh các metric (thông số) và log (nhật ký). Metric được lưu trữ trong Prometheus, log được lưu trữ trong Loki, và Grafana được dùng làm giao diện dashboard để điều tra sự cố. PrometheusRule đánh giá các metric và kích hoạt cảnh báo (alert) khi phát hiện các điều kiện bất thường.
 
-Alertmanager acts as the first alert noise-control layer. It groups related alerts, inhibits dependent alerts, supports silence rules, and controls repeat intervals before alerts enter the incident pipeline.
+Alertmanager đóng vai trò là lớp kiểm soát nhiễu cảnh báo đầu tiên. Nó thực hiện gom nhóm (grouping) các cảnh báo liên quan, ngăn chặn (inhibit) các cảnh báo phụ thuộc, hỗ trợ các quy tắc tắt tiếng (silence) và kiểm soát khoảng thời gian lặp lại (repeat intervals) trước khi cảnh báo đi vào pipeline xử lý sự cố.
 
-Ingest Lambda receives the Alertmanager webhook, validates required metadata, normalizes the alert payload, optionally stores raw alert evidence in S3, writes initial ingest/queue state to DynamoDB if required, and sends the alert event to SQS FIFO.
+Ingest Lambda nhận webhook từ Alertmanager, xác thực các siêu dữ liệu (metadata) bắt buộc, chuẩn hóa payload cảnh báo, tùy chọn lưu trữ minh chứng cảnh báo thô vào S3, ghi trạng thái tiếp nhận/hàng đợi ban đầu vào DynamoDB nếu cần, và gửi sự kiện cảnh báo tới SQS FIFO.
 
-SQS FIFO is used only for alert events. It provides durable buffering, retry, visibility timeout, FIFO DLQ, and backlog visibility. Metrics and logs do not go through SQS FIFO.
+SQS FIFO chỉ được sử dụng cho các sự kiện cảnh báo. Nó cung cấp bộ đệm bền vững (durable buffering), cơ chế thử lại (retry), thời gian ẩn tin nhắn (visibility timeout), hàng đợi lỗi FIFO DLQ và khả năng giám sát hàng đợi tích lũy (backlog). Các metric và log thô không đi qua SQS FIFO.
 
-The CDO Incident Correlator Worker polls SQS FIFO, checks DynamoDB state for idempotency, deduplicates repeated alerts, groups related alerts into incident-level triggers, writes correlation artifacts to S3, updates DynamoDB workflow state, and calls the AI Engine only when an incident is new or meaningfully updated.
+CDO Incident Correlator Worker thực hiện poll tin nhắn từ SQS FIFO, kiểm tra trạng thái trong DynamoDB để đảm bảo tính idempotency, loại bỏ các cảnh báo trùng lặp, gom các cảnh báo liên quan thành các trigger cấp sự cố (incident-level), ghi các artifact tương quan vào S3, cập nhật trạng thái workflow trong DynamoDB và chỉ gọi AI Engine khi có sự cố mới hoặc có cập nhật quan trọng.
 
-The AI Engine is owned by the AIOps/AI team. It receives the incident-level trigger, queries Prometheus and Loki through bounded read access, builds the metric/log context, performs RCA, and returns structured output such as root cause, confidence, evidence, missing context, and suggested actions. If scoped S3 access is granted, the AI Engine may also write the exact context and evidence it used for analysis to S3.
+AI Engine thuộc quyền sở hữu của đội ngũ AIOps/AI. Nó nhận trigger cấp sự cố, truy vấn Prometheus và Loki thông qua quyền truy cập đọc có giới hạn (bounded read access), xây dựng ngữ cảnh metric/log, thực hiện phân tích nguyên nhân gốc rễ (RCA) và trả về kết quả cấu trúc như nguyên nhân gốc rễ, độ tin cậy, minh chứng, ngữ cảnh bị thiếu và các hành động gợi ý. Nếu được cấp quyền truy cập S3 trong phạm vi giới hạn, AI Engine cũng có thể ghi trực tiếp ngữ cảnh và minh chứng mà nó đã sử dụng cho phân tích vào S3.
 
-Integration Lambda or the CDO Integration Layer creates or updates Slack and Jira. It reads incident state from DynamoDB, reads reports or payloads from S3 if needed, sends updates to Slack/Jira, stores integration request/response audit records in S3, and updates DynamoDB with Slack/Jira status.
+Integration Lambda hoặc Lớp Tích hợp CDO (CDO Integration Layer) chịu trách nhiệm tạo hoặc cập nhật Slack và Jira. Nó đọc trạng thái sự cố từ DynamoDB, đọc báo cáo hoặc payload từ S3 nếu cần, gửi cập nhật đến Slack/Jira, lưu trữ lịch sử yêu cầu/phản hồi tích hợp vào S3 và cập nhật trạng thái Slack/Jira vào DynamoDB.
 
-CloudWatch monitors AWS-side pipeline components such as Lambda, SQS FIFO, FIFO DLQ, DynamoDB, S3, and integration logs.
+CloudWatch giám sát các thành phần pipeline phía AWS như Lambda, SQS FIFO, FIFO DLQ, DynamoDB, S3 và các log tích hợp.
 
 ---
 
-## 1.4 Data ownership boundary
+## 1.4 Ranh giới quyền sở hữu dữ liệu (Data ownership boundary)
 
-The system has two different data flows.
+Hệ thống có hai luồng dữ liệu khác nhau.
 
-### Normal observability flow
+### Luồng giám sát thông thường (Normal observability flow)
 
 ```text
-App on EKS
+App trên EKS
 → Prometheus metrics
 → Loki logs
 → Grafana dashboards
-→ SRE / AI Engine query by tenant/service/env/time window
+→ SRE / AI Engine truy vấn theo tenant/service/env/time window
 ```
 
-This flow is used for normal monitoring, SRE investigation, dashboarding, and RCA context retrieval.
+Luồng này được sử dụng cho việc giám sát thông thường, SRE điều tra sự cố, hiển thị dashboard và lấy ngữ cảnh RCA.
 
-Important boundary:
+Ranh giới quan trọng:
 
 ```text
-Metrics/logs do not go through SQS FIFO.
-Metrics stay in Prometheus.
-Kubernetes application logs stay in Loki.
-AWS-side service logs/metrics stay in CloudWatch.
+Metrics/logs không đi qua SQS FIFO.
+Metrics nằm lại tại Prometheus.
+Log của ứng dụng Kubernetes nằm lại tại Loki.
+Log/metrics của các dịch vụ phía AWS nằm lại tại CloudWatch.
 ```
 
-The AI Engine can query observability data through bounded access.
+AI Engine có thể truy cập dữ liệu giám sát thông qua quyền truy cập giới hạn (bounded access).
 
-Recommended query dimensions:
+Các chiều truy vấn được đề xuất:
 
 ```text
 tenant_id
@@ -189,7 +189,7 @@ alertname
 severity
 ```
 
-### Alert incident flow
+### Luồng cảnh báo sự cố (Alert incident flow)
 
 ```text
 PrometheusRule
@@ -202,121 +202,121 @@ PrometheusRule
 → Slack / Jira
 ```
 
-This flow is used only when an alert event is fired and the incident triage workflow needs to start.
+Luồng này chỉ được kích hoạt khi có sự kiện cảnh báo xảy ra và quy trình xử lý sự cố cần được bắt đầu.
 
-Key distinction:
+Phân biệt cốt lõi:
 
 ```text
-Metric/log raw = analysis data.
-Alert event = incident workflow trigger.
+Metric/log thô = dữ liệu phân tích.
+Sự kiện cảnh báo = trigger kích hoạt workflow sự cố.
 ```
 
-Metrics and logs are not pushed through the alert pipeline. The alert pipeline only carries incident trigger events and workflow state transitions.
+Metric và log không được đẩy qua pipeline cảnh báo. Pipeline cảnh báo chỉ truyền tải các sự kiện trigger sự cố và các chuyển đổi trạng thái của workflow.
 
 ---
 
-## 1.5 Responsibility boundary: CDO vs AIOps / AI Engine
+## 1.5 Ranh giới trách nhiệm: CDO vs AIOps / AI Engine
 
-CDO does not own RCA logic and does not build the final AI reasoning logic.
+CDO không sở hữu logic RCA và không xây dựng logic lập luận AI cuối cùng.
 
-CDO owns:
+CDO sở hữu:
 
 ```text
-- runtime platform on EKS
-- demo application runtime environment
+- Nền tảng runtime trên EKS
+- Môi trường chạy ứng dụng demo
 - Prometheus, Grafana, Alertmanager, Loki
-- consistent observability metadata
-- bounded read access to Prometheus/Loki/CloudWatch
-- network policy, IAM, RBAC, and secret access boundary
-- alert ingestion from Alertmanager
-- SQS FIFO alert buffering and FIFO DLQ
-- alert deduplication and correlation
-- incident workflow state in DynamoDB
-- incident artifact/evidence storage in S3
-- Jira/Slack integration reliability if assigned to CDO
-- CloudWatch monitoring for AWS-side pipeline services
+- Tính nhất quán của metadata giám sát
+- Quyền truy cập đọc có giới hạn vào Prometheus/Loki/CloudWatch
+- Network policy, IAM, RBAC và ranh giới truy cập secret
+- Tiếp nhận cảnh báo từ Alertmanager
+- Bộ đệm cảnh báo SQS FIFO và FIFO DLQ
+- Loại bỏ trùng lặp và tương quan cảnh báo
+- Trạng thái workflow sự cố trong DynamoDB
+- Lưu trữ artifact/minh chứng sự cố trong S3
+- Độ tin cậy của tích hợp Jira/Slack (nếu được phân công cho CDO)
+- Giám sát CloudWatch cho các dịch vụ pipeline phía AWS
 ```
 
-AIOps / AI Engine owns:
+AIOps / AI Engine sở hữu:
 
 ```text
-- receive incident-level trigger from CDO
-- query Prometheus metrics by tenant/service/env/window
-- query Loki logs by tenant/service/env/window
-- normalize and aggregate metrics/logs
-- build time-window context
-- calculate baseline/trend/anomaly
-- perform RCA
-- return root cause, confidence, evidence, missing context, and suggested actions
-- optionally write AI context/evidence/RCA artifacts to scoped S3 prefix
+- Nhận trigger cấp sự cố từ CDO
+- Truy vấn Prometheus metrics theo tenant/service/env/window
+- Truy vấn Loki logs theo tenant/service/env/window
+- Chuẩn hóa và tổng hợp metrics/logs
+- Xây dựng ngữ cảnh theo khung thời gian (time-window)
+- Tính toán baseline/xu hướng/bất thường
+- Thực hiện RCA
+- Trả về nguyên nhân gốc rễ, độ tin cậy, minh chứng, ngữ cảnh bị thiếu và hành động gợi ý
+- Tùy chọn ghi các artifact AI/minh chứng/RCA vào prefix S3 được giới hạn phạm vi
 ```
 
-Final boundary:
+Ranh giới cuối cùng:
 
 ```text
-CDO owns platform, alert reliability, workflow state, and audit storage.
-AI owns observability interpretation and RCA.
+CDO sở hữu nền tảng, độ tin cậy cảnh báo, trạng thái workflow và lưu trữ kiểm toán.
+AI sở hữu việc diễn giải dữ liệu giám sát và RCA.
 ```
 
-AI Engine should not own SQS FIFO retry, incident idempotency, or Jira/Slack side-effect control.
+AI Engine không nên sở hữu cơ chế thử lại của SQS FIFO, tính idempotency của sự cố hoặc kiểm soát tác động ngoài (side-effect) của Jira/Slack.
 
 ---
 
-# 2. Component table
+# 2. Bảng thành phần (Component table)
 
-|Component|AWS Service / Tool|Reason|Cost note|
+|Thành phần|Dịch vụ AWS / Công cụ|Lý do lựa chọn|Lưu ý về chi phí|
 |---|---|---|---|
-|Compute|Amazon EKS|Main runtime for demo app, CDO Correlator Worker, and observability stack. Chosen because Kubernetes gives consistent workload metadata, namespace, labels, service discovery, NetworkPolicy, and GitOps-friendly deployment context.|Higher fixed cost than ECS/Lambda because of EKS control plane and worker nodes. Accepted for Kubernetes-native design.|
-|API entry|ALB + AWS Load Balancer Controller|Public entry point for user/load generator traffic into demo app on EKS. Managed through Kubernetes Ingress.|ALB has hourly and traffic-based cost. Keep one shared ALB for MVP.|
-|Metrics|Prometheus|Stores application and Kubernetes metrics, evaluates PrometheusRule, and provides query source for SRE/AIOps.|Runs inside EKS, consumes node CPU/memory/storage. Retention should be limited for MVP.|
-|Logs|Loki|Stores Kubernetes workload logs and supports label-based query by namespace, pod, service, tenant_id, env, and time window.|Runs inside EKS. Cost depends on log volume and retention.|
-|Dashboard|Grafana|Dashboard and investigation UI for metrics, logs, and alert status.|Runs inside EKS. Low MVP footprint.|
-|Alert noise control|Alertmanager|First-layer alert noise control: grouping, inhibition, silence, group_wait, repeat_interval.|Runs as part of monitoring stack.|
-|Alert ingestion|Ingest Lambda|Receives Alertmanager webhook, validates required fields, normalizes alert payload, optionally writes raw evidence, and sends message to SQS FIFO.|Low cost for MVP because alert volume is small.|
-|Event queue|SQS FIFO Raw Alert Queue + FIFO DLQ|Durable alert buffer, retry, visibility timeout, backlog visibility, FIFO DLQ for failed alerts. Decouples monitoring from downstream processing.|Low for capstone traffic. Must monitor backlog and FIFO DLQ.|
-|Incident worker|CDO Incident Correlator Worker on EKS|Polls SQS FIFO, deduplicates alerts, correlates related alerts, updates DynamoDB, writes S3 artifacts, and calls AI Engine when needed.|Runs on EKS worker nodes. Can scale by backlog.|
-|Incident state|DynamoDB|Stores incident_state, alert_fingerprint, correlation_key, workflow progress, retry_count, Jira ticket ID, Slack thread ID, last_error, and S3 URI pointers. Enables idempotency.|Low for MVP. On-demand mode is simpler for unpredictable demo traffic.|
-|Artifact storage|S3|Stores original alert payload, grouped alerts, AI request/response, AI context/evidence, RCA report, Jira/Slack payloads, and replay/debug material.|Low cost. Can use lifecycle policy to move older evidence to cheaper tier.|
-|RCA engine|AI Engine|Performs RCA by querying Prometheus/Loki and analyzing incident context.|Owned by AIOps team. Cost depends on model/runtime.|
-|External integration|Integration Lambda / CDO Integration Layer + Jira + Slack|Creates/updates Jira and Slack. One incident should map to one Jira ticket and one Slack thread.|External service cost depends on account/license, not core AWS infra.|
-|AWS-side monitoring|CloudWatch|Monitors Lambda logs, SQS FIFO backlog, FIFO DLQ count, DynamoDB errors/throttles, S3 errors, and AWS integration logs.|Cost depends on log volume and retention. Set retention policy.|
-|Secret management|Secrets Manager / SSM|Stores Jira token, Slack token/webhook, AI Engine API key, and runtime secrets.|Low if secret count is small.|
-|Pod AWS access|IAM + IRSA / EKS Pod Identity|Allows EKS pods to access SQS FIFO, DynamoDB, S3, and Secrets Manager with least privilege.|No major direct cost, but important for security.|
+|Compute (Tính toán)|Amazon EKS|Môi trường chạy chính cho app demo, CDO Correlator Worker và stack giám sát. Lựa chọn vì Kubernetes cung cấp metadata workload nhất quán, namespace, nhãn (labels), phát hiện dịch vụ (service discovery), NetworkPolicy và ngữ cảnh triển khai thân thiện với GitOps.|Chi phí cố định cao hơn ECS/Lambda do phí EKS control plane và các worker node. Được chấp nhận vì phục vụ thiết kế Kubernetes-native.|
+|API entry (Cổng vào API)|ALB + AWS Load Balancer Controller|Cổng vào công cộng cho traffic từ người dùng/bộ tạo tải vào app demo trên EKS. Được quản lý thông qua Kubernetes Ingress.|ALB tính phí theo giờ và dung lượng traffic. Duy trì một ALB dùng chung cho MVP.|
+|Metrics|Prometheus|Lưu trữ metric của ứng dụng và Kubernetes, đánh giá PrometheusRule và cung cấp nguồn truy vấn cho SRE/AIOps.|Chạy trong EKS, tiêu thụ CPU/RAM/dung lượng lưu trữ của node. Thời gian lưu trữ (retention) nên được giới hạn cho bản MVP.|
+|Logs|Loki|Lưu trữ log workload của Kubernetes và hỗ trợ truy vấn theo nhãn (label) như namespace, pod, service, tenant_id, env và time window.|Chạy trong EKS. Chi phí phụ thuộc vào lượng log phát sinh và thời gian lưu trữ.|
+|Dashboard|Grafana|Giao diện dashboard và điều tra cho metrics, logs và trạng thái cảnh báo.|Chạy trong EKS. Tiêu tốn tài nguyên rất ít trong bản MVP.|
+|Kiểm soát nhiễu cảnh báo|Alertmanager|Lớp kiểm soát nhiễu cảnh báo đầu tiên: gom nhóm (grouping), ngăn chặn (inhibition), tắt tiếng (silence), group_wait, repeat_interval.|Chạy như một phần của stack giám sát.|
+|Tiếp nhận cảnh báo|Ingest Lambda|Nhận webhook của Alertmanager, xác thực các trường bắt buộc, chuẩn hóa payload cảnh báo, tùy chọn ghi minh chứng thô và gửi tin nhắn vào SQS FIFO.|Chi phí thấp cho MVP vì lượng cảnh báo nhỏ.|
+|Hàng đợi sự kiện|SQS FIFO Raw Alert Queue + FIFO DLQ|Đóng vai trò bộ đệm cảnh báo bền vững, xử lý thử lại, ẩn tin nhắn, giám sát hàng đợi tích lũy, hàng đợi lỗi FIFO DLQ cho các tin nhắn lỗi. Giúp phân tách lớp giám sát với xử lý hạ nguồn.|Thấp đối với traffic của dự án capstone. Cần giám sát backlog và FIFO DLQ.|
+|Worker xử lý sự cố|CDO Incident Correlator Worker trên EKS|Poll tin nhắn từ SQS FIFO, loại bỏ cảnh báo trùng lặp, tương quan các cảnh báo liên quan, cập nhật DynamoDB, ghi artifact vào S3 và gọi AI Engine khi cần.|Chạy trên EKS worker node. Có thể scale dựa trên lượng hàng đợi tích lũy.|
+|Trạng thái sự cố|DynamoDB|Lưu trữ incident_state, alert_fingerprint, correlation_key, tiến trình workflow, số lần thử lại, Jira ticket ID, Slack thread ID, lỗi cuối cùng và các con trỏ S3 URI. Đảm bảo tính idempotency.|Thấp cho MVP. Chế độ On-demand (theo yêu cầu) phù hợp hơn với traffic demo không ổn định.|
+|Lưu trữ artifact|S3|Lưu trữ payload cảnh báo gốc, cảnh báo đã gom nhóm, yêu cầu/phản hồi AI, ngữ cảnh/minh chứng của AI, báo cáo RCA, payload Jira/Slack và tài liệu replay/debug.|Chi phí thấp. Có thể sử dụng lifecycle policy để chuyển dữ liệu cũ sang các tầng lưu trữ rẻ hơn.|
+|RCA engine|AI Engine|Thực hiện phân tích RCA bằng cách truy vấn Prometheus/Loki và phân tích ngữ cảnh sự cố.|Do đội AIOps sở hữu. Chi phí phụ thuộc vào model/runtime.|
+|Tích hợp bên ngoài|Integration Lambda / CDO Integration Layer + Jira + Slack|Tạo/cập nhật Jira và Slack. Một sự cố tương ứng với một Jira ticket và một Slack thread.|Chi phí dịch vụ bên ngoài phụ thuộc vào tài khoản/license, không tính vào hạ tầng AWS cốt lõi.|
+|Giám sát phía AWS|CloudWatch|Giám sát log Lambda, SQS FIFO backlog, số lượng FIFO DLQ, lỗi/nghẽn của DynamoDB, lỗi S3 và log tích hợp AWS.|Chi phí phụ thuộc vào lượng log lưu trữ. Cần thiết lập retention policy để tối ưu.|
+|Quản lý secret|Secrets Manager / SSM|Lưu trữ token Jira, token/webhook Slack, API key của AI Engine và các secret dùng trong runtime.|Thấp nếu số lượng secret nhỏ.|
+|Quyền truy cập AWS của Pod|IAM + IRSA / EKS Pod Identity|Cho phép các pod trên EKS truy cập SQS FIFO, DynamoDB, S3 và Secrets Manager với nguyên tắc đặc quyền tối thiểu.|Không tốn thêm chi phí trực tiếp, nhưng rất quan trọng cho bảo mật.|
 
 ---
 
-## 2.1 Component responsibility
+## 2.1 Trách nhiệm của thành phần (Component responsibility)
 
-|Component|Does|Does not do|
+|Thành phần|Nhiệm vụ thực hiện|Không thực hiện|
 |---|---|---|
-|ALB|Routes public traffic to demo app/API service on EKS.|Does not call AI Engine directly.|
-|EKS|Runs app workloads, Worker, and observability stack.|Does not store durable incident state by itself.|
-|Demo App|Generates traffic, metrics, logs, and failure scenarios.|Does not perform RCA or create Jira/Slack.|
-|Prometheus|Scrapes metrics, stores time-series, evaluates rules.|Does not store application logs.|
-|Loki|Stores Kubernetes application/workload logs.|Does not monitor AWS managed services.|
-|Grafana|Provides dashboard and investigation UI.|Does not own incident workflow state.|
-|Alertmanager|Groups, inhibits, silences, and controls repeated alerts before ingestion.|Does not perform deep multi-service incident correlation or Jira/Slack idempotency.|
-|Ingest Lambda|Validates and normalizes alert webhook, optionally stores raw alert artifact, writes initial ingest/queue state, pushes alert to SQS FIFO.|Does not do RCA, does not deeply query metrics/logs, does not call AI Engine for RCA, does not create Jira/Slack.|
-|SQS FIFO|Stores alert event durably and supports retry/FIFO DLQ.|Does not store metric/log raw and does not write to DynamoDB/S3 by itself.|
-|SQS FIFO DLQ|Stores messages that fail too many times.|Does not fix failed messages automatically.|
-|CDO Correlator Worker|Polls SQS FIFO, deduplicates alerts, correlates related alerts, updates DynamoDB, writes S3 artifacts, decides whether to call AI Engine.|Does not own RCA reasoning, baseline calculation, anomaly interpretation, or deep log analysis.|
-|DynamoDB|Stores incident state, idempotency keys, workflow progress, Jira/Slack IDs, and pointers to S3 artifacts.|Does not store raw logs, full metric windows, or large AI evidence.|
-|S3 Artifact Store|Stores audit evidence, AI request/response, payload snapshots, RCA reports, and replay/debug material.|Does not track live workflow state and does not serve as the state machine.|
-|AI Engine|Queries observability data, builds RCA context, performs reasoning, optionally writes AI artifacts to S3, returns RCA/confidence/suggested actions.|Does not own alert durability, SQS FIFO retry, pipeline state, or Jira/Slack side-effect control.|
-|Integration Lambda / CDO Integration Layer|Creates/updates Jira and Slack, writes request/response audit artifacts, updates DynamoDB.|Does not perform RCA.|
-|Jira/Slack|Human-facing incident tracking and notification.|Does not act as source of truth for workflow state.|
-|CloudWatch|Monitors AWS-side pipeline components.|Does not replace Loki for Kubernetes application logs.|
+|ALB|Định tuyến traffic công cộng tới app demo/dịch vụ API trên EKS.|Không gọi trực tiếp AI Engine.|
+|EKS|Chạy các workload ứng dụng, Worker và stack giám sát.|Không tự lưu trữ trạng thái sự cố bền vững.|
+|Demo App|Tạo traffic, metrics, logs và các kịch bản lỗi.|Không thực hiện RCA hoặc tạo Jira/Slack.|
+|Prometheus|Thu thập metrics, lưu trữ time-series, đánh giá các luật cảnh báo.|Không lưu trữ nhật ký (logs) của ứng dụng.|
+|Loki|Lưu trữ logs của ứng dụng/workload trên Kubernetes.|Không giám sát các dịch vụ AWS được quản lý.|
+|Grafana|Cung cấp giao diện dashboard và điều tra sự cố.|Không sở hữu trạng thái workflow sự cố.|
+|Alertmanager|Gom nhóm, ngăn chặn, tắt tiếng và kiểm soát cảnh báo lặp lại trước khi tiếp nhận.|Không thực hiện tương quan sự cố sâu giữa nhiều dịch vụ hoặc quản lý idempotency phía Jira/Slack.|
+|Ingest Lambda|Xác thực và chuẩn hóa webhook cảnh báo, tùy chọn lưu artifact cảnh báo thô, ghi trạng thái tiếp nhận/hàng đợi ban đầu, đẩy cảnh báo vào SQS FIFO.|Không thực hiện RCA, không truy vấn sâu metrics/logs, không gọi AI Engine để phân tích RCA, không tạo Jira/Slack.|
+|SQS FIFO|Lưu trữ sự kiện cảnh báo một cách bền vững và hỗ trợ thử lại/FIFO DLQ.|Không lưu trữ dữ liệu thô metric/log và không tự ghi vào DynamoDB/S3.|
+|SQS FIFO DLQ|Lưu trữ các tin nhắn bị lỗi quá số lần quy định.|Không tự động sửa các tin nhắn bị lỗi.|
+|CDO Correlator Worker|Poll tin nhắn từ SQS FIFO, loại bỏ cảnh báo trùng lặp, tương quan các cảnh báo liên quan, cập nhật DynamoDB, ghi artifact vào S3, quyết định có gọi AI Engine hay không.|Không sở hữu logic lập luận RCA, tính toán baseline, diễn giải bất thường hoặc phân tích sâu nhật ký.|
+|DynamoDB|Lưu trữ trạng thái sự cố, key idempotency, tiến trình workflow, ID của Jira/Slack và các con trỏ trỏ tới artifact trên S3.|Không lưu trữ logs thô, dữ liệu metric lớn hoặc minh chứng lớn của AI.|
+|S3 Artifact Store|Lưu trữ minh chứng kiểm toán, yêu cầu/phản hồi AI, snapshot payload, báo cáo RCA và tài liệu replay/debug.|Không theo dõi trạng thái workflow trực tiếp và không hoạt động như một state machine.|
+|AI Engine|Truy vấn dữ liệu giám sát, xây dựng ngữ cảnh RCA, thực hiện lập luận phân tích, tùy chọn viết artifact AI lên S3, trả về kết quả RCA/độ tin cậy/hành động gợi ý.|Không sở hữu độ bền vững cảnh báo, cơ chế thử lại của SQS FIFO, trạng thái pipeline hoặc kiểm soát tác động ngoài của Jira/Slack.|
+|Integration Lambda / CDO Integration Layer|Tạo/cập nhật Jira và Slack, ghi nhật ký yêu cầu/phản hồi tích hợp, cập nhật DynamoDB.|Không thực hiện RCA.|
+|Jira/Slack|Giao diện thông báo và theo dõi sự cố dành cho con người.|Không làm nguồn dữ liệu gốc (source of truth) cho trạng thái workflow.|
+|CloudWatch|Giám sát các thành phần pipeline phía AWS.|Không thay thế Loki để lưu trữ log ứng dụng Kubernetes.|
 
 ---
 
-# 3. Differentiation angle deep-dive
+# 3. Phân tích sâu về góc độ tạo sự khác biệt (Differentiation angle deep-dive)
 
-## 3.1 Why this angle?
+## 3.1 Tại sao chọn góc độ này?
 
-Chosen angle:
+Góc độ lựa chọn:
 
 ```text
-Reliable Incident Triage Pipeline with Alert Storm Control and AI Call Gating
+Pipeline xử lý sự cố tin cậy với khả năng kiểm soát cơn bão cảnh báo (Alert Storm) và cổng gọi AI hạn chế
 ```
 
 Điểm khác biệt chính của thiết kế này không chỉ nằm ở việc chọn EKS. EKS là runtime foundation. Giá trị thật của kiến trúc nằm ở cách CDO biến các alert nhiễu, lặp và phân mảnh thành incident-level trigger đáng tin cậy trước khi gọi AI Engine.
@@ -344,24 +344,24 @@ Alert
 thì hệ thống có nhiều rủi ro:
 
 ```text
-- AI Engine bị gọi quá nhiều lần cho cùng một incident
-- Jira ticket có thể bị tạo trùng
-- Slack channel có thể bị spam
-- RCA bị phân mảnh theo từng alert
-- operator có thể hiểu nhầm symptom là incident riêng
-- cost và latency tăng không cần thiết
+- AI Engine bị gọi quá nhiều lần cho cùng một incident (tốn chi phí và tài nguyên)
+- Jira ticket có thể bị tạo trùng lặp
+- Slack channel có thể bị spam gây loãng thông tin
+- RCA bị phân mảnh theo từng alert riêng lẻ
+- Người vận hành có thể hiểu nhầm symptom (triệu chứng) là các sự cố riêng biệt
+- Cost và latency tăng không cần thiết
 ```
 
 Thiết kế CDO đề xuất thêm một reliable incident pipeline trước AI processing:
 
 ```text
-Main incident flow:
+Luồng sự cố chính:
 PrometheusRule
 → Alertmanager
 → Ingest Lambda
 → SQS FIFO Raw Alert Queue
 → CDO Incident Correlator Worker
-→ AI Engine only when needed
+→ AI Engine (chỉ gọi khi cần thiết)
 → Integration Lambda / CDO Integration Layer
 → Jira/Slack
 ```
@@ -369,65 +369,65 @@ PrometheusRule
 DynamoDB và S3 không nằm tuyến tính trong main flow. Chúng là shared stores được nhiều component đọc/ghi:
 
 ```text
-Side stores:
+Các kho lưu trữ phụ trợ:
 - DynamoDB incident_state:
-  workflow state, idempotency, retry status, current step, Jira/Slack IDs, S3 URI pointers
+  lưu trạng thái workflow, idempotency, trạng thái retry, bước hiện tại, các ID của Jira/Slack, con trỏ S3 URI
 
-- S3 audit/evidence store:
-  raw alert payload, grouped alerts, AI request/response, RCA evidence, Jira/Slack payloads, replay material
+- Kho lưu trữ minh chứng/kiểm toán S3:
+  lưu payload cảnh báo thô, cảnh báo đã gom nhóm, yêu cầu/phản hồi AI, minh chứng RCA, payload của Jira/Slack, tài liệu phục vụ replay
 ```
 
 Thiết kế này có ba lớp bảo vệ chính:
 
 ```text
-1. Alertmanager giảm noise cơ bản trước ingestion.
-2. SQS FIFO bảo vệ alert delivery bằng durable buffering, retry và FIFO DLQ.
-3. CDO Correlator + DynamoDB deduplicate alert, gom alert liên quan thành incident và tránh duplicate Jira/Slack.
+1. Alertmanager giảm nhiễu cơ bản trước khi tiếp nhận (ingestion).
+2. SQS FIFO bảo vệ việc chuyển cảnh báo (alert delivery) bằng cơ chế đệm bền vững, thử lại và FIFO DLQ.
+3. CDO Correlator + DynamoDB loại trùng cảnh báo, gom các cảnh báo liên quan thành một sự cố (incident) và tránh tạo trùng lặp Jira/Slack.
 ```
 
-Core statement:
+Tuyên bố cốt lõi:
 
 ```text
-SQS FIFO protects alert delivery.
-DynamoDB protects workflow state and idempotency.
-S3 preserves audit evidence and replay material.
-The CDO Correlator protects the AI Engine from alert storms.
-EKS provides the ecosystem where these platform components can run close to the workload.
+SQS FIFO bảo vệ việc truyền tải cảnh báo.
+DynamoDB bảo vệ trạng thái workflow và tính idempotency.
+S3 lưu giữ minh chứng kiểm toán và tài liệu phục vụ replay.
+CDO Correlator bảo vệ AI Engine khỏi các cơn bão cảnh báo (alert storms).
+EKS cung cấp hệ sinh thái nơi các thành phần nền tảng này có thể chạy gần với workload.
 ```
 
 ---
 
-## 3.2 Why not Lambda or ECS as the main platform?
+## 3.2 Tại sao không dùng Lambda hay ECS làm nền tảng chính?
 
-### Why not Lambda as the main compute?
+### Tại sao không dùng Lambda làm nền tảng compute chính?
 
 Lambda phù hợp cho short-lived event handling, nhưng TF1 Triage Hub không chỉ là một API hoặc một simple event processor.
 
 Nền tảng này cần chạy nhiều thành phần có tính platform và long-running:
 
 ```text
-- demo app workloads
+- Các workload ứng dụng demo
 - CDO Incident Correlator Worker
 - Prometheus
 - Loki
 - Grafana
 - Alertmanager
-- GitOps-managed deployment context
-- Kubernetes metadata quanh workload
+- Ngữ cảnh triển khai được quản lý bằng GitOps
+- Siêu dữ liệu Kubernetes bao quanh workload
 ```
 
-Nếu dùng Lambda làm compute chính, team vẫn cần một runtime khác để chạy observability stack và worker-like components. Điều đó làm hệ thống bị chia thành nhiều execution model khác nhau:
+Nếu dùng Lambda làm compute chính, team vẫn cần một runtime khác để chạy observability stack và các thành phần dạng worker. Điều đó làm hệ thống bị chia thành nhiều execution model khác nhau:
 
 ```text
 - Lambda cho alert/API
-- một runtime khác cho app
-- một runtime khác cho observability
-- một cách khác để quản lý deployment metadata
+- Một runtime khác cho app
+- Một runtime khác cho observability
+- Một cách khác để quản lý deployment metadata
 ```
 
 Kết quả là RCA context khó nhất quán hơn. AI Engine cần biết alert liên quan tới service nào, pod/task nào, deployment version nào, namespace nào, tenant nào và logs/metrics nào trong cùng time window. Lambda không cung cấp một workload metadata ecosystem đủ tự nhiên cho bài toán này.
 
-Vì vậy, Lambda vẫn được dùng, nhưng chỉ là thin adapter:
+Vì vậy, Lambda vẫn được dùng, nhưng chỉ là thin adapter (bộ chuyển đổi mỏng):
 
 ```text
 Alertmanager
@@ -438,33 +438,33 @@ Alertmanager
 Lambda chỉ làm:
 
 ```text
-- receive webhook
-- validate alert payload
-- normalize alert event
-- send message to SQS FIFO
-- optionally write initial ingest state or raw payload evidence
+- Nhận webhook
+- Xác thực alert payload
+- Chuẩn hóa sự kiện cảnh báo
+- Gửi tin nhắn tới SQS FIFO
+- Tùy chọn ghi trạng thái tiếp nhận ban đầu hoặc minh chứng payload thô
 ```
 
 Lambda không làm:
 
 ```text
-- main runtime
-- observability platform
-- long-running worker
-- incident correlation sâu
-- RCA
+- Runtime chính của toàn hệ thống
+- Nền tảng observability
+- Worker chạy ngầm (long-running worker)
+- Tương quan sự cố sâu
+- Phân tích RCA
 ```
 
-Decision:
+Quyết định (Decision):
 
 ```text
-Use Lambda only for lightweight alert ingestion.
-Do not use Lambda as the main compute platform.
+Chỉ sử dụng Lambda cho việc tiếp nhận cảnh báo nhẹ nhàng (lightweight alert ingestion).
+Không sử dụng Lambda làm nền tảng tính toán chính.
 ```
 
 ---
 
-### Why not ECS Fargate?
+### Tại sao không dùng ECS Fargate?
 
 ECS Fargate chạy container tốt, đơn giản hơn EKS và thường rẻ hơn cho bài toán host service thông thường.
 
@@ -473,134 +473,134 @@ Lý do không chọn ECS không phải vì ECS không làm được. ECS vẫn c
 Nhưng TF1 cần nhiều hơn container hosting. TF1 cần một ecosystem thống nhất cho:
 
 ```text
-- workload runtime
-- observability
-- alerting
-- deployment evidence
-- security boundary
-- incident metadata
-- bounded RCA query access
+- Workload runtime
+- Observability
+- Alerting
+- Triển khai minh chứng (deployment evidence)
+- Ranh giới bảo mật (security boundary)
+- Siêu dữ liệu sự cố (incident metadata)
+- Quyền truy cập truy vấn RCA có giới hạn (bounded access)
 ```
 
-Với ECS, các context cần cho RCA thường nằm rải ở nhiều nơi:
+Với ECS, các ngữ cảnh cần cho RCA thường nằm rải ở nhiều nơi:
 
 ```text
-- ECS service/task metadata
+- Metadata của ECS service/task
 - CloudWatch metrics/logs
-- EventBridge deployment events
+- Các sự kiện triển khai của EventBridge
 - ALB target group
-- CI/CD pipeline records
-- AWS resource tags
-- custom naming convention
+- Lịch sử pipeline CI/CD
+- Các AWS resource tags
+- Quy ước đặt tên tùy chỉnh (custom naming convention)
 ```
 
 Ví dụ khi alert `High5xx` xảy ra ở `checkout-api`, AIOps cần biết:
 
 ```text
-- tenant nào bị ảnh hưởng
-- env nào bị ảnh hưởng
-- service nào lỗi
-- task/pod nào unhealthy
-- version nào đang chạy
-- có rollout nào vừa xảy ra không
-- metrics/logs nào thuộc cùng time window
-- alert này liên quan tới service group nào
+- Tenant nào bị ảnh hưởng
+- Env nào bị ảnh hưởng
+- Service nào lỗi
+- Task/pod nào không khỏe (unhealthy)
+- Version nào đang chạy
+- Có đợt rollout nào vừa diễn ra không
+- Metrics/logs nào thuộc cùng khung thời gian (time window)
+- Cảnh báo này liên quan tới nhóm dịch vụ (service group) nào
 ```
 
-Với ECS, các thông tin này có thể lấy được, nhưng CDO phải viết thêm glue logic để nối ECS metadata, CloudWatch, EventBridge, ALB, CI/CD records và tags thành một incident context thống nhất.
+Với ECS, các thông tin này có thể lấy được, nhưng CDO phải viết thêm glue logic (logic gắn kết) để nối ECS metadata, CloudWatch, EventBridge, ALB, CI/CD records và tags thành một ngữ cảnh sự cố thống nhất.
 
-Với EKS, nhiều thông tin này nằm tự nhiên trong Kubernetes workload model:
+Với EKS, nhiều thông tin này nằm tự nhiên trong mô hình workload của Kubernetes:
 
 ```text
-- namespace
-- pod
-- deployment
-- service
-- labels
-- annotations
-- rollout state
+- Namespace
+- Pod
+- Deployment
+- Service
+- Labels
+- Annotations
+- Trạng thái rollout
 - NetworkPolicy
 - RBAC
 - ServiceAccount
 ```
 
-Cùng một label model có thể đi xuyên suốt:
+Cùng một mô hình nhãn (label model) có thể đi xuyên suốt:
 
 ```text
 Kubernetes workload
 → Prometheus metrics
 → Loki logs
 → Alertmanager alert labels
-→ ArgoCD deployment history
+→ Lịch sử triển khai của Argo CD
 → CDO Correlator incident_state
-→ AI Engine bounded query contract
+→ Hợp đồng truy vấn giới hạn của AI Engine
 ```
 
 Vì vậy, ECS là lựa chọn tốt nếu mục tiêu là chạy container đơn giản, chi phí thấp. Nhưng với TF1, mục tiêu là xây một AIOps-ready incident platform có metadata nhất quán quanh workload.
 
-Decision:
+Quyết định (Decision):
 
 ```text
-Do not choose ECS as the main platform for TF1 MVP.
-Choose EKS because the project benefits more from Kubernetes-native observability,
-alerting, GitOps evidence, security boundary, and workload metadata consistency.
+Không chọn ECS làm nền tảng chính cho TF1 MVP.
+Chọn EKS vì dự án được hưởng lợi nhiều hơn từ tính năng Kubernetes-native observability,
+alerting, GitOps evidence, ranh giới bảo mật và tính nhất quán của siêu dữ liệu workload.
 ```
 
 ---
 
-## 3.3 Why EKS still matters in this angle
+## 3.3 Tại sao EKS vẫn đóng vai trò quan trọng trong góc độ này
 
 EKS phù hợp hơn không phải vì ECS không chạy được container. ECS hoàn toàn có thể chạy service ổn, rẻ hơn và đơn giản hơn trong nhiều trường hợp.
 
-Điểm khác biệt là TF1 Triage Hub không chỉ cần một nơi để host container. TF1 cần một hệ sinh thái vận hành đủ mạnh để gom runtime state, observability data, alerting, deployment evidence, security boundary và tenant metadata về cùng một mô hình nhất quán cho incident triage.
+Điểm khác biệt là TF1 Triage Hub không chỉ cần một nơi để host container. TF1 Triage Hub cần một hệ sinh thái vận hành đủ mạnh để gom runtime state, observability data, alerting, deployment evidence, security boundary và tenant metadata về cùng một mô hình nhất quán cho incident triage.
 
-EKS phù hợp hơn vì Kubernetes cung cấp một ecosystem thống nhất quanh workload:
+EKS phù hợp hơn vì Kubernetes cung cấp một hệ sinh thái (ecosystem) thống nhất quanh workload:
 
 ```text
-1. Workload runtime ecosystem
+1. Hệ sinh thái runtime của workload (Workload runtime ecosystem)
    - Pod
    - Deployment
    - Service
    - Namespace
-   - Labels
+   - Labels (Nhãn)
    - Annotations
-   - ReplicaSet / rollout state
+   - ReplicaSet / Trạng thái rollout
 
-2. Observability ecosystem
+2. Hệ sinh thái giám sát (Observability ecosystem)
    - Prometheus
    - ServiceMonitor / PodMonitor
    - Loki
    - Grafana
    - Alertmanager
-   - Kubernetes events
-   - app/workload labels attached to metrics and logs
+   - Các sự kiện Kubernetes (Kubernetes events)
+   - Các nhãn ứng dụng/workload đi kèm với metrics và logs
 
-3. Alerting ecosystem
+3. Hệ sinh thái cảnh báo (Alerting ecosystem)
    - PrometheusRule
    - Alertmanager grouping
-   - inhibition
-   - silence
-   - repeat interval
-   - alert labels such as tenant_id, service, env, severity
+   - Inhibition (Ngăn chặn)
+   - Silence (Tắt tiếng)
+   - Repeat interval (Khoảng thời gian lặp lại)
+   - Các nhãn cảnh báo như tenant_id, service, env, severity
 
-4. GitOps and deployment evidence ecosystem
+4. Hệ sinh thái GitOps và minh chứng triển khai
    - Argo CD
    - Helm / Kustomize
-   - deployment diff
-   - rollout history
-   - rollback evidence
-   - Git commit / image version mapping
+   - Khác biệt triển khai (deployment diff)
+   - Lịch sử rollout
+   - Minh chứng rollback
+   - Bản đồ Git commit / image version
 
-5. Security and isolation ecosystem
+5. Hệ sinh thái bảo mật và cô lập (Security and isolation)
    - Namespace
    - RBAC
    - ServiceAccount
    - IRSA / EKS Pod Identity
    - NetworkPolicy
-   - Secret integration
-   - workload-level access boundary
+   - Tích hợp Secret
+   - Ranh giới truy cập cấp workload
 
-6. Platform metadata ecosystem
+6. Hệ sinh thái siêu dữ liệu nền tảng (Platform metadata ecosystem)
    - tenant_id
    - service
    - env
@@ -608,13 +608,13 @@ EKS phù hợp hơn vì Kubernetes cung cấp một ecosystem thống nhất qua
    - pod
    - deployment
    - version
-   - owner
+   - owner (chủ sở hữu)
    - service_group
 ```
 
 Các phần này không đứng rời rạc. Chúng xoay quanh cùng một Kubernetes workload model.
 
-Ví dụ một service `checkout-api` có thể có metadata:
+Ví dụ một service `checkout-api` có thể có siêu dữ liệu (metadata):
 
 ```text
 tenant_id = tenant-a
@@ -631,15 +631,15 @@ service_group = checkout-stack
 Metadata này có thể xuất hiện xuyên suốt trong:
 
 ```text
-- Kubernetes Deployment labels
-- Pod labels
-- Prometheus metrics labels
-- Loki log labels
-- Alertmanager alert labels
-- Argo CD deployment history
-- NetworkPolicy/RBAC boundary
-- CDO Correlator incident_state
-- AI Engine bounded query contract
+- Các nhãn Kubernetes Deployment
+- Các nhãn Pod
+- Các nhãn Prometheus metrics
+- Các nhãn Loki log
+- Các nhãn Alertmanager alert
+- Lịch sử triển khai Argo CD
+- Ranh giới NetworkPolicy/RBAC
+- Trạng thái sự cố (incident_state) của CDO Correlator
+- Hợp đồng truy vấn giới hạn của AI Engine
 ```
 
 Khi alert `High5xx` xảy ra ở `checkout-api`, hệ thống không chỉ biết “service này lỗi”. Hệ thống có thể nối alert đó với:
@@ -655,8 +655,8 @@ alert
 → recent rollout
 → metrics window
 → logs window
-→ related alerts
-→ incident trigger
+→ related alerts (các cảnh báo liên quan)
+→ incident trigger (kích hoạt sự cố)
 ```
 
 Đây là điểm quan trọng cho AIOps/RCA. AI Engine cần query đúng metric/log theo tenant, service, env và time window. CDO cần đảm bảo dữ liệu đó có metadata nhất quán từ lúc workload chạy, sinh metric/log, tạo alert, đi qua correlator, rồi thành incident trigger.
@@ -666,101 +666,101 @@ Nếu dùng ECS, hệ thống vẫn làm được, nhưng context thường nằ
 ```text
 - ECS task/service metadata
 - CloudWatch metrics/logs
-- EventBridge deployment events
+- Các sự kiện triển khai của EventBridge
 - ALB target group
-- CI/CD pipeline records
-- AWS resource tags
-- custom naming convention
+- Lịch sử pipeline CI/CD
+- Các AWS resource tags
+- Quy ước đặt tên tùy chỉnh
 ```
 
-CDO sẽ phải viết thêm glue logic để nối các nguồn này thành một incident context thống nhất. Với EKS, nhiều phần context đã nằm tự nhiên trong Kubernetes ecosystem thông qua namespace, labels, annotations, service discovery, rollout state và observability labels.
+CDO sẽ phải viết thêm glue logic để nối các nguồn này thành một ngữ cảnh sự cố thống nhất. Với EKS, nhiều phần context đã nằm tự nhiên trong Kubernetes ecosystem thông qua namespace, labels, annotations, service discovery, rollout state và observability labels.
 
 Vì vậy, lý do chọn EKS không phải là “EKS chạy container tốt hơn ECS”. Lý do là:
 
 ```text
-EKS giúp CDO xây một AIOps-ready operational platform,
-nơi runtime, observability, alerting, GitOps evidence,
-security boundary và incident metadata dùng chung một workload model.
+EKS giúp CDO xây dựng một nền tảng vận hành sẵn sàng cho AIOps (AIOps-ready operational platform),
+nơi runtime, observability, alerting, minh chứng GitOps, ranh giới bảo mật
+và siêu dữ liệu sự cố dùng chung một mô hình workload.
 ```
 
 ---
 
-## 3.4 Architectural advantages
+## 3.4 Lợi thế về kiến trúc (Architectural advantages)
 
-Không claim benchmark numbers trong phần này. So sánh dưới đây dựa trên capability kiến trúc.
+Không đưa ra các con số benchmark trong phần này. Bảng so sánh dưới đây dựa trên khả năng kiến trúc.
 
-|Axis|Proposed design|Simple direct-alert design|
+|Trục so sánh|Thiết kế đề xuất|Thiết kế cảnh báo trực tiếp đơn giản|
 |---|---|---|
-|Alert durability|Alert event được lưu trong SQS FIFO, có retry và FIFO DLQ.|Alert có thể fail nếu downstream service unavailable.|
-|Alert storm handling|Alertmanager + Correlator giảm noise trước khi gọi AI.|Mỗi alert có thể gọi AI riêng.|
-|Duplicate prevention|DynamoDB lưu fingerprint/state và ngăn duplicate side effects.|Retry có thể tạo duplicate Jira/Slack.|
-|Incident correlation|Nhiều alert liên quan có thể được gom thành một incident.|Mỗi alert có thể bị xem là một incident riêng.|
-|AI protection|AI chỉ nhận incident-level trigger khi cần.|AI nhận raw alert spam.|
-|Recovery|Worker retry từ SQS FIFO và reuse DynamoDB state.|Stateless retry có thể lặp lại step đã hoàn tất.|
-|Debug/replay|SQS FIFO DLQ + S3 audit cung cấp evidence và replay material.|Khó inspect/replay failed alert hơn.|
-|Ops visibility|Quan sát được SQS FIFO backlog, FIFO DLQ, Lambda errors, DynamoDB errors và CloudWatch logs.|Khó xác định failure point hơn.|
-|Metadata consistency|EKS cung cấp metadata nhất quán quanh namespace, pod, service, deployment, version, tenant_id, env.|ECS vẫn làm được nhưng thường cần nhiều custom glue giữa service/task metadata, CloudWatch, EventBridge, ALB, CI/CD records và resource tags.|
+|Độ bền bỉ của cảnh báo (Alert durability)|Sự kiện cảnh báo được lưu trong SQS FIFO, có cơ chế retry và FIFO DLQ.|Cảnh báo có thể bị mất nếu dịch vụ hạ nguồn không khả dụng.|
+|Xử lý bão cảnh báo (Alert storm handling)|Alertmanager + Correlator giảm nhiễu trước khi gọi AI.|Mỗi cảnh báo có thể kích hoạt cuộc gọi AI riêng lẻ.|
+|Ngăn ngừa trùng lặp (Duplicate prevention)|DynamoDB lưu trữ fingerprint/state và ngăn chặn các tác động ngoài (side effects) bị trùng lặp.|Cơ chế thử lại (retry) có thể tạo ra các ticket Jira hoặc tin nhắn Slack trùng lặp.|
+|Tương quan sự cố (Incident correlation)|Nhiều cảnh báo liên quan có thể được gom thành một sự cố duy nhất.|Mỗi cảnh báo có thể bị coi là một sự cố riêng lẻ.|
+|Bảo vệ AI Engine (AI protection)|AI chỉ nhận trigger cấp sự cố khi thực sự cần thiết.|AI nhận toàn bộ lượng cảnh báo thô (spam).|
+|Khả năng phục hồi (Recovery)|Worker thực hiện thử lại từ SQS FIFO và tái sử dụng trạng thái trong DynamoDB.|Cơ chế thử lại stateless có thể lặp lại các bước đã hoàn tất trước đó.|
+|Debug/replay|SQS FIFO DLQ + S3 audit cung cấp minh chứng và tài liệu phục vụ replay.|Khó kiểm tra và replay các cảnh báo bị lỗi.|
+|Giám sát vận hành (Ops visibility)|Có thể quan sát SQS FIFO backlog, FIFO DLQ, lỗi Lambda, lỗi DynamoDB và CloudWatch logs.|Khó xác định điểm lỗi trong luồng hơn.|
+|Tính nhất quán của siêu dữ liệu|EKS cung cấp metadata nhất quán quanh namespace, pod, service, deployment, version, tenant_id, env.|ECS vẫn làm được nhưng cần nhiều custom glue giữa task metadata, CloudWatch, EventBridge, ALB, CI/CD và tags.|
 
 ---
 
-## 3.5 Weakness accepted
+## 3.5 Các điểm yếu được chấp nhận (Weakness accepted)
 
-Thiết kế này phức tạp hơn direct webhook-to-AI.
+Thiết kế này phức tạp hơn thiết kế gửi webhook trực tiếp sang AI.
 
-Nó thêm:
+Nó bổ sung thêm:
 
 ```text
-- EKS cluster operation
-- Alertmanager configuration
+- Quản lý vận hành EKS cluster
+- Cấu hình Alertmanager phức tạp hơn
 - Ingest Lambda
 - SQS FIFO + FIFO DLQ
 - CDO Correlator Worker
 - DynamoDB incident_state
-- S3 audit store
-- IAM/IRSA permissions
-- CloudWatch monitoring for pipeline components
+- Kho lưu trữ audit trên S3
+- Quyền hạn IAM/IRSA
+- Giám sát CloudWatch cho các thành phần pipeline
 ```
 
-Team chấp nhận trade-off này vì mục tiêu không chỉ là demo happy path. Mục tiêu là xây một reliable incident triage pipeline có thể survive retry, giảm alert storm, tránh duplicate Jira/Slack và cung cấp audit evidence.
+Team chấp nhận trade-off này vì mục tiêu không chỉ là demo happy path. Mục tiêu là xây dựng một pipeline xử lý sự cố tin cậy có thể sống sót qua các lỗi, giảm thiểu bão cảnh báo, tránh trùng lặp Jira/Slack và cung cấp minh chứng kiểm toán rõ ràng.
 
-MVP limitation:
+Hạn chế của bản MVP (MVP limitation):
 
 ```text
-Correlation is rule-based.
-It is not yet topology-aware, trace-aware, or AI-assisted.
+Cơ chế tương quan dựa trên quy tắc cấu hình (rule-based).
+Chưa hỗ trợ topology-aware (nhận biết sơ đồ kiến trúc), trace-aware hoặc có sự hỗ trợ của AI.
 ```
 
-Future improvements có thể thêm:
+Cải tiến trong tương lai có thể thêm:
 
 ```text
-- service dependency graph
-- topology-aware correlation
-- OpenTelemetry tracing
-- adaptive time windows
-- AI-assisted correlation
-- human feedback loop
+- Đồ thị phụ thuộc dịch vụ (service dependency graph)
+- Tương quan nhận biết topology (topology-aware correlation)
+- Distributed tracing bằng OpenTelemetry
+- Khung thời gian động (adaptive time windows)
+- Tương quan có AI hỗ trợ (AI-assisted correlation)
+- Vòng phản hồi từ con người (human feedback loop)
 ```
 
-Final takeaway:
+Kết luận cuối cùng (Final takeaway):
 
 ```text
 Nếu mục tiêu chỉ là chạy container rẻ và đơn giản, ECS là lựa chọn tốt hơn.
 
-Nếu mục tiêu là xây một incident triage platform cần metadata nhất quán,
-observability gần workload, GitOps evidence, alert correlation,
-bounded RCA query access và reliable incident workflow,
-EKS + SQS FIFO + DynamoDB + Correlator là hướng phù hợp hơn.
+Nếu mục tiêu là xây một nền tảng triage sự cố cần metadata nhất quán,
+hệ thống giám sát đặt gần workload, minh chứng GitOps, tương quan cảnh báo,
+truy cập truy vấn RCA có giới hạn và quy trình sự cố đáng tin cậy,
+EKS + SQS FIFO + DynamoDB + Correlator là hướng đi phù hợp hơn.
 ```
 
 ---
 
-# 4. Multi-tenant approach
+# 4. Hướng tiếp cận Multi-tenant (Đa người thuê)
 
-## 4.1 Tenant model
+## 4.1 Mô hình Tenant
 
-In the MVP, multi-tenancy is handled mainly through metadata, not a full SaaS tenant lifecycle.
+Trong bản MVP, multi-tenancy chủ yếu được xử lý thông qua siêu dữ liệu (metadata), không triển khai một vòng đời tenant SaaS đầy đủ.
 
-Required metadata:
+Các metadata bắt buộc:
 
 ```text
 tenant_id
@@ -773,142 +773,142 @@ alertname
 severity
 ```
 
-Example tenant IDs for demo:
+Ví dụ các Tenant ID cho bản demo:
 
 ```text
 tenant-a
 tenant-b
 ```
 
-Production can use UUID v4, but the MVP does not claim full production tenant onboarding.
+Môi trường production có thể sử dụng UUID v4, nhưng bản MVP không bao gồm quy trình đăng ký tenant (tenant onboarding) đầy đủ như thực tế.
 
 ---
 
-## 4.2 Isolation pattern
+## 4.2 Mô hình cô lập (Isolation pattern)
 
-Data isolation uses a pooled model by metadata.
-
-```text
-Prometheus labels include tenant_id, service, env.
-Loki labels include tenant_id, service, env, namespace, pod.
-DynamoDB keys include tenant_id, service, incident_id, and correlation_key.
-S3 audit prefix includes tenant_id/service/incident_id.
-```
-
-Compute isolation uses a shared EKS cluster.
+Cô lập dữ liệu sử dụng mô hình dùng chung tài nguyên (pooled model) phân tách bằng metadata.
 
 ```text
-Demo app workloads can be separated by namespace.
-CDO pipeline components run in platform/ops namespace.
-AIOps/AI Engine can run in its own namespace or external runtime.
+Prometheus labels bao gồm tenant_id, service, env.
+Loki labels bao gồm tenant_id, service, env, namespace, pod.
+Các key của DynamoDB bao gồm tenant_id, service, incident_id, và correlation_key.
+S3 audit prefix bao gồm tenant_id/service/incident_id.
 ```
 
-This pattern is suitable for capstone scope because the target is to prove reliable alert handling and incident correlation, not to implement full SaaS tenant isolation with per-tenant accounts or clusters.
+Cô lập tài nguyên tính toán (compute isolation) sử dụng chung một EKS cluster.
+
+```text
+Workload của các ứng dụng demo có thể được phân tách theo namespace.
+Các thành phần pipeline CDO chạy trong namespace platform/ops.
+AIOps/AI Engine có thể chạy trong namespace riêng hoặc một runtime bên ngoài.
+```
+
+Mô hình này phù hợp với phạm vi capstone vì mục tiêu chính là chứng minh khả năng xử lý cảnh báo tin cậy và tương quan sự cố, không phải triển khai cô lập tenant SaaS hoàn toàn với các tài khoản hoặc cluster riêng biệt cho mỗi tenant.
 
 ---
 
-## 4.3 Bounded access for AI Engine
+## 4.3 Truy cập có giới hạn cho AI Engine (Bounded access)
 
-CDO must not give the AI Engine unrestricted access to the entire monitoring stack.
+CDO không được cấp quyền truy cập không hạn chế cho AI Engine vào toàn bộ stack giám sát.
 
-Access should be bounded by:
+Quyền truy cập cần được giới hạn bởi:
 
 ```text
 tenant_id
 env
-service or service_group
-time window
-read-only permission
-internal network path
+service hoặc service_group
+Khung thời gian (time window)
+Quyền chỉ đọc (read-only)
+Đường truyền mạng nội bộ (internal network path)
 ```
 
-Possible enforcement mechanisms:
+Các cơ chế thực thi khả thi:
 
 ```text
-- internal query gateway/API
-- read-only service account or token
-- namespace and NetworkPolicy boundary
-- IAM/RBAC boundary if AWS-side access is needed
-- query convention requiring tenant_id/service/env/window
-- audit logging of AI queries
-- scoped S3 prefix if AI writes RCA artifacts
+- Cổng truy vấn/API nội bộ (internal query gateway/API)
+- Service account hoặc token chỉ đọc
+- Ranh giới namespace và NetworkPolicy
+- Ranh giới IAM/RBAC nếu cần truy cập phía AWS
+- Quy ước truy vấn bắt buộc có tenant_id/service/env/window
+- Lưu log kiểm toán (audit logging) cho các truy vấn của AI
+- Định rõ prefix S3 giới hạn nếu AI ghi các artifact RCA
 ```
 
-Important note:
+Lưu ý quan trọng:
 
 ```text
-Prometheus/Loki labels alone are not strong tenant isolation.
-For MVP, they are acceptable as metadata-based scoping.
-For production, a query gateway or stronger access-control layer should be added.
+Chỉ các nhãn của Prometheus/Loki thì chưa đủ để tạo sự cô lập tenant mạnh mẽ.
+Đối với bản MVP, chúng được chấp nhận dưới dạng phân vùng dựa trên metadata.
+Đối với môi trường production, cần bổ sung một cổng truy vấn hoặc một lớp kiểm soát truy cập mạnh mẽ hơn.
 ```
 
 ---
 
-## 4.4 Tenant onboarding flow
+## 4.4 Luồng đăng ký tenant mới (Tenant onboarding flow)
 
-MVP onboarding:
+Quy trình đăng ký trên bản MVP:
 
 ```text
-1. Create tenant_id or service label in config.
-2. Attach tenant_id/service/env to metrics, logs, and alert labels.
-3. Create namespace if workload separation is needed.
-4. Configure Alertmanager grouping by tenant/env/service/severity.
-5. Verify alert payload has required metadata.
-6. Verify AI Engine can query bounded data by tenant/service/env/window.
-7. Verify DynamoDB keys and S3 prefixes include tenant/service/incident identity.
+1. Tạo tenant_id hoặc nhãn dịch vụ (service label) trong cấu hình.
+2. Gắn tenant_id/service/env vào các nhãn metric, log và alert.
+3. Tạo namespace nếu cần phân tách workload.
+4. Cấu hình Alertmanager gom nhóm theo tenant/env/service/severity.
+5. Xác minh payload cảnh báo có đầy đủ metadata bắt buộc.
+6. Xác minh AI Engine có thể truy vấn dữ liệu giới hạn theo tenant/service/env/window.
+7. Xác minh các key DynamoDB và prefix S3 đã chứa định danh tenant/service/incident.
 ```
 
-Future production onboarding:
+Quy trình đăng ký trên môi trường production tương lai:
 
 ```text
 POST /platform/v1/tenants
-→ Terraform/Step Function provisions namespace/config/IAM
-→ create tenant-scoped observability labels
-→ create tenant-scoped S3 prefix and access policy
-→ create secret and access policy
-→ smoke test
-→ tenant ready callback
+→ Terraform/Step Function khởi tạo namespace/config/IAM
+→ Tạo các nhãn giám sát giới hạn theo tenant (tenant-scoped)
+→ Tạo prefix S3 và access policy giới hạn theo tenant
+→ Tạo secret và access policy
+→ Chạy smoke test (kiểm tra nhanh)
+→ Gọi lại (callback) thông báo tenant đã sẵn sàng
 ```
 
-Do not claim this full lifecycle is implemented in the MVP unless it is actually built.
+Không tuyên bố quy trình vòng đời đầy đủ này đã được triển khai trong MVP trừ khi nó thực sự được xây dựng.
 
 ---
 
-## 4.5 Noisy neighbor mitigation
+## 4.5 Giảm thiểu ảnh hưởng từ các tenant khác (Noisy neighbor mitigation)
 
-MVP controls:
+Các biện pháp kiểm soát trên MVP:
 
 ```text
-- ResourceQuota and LimitRange per namespace if multiple tenants are simulated
-- Alertmanager grouping to reduce alert spam before Lambda/SQS FIFO
-- SQS FIFO backlog visibility to detect high alert volume
-- Correlator gating to avoid repeated AI calls
-- bounded observability queries by tenant/service/env/time window
-- DynamoDB idempotency keys to prevent duplicate side effects
-- S3 prefix organization for tenant/service/incident artifacts
+- Cấu hình ResourceQuota và LimitRange cho mỗi namespace nếu mô phỏng nhiều tenant
+- Cơ chế gom nhóm của Alertmanager để giảm thiểu spam cảnh báo trước khi tới Lambda/SQS FIFO
+- Giám sát độ dài hàng đợi SQS FIFO để phát hiện lượng cảnh báo tăng đột biến
+- Gating tại Correlator để tránh các cuộc gọi AI lặp lại liên tục
+- Giới hạn các câu truy vấn giám sát theo tenant/service/env/time window
+- Sử dụng key idempotency trên DynamoDB để ngăn các tác động ngoài bị trùng lặp
+- Tổ chức các prefix trên S3 theo tenant/service/incident để quản lý các artifact
 ```
 
-Avoid claiming exact quota numbers unless tested.
+Tránh đưa ra các ngưỡng số lượng cụ thể trừ khi đã được đo đạc thực tế.
 
 ---
 
-# 5. Key design decisions / alternatives considered
+# 5. Các quyết định thiết kế chính / Các giải pháp thay thế được cân nhắc
 
-## 5.1 Why Amazon EKS?
+## 5.1 Tại sao chọn Amazon EKS?
 
-Alternatives:
+Các giải pháp thay thế:
 
 ```text
-Option A: Lambda + API Gateway
-Option B: ECS Fargate + ALB
-Option C: Amazon EKS
+Lựa chọn A: Lambda + API Gateway
+Lựa chọn B: ECS Fargate + ALB
+Lựa chọn C: Amazon EKS
 ```
 
-Lambda is good for short-lived event handling, but TF1 is not only an API or simple event processor. The platform needs to run demo workloads, worker processes, observability stack, Alertmanager, Grafana, Loki, Prometheus, and Kubernetes-style metadata around workloads.
+Lambda rất tốt cho việc xử lý các sự kiện ngắn hạn, nhưng TF1 không chỉ là một API hoặc một bộ xử lý sự kiện đơn giản. Nền tảng cần chạy các workload demo, các quy trình worker chạy ngầm, stack giám sát, Alertmanager, Grafana, Loki, Prometheus và siêu dữ liệu kiểu Kubernetes bao quanh các workload.
 
-Lambda is still used, but only as lightweight alert ingestion and integration components.
+Lambda vẫn được sử dụng, nhưng chỉ đóng vai trò tiếp nhận cảnh báo nhẹ nhàng và các thành phần tích hợp.
 
-ECS can run containers well and is often simpler and cheaper than EKS. However, this project benefits from Kubernetes-native concepts:
+ECS có thể chạy tốt các container, thường đơn giản và rẻ hơn EKS. Tuy nhiên, dự án này được hưởng lợi rất nhiều từ các khái niệm native của Kubernetes:
 
 ```text
 - namespace
@@ -917,12 +917,12 @@ ECS can run containers well and is often simpler and cheaper than EKS. However, 
 - service discovery
 - NetworkPolicy
 - GitOps
-- rollout metadata
-- pod/deployment identity
-- observability close to workload
+- metadata của đợt rollout
+- định danh pod/deployment
+- giám sát đặt gần workload
 ```
 
-EKS gives one consistent metadata model around:
+EKS cung cấp một mô hình metadata nhất quán xoay quanh:
 
 ```text
 tenant_id
@@ -934,156 +934,156 @@ deployment
 version
 ```
 
-This metadata can be used across runtime, metrics, logs, alerts, deployment history, and bounded query access for AIOps.
+Metadata này có thể được sử dụng xuyên suốt trên runtime, metrics, logs, cảnh báo, lịch sử triển khai và quyền truy cập truy vấn giới hạn cho AIOps.
 
-Decision:
+Quyết định (Decision):
 
 ```text
-Choose EKS because TF1 is an AIOps-ready incident triage platform,
-not only a cheap container hosting problem.
+Chọn EKS vì TF1 là một nền tảng triage sự cố sẵn sàng cho AIOps,
+không đơn thuần chỉ là bài toán chạy container giá rẻ.
 ```
 
 ---
 
-## 5.2 Why AWS Load Balancer Controller + ALB?
+## 5.2 Tại sao chọn AWS Load Balancer Controller + ALB?
 
-Alternatives:
+Các giải pháp thay thế:
 
 ```text
-Option A: NodePort
-Option B: NGINX Ingress only
-Option C: API Gateway
-Option D: AWS Load Balancer Controller + ALB
+Lựa chọn A: NodePort
+Lựa chọn B: Chỉ dùng NGINX Ingress
+Lựa chọn C: API Gateway
+Lựa chọn D: AWS Load Balancer Controller + ALB
 ```
 
-The demo app and possible API entrypoints run inside EKS. AWS Load Balancer Controller allows Kubernetes Ingress to manage ALB automatically.
+Ứng dụng demo và các cổng vào API khả thi chạy bên trong EKS. AWS Load Balancer Controller cho phép Kubernetes Ingress tự động quản lý ALB.
 
-Benefits:
+Lợi ích:
 
 ```text
-- Kubernetes-native ingress management
-- no manual ALB/target group management
-- works naturally with EKS service discovery
-- supports path-based and host-based routing
-- fits GitOps workflow because ingress config lives in Kubernetes manifests
+- Quản lý ingress theo phong cách Kubernetes-native
+- Không cần cấu hình thủ công ALB/target group
+- Hoạt động tự nhiên với cơ chế phát hiện dịch vụ của EKS
+- Hỗ trợ định tuyến dựa trên đường dẫn (path-based) và host (host-based)
+- Phù hợp với luồng GitOps vì cấu hình ingress nằm trong các manifest Kubernetes
 ```
 
-API Gateway is useful for managed API auth/throttling, but this MVP mainly exposes containerized workloads inside EKS. ALB is simpler and more natural for HTTP ingress into Kubernetes workloads.
+API Gateway rất hữu ích cho việc quản lý xác thực/giới hạn tốc độ của API, nhưng bản MVP này chủ yếu đóng vai trò mở ra các workload dạng container bên trong EKS. ALB đơn giản và tự nhiên hơn cho HTTP ingress vào workload Kubernetes.
 
-Decision:
-
-```text
-Use ALB + AWS Load Balancer Controller for public app/API entry into EKS.
-```
-
----
-
-## 5.3 Why Ingest Lambda before SQS FIFO?
-
-Alternatives:
+Quyết định (Decision):
 
 ```text
-Option A: Alertmanager sends directly to SQS FIFO
-Option B: Alertmanager sends directly to Worker/API
-Option C: Alertmanager sends to Ingest Lambda, then Lambda sends to SQS FIFO
-```
-
-Alertmanager webhook payload may need validation and normalization before becoming an internal alert event.
-
-Ingest Lambda performs:
-
-```text
-- receive webhook
-- validate required fields
-- normalize payload
-- attach tenant/service/env/window metadata
-- generate idempotency key or correlation fields if needed
-- optionally store raw/normalized alert payload in S3
-- optionally write ingest and queue state to DynamoDB
-- send message to SQS FIFO
-```
-
-It is intentionally lightweight.
-
-It does not:
-
-```text
-- perform RCA
-- deeply query metrics/logs
-- correlate incidents
-- call AI Engine for RCA
-- create Jira/Slack
-```
-
-Decision:
-
-```text
-Use Ingest Lambda as a thin adapter between Alertmanager webhook and SQS FIFO.
+Sử dụng ALB + AWS Load Balancer Controller cho các kết nối công cộng vào EKS.
 ```
 
 ---
 
-## 5.4 Why SQS FIFO + FIFO DLQ?
+## 5.3 Tại sao dùng Ingest Lambda trước SQS FIFO?
 
-Alternatives:
+Các giải pháp thay thế:
 
 ```text
-Option A: Direct webhook to AI Engine
-Option B: Lambda retry only
-Option C: SQS FIFO + FIFO DLQ
+Lựa chọn A: Alertmanager gửi trực tiếp tới SQS FIFO
+Lựa chọn B: Alertmanager gửi trực tiếp tới Worker/API
+Lựa chọn C: Alertmanager gửi tới Ingest Lambda, sau đó Lambda gửi tới SQS FIFO
 ```
 
-Alert event is a critical incident trigger. If the alert is lost, the triage workflow may never start.
+Payload webhook của Alertmanager có thể cần được xác thực và chuẩn hóa trước khi trở thành một sự kiện cảnh báo nội bộ.
 
-SQS FIFO provides:
+Ingest Lambda thực hiện:
 
 ```text
-- durable alert buffer
-- retry through visibility timeout
-- FIFO DLQ for poison messages
-- backlog visibility
-- decoupling between monitoring and downstream processing
-- replay/debug capability
+- Nhận webhook
+- Xác thực các trường bắt buộc
+- Chuẩn hóa payload
+- Gắn thêm siêu dữ liệu tenant/service/env/window
+- Tạo key idempotency hoặc các trường tương quan nếu cần
+- Tùy chọn lưu trữ payload cảnh báo thô/chuẩn hóa vào S3
+- Tùy chọn ghi trạng thái tiếp nhận và hàng đợi vào DynamoDB
+- Gửi tin nhắn tới SQS FIFO
 ```
 
-Lambda retry only protects function execution in some cases. SQS FIFO protects the incident event lifecycle more explicitly.
+Nhiệm vụ của nó được thiết kế cố ý rất nhẹ nhàng.
 
-SQS FIFO is at-least-once delivery, so duplicate processing is possible. DynamoDB is required for idempotency and workflow state.
-
-Decision:
+Nó không thực hiện:
 
 ```text
-Use SQS FIFO for alert events only.
-Do not use SQS FIFO for metric/log raw data.
+- Phân tích RCA
+- Truy vấn sâu vào metrics/logs
+- Tương quan sự cố
+- Gọi AI Engine để phân tích RCA
+- Tạo Jira/Slack
+```
+
+Quyết định (Decision):
+
+```text
+Sử dụng Ingest Lambda như một bộ chuyển đổi mỏng giữa webhook Alertmanager và SQS FIFO.
 ```
 
 ---
 
-## 5.5 Why DynamoDB for incident_state?
+## 5.4 Tại sao chọn SQS FIFO + FIFO DLQ?
 
-Alternatives:
-
-```text
-Option A: No database
-Option B: RDS/Aurora
-Option C: DynamoDB
-```
-
-State is needed because the workflow has retries and external side effects.
-
-Example:
+Các giải pháp thay thế:
 
 ```text
-Worker receives alert
-→ AI RCA completes
-→ Integration Lambda creates Jira successfully
-→ Integration Lambda crashes before Slack
-→ retry happens
+Lựa chọn A: Gửi webhook trực tiếp đến AI Engine
+Lựa chọn B: Chỉ sử dụng cơ chế thử lại của Lambda
+Lựa chọn C: Sử dụng SQS FIFO + FIFO DLQ
 ```
 
-Without state, the system may create duplicate Jira tickets or duplicate Slack messages.
+Sự kiện cảnh báo là trigger kích hoạt sự cố cực kỳ quan trọng. Nếu cảnh báo bị mất, quy trình xử lý sự cố có thể không bao giờ được bắt đầu.
 
-DynamoDB stores compact workflow state:
+SQS FIFO cung cấp:
+
+```text
+- Bộ đệm cảnh báo bền vững
+- Thử lại thông qua thời gian ẩn tin nhắn (visibility timeout)
+- FIFO DLQ cho các tin nhắn độc (poison messages)
+- Giám sát lượng tin nhắn tích lũy (backlog visibility)
+- Phân tách giữa hệ thống giám sát và xử lý hạ nguồn
+- Khả năng replay/debug khi cần
+```
+
+Lambda retry chỉ bảo vệ việc thực thi hàm trong một số trường hợp. SQS FIFO bảo vệ toàn bộ vòng đời của sự kiện sự cố một cách rõ ràng hơn.
+
+SQS FIFO là phân phát ít nhất một lần (at-least-once delivery), do đó việc xử lý trùng lặp vẫn có thể xảy ra. Do đó DynamoDB là cần thiết để đảm bảo tính idempotency và lưu trữ trạng thái workflow.
+
+Quyết định (Decision):
+
+```text
+Sử dụng SQS FIFO cho các sự kiện cảnh báo.
+Không sử dụng SQS FIFO cho dữ liệu thô metric/log.
+```
+
+---
+
+## 5.5 Tại sao chọn DynamoDB cho incident_state?
+
+Các giải pháp thay thế:
+
+```text
+Lựa chọn A: Không sử dụng database
+Lựa chọn B: Sử dụng RDS/Aurora
+Lựa chọn C: Sử dụng DynamoDB
+```
+
+Việc lưu trữ trạng thái là cần thiết vì quy trình xử lý có cơ chế thử lại và các tác động ngoài lên hệ thống bên thứ ba.
+
+Ví dụ:
+
+```text
+Worker nhận cảnh báo
+→ Hoàn thành AI RCA
+→ Integration Lambda tạo thành công ticket Jira
+→ Integration Lambda bị sập trước khi gửi tin Slack
+→ Cơ chế thử lại kích hoạt
+```
+
+Nếu không lưu trạng thái, hệ thống có thể tạo trùng lặp ticket Jira hoặc tin nhắn Slack.
+
+DynamoDB lưu trữ trạng thái workflow nhỏ gọn:
 
 ```text
 - incident_id
@@ -1095,71 +1095,71 @@ DynamoDB stores compact workflow state:
 - last_error
 - jira_ticket_id
 - slack_thread_id
-- S3 URI pointers
+- Các con trỏ S3 URI
 - created_at
 - updated_at
 ```
 
-Decision:
+Quyết định (Decision):
 
 ```text
-Use DynamoDB as incident state store, idempotency store, workflow progress store, and pointer index for S3 artifacts.
+Sử dụng DynamoDB làm kho lưu trạng thái sự cố, kho lưu idempotency, kho lưu tiến trình workflow và lưu trữ chỉ mục con trỏ tới các artifact trên S3.
 ```
 
 ---
 
-## 5.6 Why S3 Audit Store?
+## 5.6 Tại sao chọn S3 Audit Store?
 
-Alternatives:
+Các giải pháp thay thế:
 
 ```text
-Option A: Store everything in DynamoDB
-Option B: Store audit evidence in S3
+Lựa chọn A: Lưu trữ tất cả trong DynamoDB
+Lựa chọn B: Lưu trữ các minh chứng kiểm toán trong S3
 ```
 
-DynamoDB should store current state, not large evidence objects.
+DynamoDB nên được sử dụng để lưu trữ trạng thái hiện tại, không nên lưu các đối tượng minh chứng có kích thước lớn.
 
-S3 can store:
+S3 có thể lưu trữ:
 
 ```text
-- original alert payload
-- normalized alert payload
-- grouped alert payload
-- incident trigger sent to AI
-- AI request
-- AI response
-- context used by AI
-- evidence used by AI
-- RCA report
-- Jira request/response
-- Slack request/response
-- replay/debug material
+- Payload cảnh báo gốc
+- Payload cảnh báo đã chuẩn hóa
+- Payload cảnh báo đã gom nhóm
+- Trigger sự cố gửi tới AI
+- Yêu cầu gửi tới AI (AI request)
+- Phản hồi từ AI (AI response)
+- Ngữ cảnh AI đã sử dụng
+- Minh chứng AI đã sử dụng
+- Báo cáo RCA
+- Yêu cầu/phản hồi Jira
+- Yêu cầu/phản hồi Slack
+- Tài liệu phục vụ replay/debug
 ```
 
-This helps answer:
+Điều này giúp trả lời các câu hỏi:
 
 ```text
-What did the system receive?
-What did the AI receive?
-What context and evidence did AI use?
-Can we replay/debug this incident?
-What exactly was sent to Jira/Slack?
+Hệ thống đã nhận được những gì?
+AI đã nhận được thông tin gì?
+AI đã sử dụng ngữ cảnh và minh chứng nào?
+Chúng ta có thể replay/debug sự cố này không?
+Thông tin chính xác nào đã được gửi tới Jira/Slack?
 ```
 
-Decision:
+Quyết định (Decision):
 
 ```text
-Use DynamoDB for current state and S3 pointers.
-Use S3 for detailed audit evidence and replay material.
+Sử dụng DynamoDB cho trạng thái hiện tại và các con trỏ S3.
+Sử dụng S3 để lưu trữ chi tiết minh chứng kiểm toán và tài liệu phục vụ replay.
 ```
 
 ---
 
-## 5.7 Why Prometheus/Loki + CloudWatch split?
+## 5.7 Tại sao chia tách Prometheus/Loki + CloudWatch?
 
-CloudWatch is strong for AWS managed services, but Kubernetes workload metrics/logs are easier to work with through Kubernetes-native labels.
+CloudWatch rất mạnh đối với các dịch vụ được quản lý của AWS, nhưng các metric/log của workload Kubernetes sẽ dễ xử lý hơn nhiều thông qua các nhãn native của Kubernetes.
 
-Prometheus/Loki fit EKS workloads because they can use labels such as:
+Prometheus/Loki phù hợp với các workload trên EKS vì chúng có thể sử dụng các nhãn như:
 
 ```text
 namespace
@@ -1170,381 +1170,221 @@ tenant_id
 env
 ```
 
-CloudWatch is still needed for AWS-side services:
+CloudWatch vẫn cần thiết cho các dịch vụ phía AWS:
 
 ```text
-- Lambda logs/errors/duration
-- SQS FIFO backlog and FIFO DLQ metrics
-- DynamoDB throttles/errors
-- S3 request/error metrics if enabled
-- AWS integration logs
+- Log/lỗi/thời gian chạy của Lambda
+- Metric hàng đợi tích lũy và FIFO DLQ của SQS
+- Các lỗi/nghẽn của DynamoDB
+- Các metric yêu cầu/lỗi của S3 nếu được bật
+- Log tích hợp phía AWS
 ```
 
-Decision:
+Quyết định (Decision):
 
 ```text
-Prometheus = EKS/app metrics.
-Loki = EKS/app logs.
-Grafana = dashboard/investigation UI.
-CloudWatch = AWS-side pipeline monitoring.
-S3 = audit/evidence store.
+Prometheus = metrics ứng dụng/EKS.
+Loki = logs ứng dụng/EKS.
+Grafana = giao diện dashboard/điều tra sự cố.
+CloudWatch = giám sát các thành phần pipeline phía AWS.
+S3 = kho lưu trữ audit/minh chứng.
 ```
 
 ---
 
-## 5.8 Why Alertmanager + CDO Correlator, not Alertmanager only?
+## 5.8 Tại sao dùng Alertmanager + CDO Correlator thay vì chỉ dùng Alertmanager?
 
-Alertmanager is good for basic noise control:
-
-```text
-- grouping
-- inhibition
-- silence
-- repeat interval
-```
-
-But Alertmanager does not fully understand:
+Alertmanager tốt cho việc kiểm soát nhiễu cơ bản:
 
 ```text
-- incident workflow state
-- Jira/Slack side effects
-- AI call gating
-- cross-service incident correlation
-- S3 artifact pointers
-- replay state
+- gom nhóm (grouping)
+- ngăn chặn (inhibition)
+- tắt tiếng (silence)
+- khoảng thời gian lặp lại (repeat interval)
 ```
 
-The CDO Correlator handles:
+Nhưng Alertmanager không hiểu đầy đủ về:
+
+```text
+- trạng thái workflow sự cố
+- các tác động ngoài của Jira/Slack
+- cổng hạn chế gọi AI (AI call gating)
+- tương quan sự cố chéo dịch vụ
+- các con trỏ artifact trên S3
+- trạng thái replay
+```
+
+CDO Correlator xử lý:
 
 ```text
 - alert_fingerprint
 - correlation_key
 - incident_state
-- AI call decision
-- duplicate prevention
-- workflow resume
-- S3 artifact tracking
+- quyết định gọi AI
+- ngăn ngừa trùng lặp
+- khôi phục/tiếp tục workflow
+- theo dõi artifact trên S3
 ```
 
-Decision:
+Quyết định (Decision):
 
 ```text
-Use Alertmanager as Layer 1 noise control.
-Use CDO Correlator + DynamoDB as Layer 2 incident correlation and idempotency control.
+Sử dụng Alertmanager làm lớp kiểm soát nhiễu Layer 1.
+Sử dụng CDO Correlator + DynamoDB làm lớp tương quan sự cố và kiểm soát tính idempotency Layer 2.
 ```
 
 ---
 
-# 6. Scaling strategy
+# 6. Chiến lược mở rộng (Scaling strategy)
 
-## 6.1 Vertical scaling
+## 6.1 Mở rộng theo chiều dọc (Vertical scaling)
 
-Increase CPU/memory for:
+Tăng cấu hình instance type của EKS nodes, Prometheus hoặc CPU/memory của Loki khi gặp nghẽn cổ chai.
 
-```text
-- Demo App pods
-- CDO Correlator Worker pod
-- Prometheus
-- Loki
-- Grafana
-- Alertmanager
-```
-
-Use this when one component is resource constrained but not horizontally bottlenecked.
+Sử dụng phương pháp này khi một thành phần bị giới hạn tài nguyên nhưng không gặp phải nghẽn cổ chai khi mở rộng theo chiều ngang.
 
 ---
 
-## 6.2 Horizontal scaling
+## 6.2 Mở rộng theo chiều ngang (Horizontal scaling)
 
-Scale out:
+Tăng số lượng instance:
 
 ```text
 Demo App:
-- by CPU/memory or request traffic
+- theo mức sử dụng CPU/RAM hoặc traffic yêu cầu
 
 CDO Correlator Worker:
-- by SQS FIFO visible messages
-- by age of oldest message
-- by worker error rate
+- theo số lượng tin nhắn hiển thị trong SQS FIFO
+- theo thời gian tồn tại của tin nhắn lâu nhất (age of oldest message)
+- theo tỷ lệ lỗi của worker
 
 Integration Lambda:
-- naturally scales by invocation volume
-- should still protect Jira/Slack with retry and rate-limit logic
+- tự động mở rộng theo khối lượng cuộc gọi (invocation volume)
+- vẫn cần bảo vệ Jira/Slack bằng cơ chế retry và logic giới hạn tốc độ (rate-limit)
 
 Observability stack:
-- start with MVP sizing
-- increase replicas/storage only if needed
+- bắt đầu với cấu hình kích thước của bản MVP
+- tăng số lượng bản sao (replicas)/dung lượng lưu trữ nếu thực sự cần thiết
 
 AI Engine:
-- owned by AIOps team
-- CDO protects it by reducing repeated calls
+- thuộc sở hữu của đội AIOps
+- CDO bảo vệ nó bằng cách giảm các cuộc gọi lặp lại
 ```
 
-For MVP, fixed replicas are acceptable. HPA/KEDA can be added if there is enough time.
+Đối với bản MVP, cấu hình số lượng bản sao cố định là chấp nhận được. HPA/KEDA có thể được bổ sung nếu có đủ thời gian triển khai.
 
 ---
 
-## 6.3 Scaling triggers
+## 6.3 Các trigger kích hoạt mở rộng (Scaling triggers)
 
-Recommended triggers:
+Các trigger được đề xuất:
 
 ```text
-- CPU usage
-- memory usage
-- SQS FIFO ApproximateNumberOfMessagesVisible
-- SQS FIFO ApproximateAgeOfOldestMessage
-- worker error rate
-- Lambda error rate
-- DynamoDB throttle/error rate
-- S3 put/read error rate
-- AI Engine latency/error rate
-- Jira/Slack integration error rate
+- Mức sử dụng CPU
+- Mức sử dụng bộ nhớ (memory)
+- Chỉ số SQS FIFO ApproximateNumberOfMessagesVisible
+- Chỉ số SQS FIFO ApproximateAgeOfOldestMessage
+- Tỷ lệ lỗi của worker
+- Tỷ lệ lỗi của Lambda
+- Tỷ lệ lỗi/nghẽn của DynamoDB
+- Tỷ lệ lỗi đẩy/đọc (put/read) của S3
+- Độ trễ/tỷ lệ lỗi của AI Engine
+- Tỷ lệ lỗi tích hợp Jira/Slack
 ```
 
-Do not claim exact thresholds unless measured.
+Tránh đưa ra các ngưỡng cụ thể trừ khi đã được đo lường thực tế.
 
 ---
 
-## 6.4 AI call control
+## 6.4 Kiểm soát cuộc gọi AI (AI call control)
 
-The Correlator should not call AI for every alert.
+Correlator không được gọi AI đối với mọi cảnh báo.
 
-Call AI only when:
-
-```text
-- new incident is created
-- severity increases
-- new important alert type appears
-- incident lasts longer than a threshold
-- previous RCA confidence is low
-- human requests re-analysis
-```
-
-Skip AI call when:
+Chỉ gọi AI khi:
 
 ```text
-- alert is duplicate
-- alert belongs to existing incident
-- only alert_count or last_seen_at changes
-- message is only SQS FIFO retry
+- Một sự cố mới được tạo
+- Độ nghiêm trọng (severity) tăng lên
+- Xuất hiện loại cảnh báo quan trọng mới
+- Sự cố kéo dài quá một khoảng thời gian ngưỡng nhất định
+- Độ tin cậy RCA trước đó thấp
+- Con người yêu cầu phân tích lại (re-analysis)
 ```
 
-This protects AI cost and avoids repeated RCA.
+Bỏ qua cuộc gọi AI khi:
+
+```text
+- Cảnh báo bị trùng lặp
+- Cảnh báo thuộc về một sự cố đang tồn tại
+- Chỉ có chỉ số alert_count hoặc last_seen_at thay đổi
+- Tin nhắn chỉ là một lượt thử lại (retry) từ SQS FIFO
+```
+
+Cơ chế này bảo vệ chi phí sử dụng AI và tránh lặp lại phân tích RCA vô ích.
 
 ---
 
-## 7. Failure modes + recovery
+## 7. Các kịch bản lỗi + Phục hồi (Failure modes + recovery)
 
-| Failure | Detection | Recovery | RTO/RPO |
+| Kịch bản lỗi | Phát hiện | Phục hồi | RTO/RPO |
 |---|---|---|---|
-|Demo app pod crash|Kubernetes events, Prometheus target down|Kubernetes restarts/reschedules pod|RTO: <1 min / RPO: 0 (stateless app)|
-|Prometheus unavailable|Grafana/Prometheus health, scrape failure|Restart pod, restore config/storage if needed|RTO: <5 min / RPO: Metrics gap during outage|
-|Loki unavailable|Grafana Explore error, Loki pod health|Restart Loki/agent, inspect storage|RTO: <5 min / RPO: Logs gap during outage|
-|Alert storm|Alert volume spike, Alertmanager dashboard, SQS FIFO backlog|Alertmanager grouping/inhibition + Correlator gating|RTO: N/A (throttled) / RPO: 0 (events buffered in SQS FIFO)|
-|Ingest Lambda error|CloudWatch Lambda error/duration|Fix schema/config and replay if source supports retry|RTO: <5 min (auto) / RPO: Potential loss if source does not retry|
-|SQS FIFO backlog high|CloudWatch SQS FIFO visible messages / age|Scale worker, inspect downstream latency/errors|RTO: <10 min (scale) / RPO: 0 (retained in queue)|
-|Worker crash|Pod restart, worker logs, SQS FIFO message visible again|SQS FIFO retries message; worker resumes using DynamoDB state|RTO: <2 min / RPO: 0 (state in DynamoDB)|
-|Duplicate alert|Same alert_fingerprint|Update count/last_seen_at, skip new incident|RTO: 0 / RPO: 0|
-|Related alerts|Same correlation_key|Append to existing incident and update state|RTO: 0 / RPO: 0|
-|AI Engine returns 400 (Bad Request / Tenant mismatch)|HTTP 400 response from /v1/triage|CDO Worker logs error, marks state FAILED_INVALID in DynamoDB, stops retrying to prevent loop, alerts operator|RTO: N/A / RPO: 0|
-|AI Engine returns 401 (Auth failed)|HTTP 401 response from /v1/triage|CDO Worker refreshes credentials/token from Secrets Manager, retries once. If failure persists, marks state AUTH_FAILED|RTO: <2 min / RPO: 0|
-|AI Engine returns 429 (Rate limited)|HTTP 429 response from /v1/triage|CDO Worker sends message back to SQS FIFO, performs exponential backoff retry|RTO: <10 min / RPO: 0|
-|AI Engine returns 500 (Unexpected error)|HTTP 500 response from /v1/triage|CDO Worker uses local rule-based fallback, creates fallback ticket with raw alert context, marks incident DIAGNOSED_FALLBACK|RTO: <5 min / RPO: 0|
-|AI Engine returns 503 / Timeout (AI unavailable)|HTTP 503 response or connection timeout|Retries via SQS FIFO. If outage exceeds timeout limit, falls back to rule-based triage to prevent pipeline block|RTO: <10 min / RPO: 0|
-|AI Engine S3 write failure|AI error, missing artifact URI|AI retries or returns artifact to Worker for storage|RTO: <5 min / RPO: Incomplete audit evidence|
-|Jira created but Integration Lambda crashes before Slack|DynamoDB has jira_ticket_id and current_step|On retry, skip Jira and continue Slack|RTO: <5 min / RPO: 0|
-|Slack failure|Integration Lambda error and last_error in DynamoDB|Retry Slack update using existing incident state|RTO: <5 min / RPO: 0|
-|DynamoDB throttle/error|CloudWatch DynamoDB metrics|Retry with backoff; tune capacity/on-demand|RTO: <5 min (backoff) / RPO: 0|
-|S3 write failure|Worker/Lambda logs, CloudWatch error|Retry audit write; keep minimal state in DynamoDB|RTO: <5 min / RPO: Incomplete audit evidence|
-|FIFO DLQ has messages|CloudWatch FIFO DLQ message count|Inspect, fix bug, replay manually|RTO: Manual / RPO: 0 (retention 14 days)|
-|CloudWatch logging issue|Missing logs/metric ingestion|Check log group/retention/IAM|RTO: <15 min / RPO: Logs gap|
-|AZ/node failure|EKS node events, pod rescheduling|Multi-AZ node group if configured|RTO: <5 min / RPO: 0 (Managed services)|
-|Region outage|External monitor/manual detection|Out of MVP scope; future DR plan|RTO: TBD / RPO: TBD (Out of MVP scope)|
+|Demo app pod bị sập|Sự kiện Kubernetes, Prometheus báo target down|Kubernetes tự động khởi động lại hoặc lên lịch chạy lại pod|RTO: <1 phút / RPO: 0 (ứng dụng stateless)|
+|Prometheus không khả dụng|Kiểm tra sức khỏe Grafana/Prometheus, lỗi thu thập (scrape)|Khởi động lại pod, khôi phục cấu hình/lưu trữ nếu cần|RTO: <5 phút / RPO: Mất dữ liệu metric trong thời gian gặp lỗi|
+|Loki không khả dụng|Lỗi Grafana Explore, kiểm tra sức khỏe Loki pod|Khởi động lại Loki/agent, kiểm tra dung lượng lưu trữ|RTO: <5 phút / RPO: Mất dữ liệu log trong thời gian gặp lỗi|
+|Cơn bão cảnh báo (Alert storm)|Lượng cảnh báo tăng đột biến, Dashboard Alertmanager, SQS FIFO backlog|Cơ chế gom nhóm/ngăn chặn của Alertmanager + Gating của Correlator|RTO: N/A (bị hạn chế tốc độ) / RPO: 0 (các sự kiện được đệm an toàn trong SQS FIFO)|
+|Ingest Lambda gặp lỗi|Lỗi Lambda/thời gian chạy trên CloudWatch|Sửa schema/cấu hình và replay lại nếu nguồn phát hỗ trợ thử lại|RTO: <5 phút (tự động) / RPO: Có thể mất cảnh báo nếu nguồn phát không thử lại|
+|SQS FIFO tích lũy cao|Chỉ số tin nhắn hiển thị/tuổi tin nhắn trên CloudWatch|Mở rộng quy mô worker, điều tra độ trễ/lỗi ở hạ nguồn|RTO: <10 phút (mở rộng) / RPO: 0 (tin nhắn được giữ lại trong hàng đợi)|
+|Worker bị sập|Pod khởi động lại, worker logs, tin nhắn hiển thị lại trên SQS|SQS thử lại tin nhắn; worker tiếp tục xử lý sử dụng trạng thái trong DynamoDB|RTO: <2 phút / RPO: 0 (trạng thái lưu trong DynamoDB)|
+|Cảnh báo trùng lặp|Trùng alert_fingerprint|Cập nhật chỉ số count/last_seen_at, bỏ qua việc tạo sự cố mới|RTO: 0 / RPO: 0|
+|Cảnh báo liên quan|Trùng correlation_key|Gắn thêm vào sự cố đang tồn tại và cập nhật trạng thái|RTO: 0 / RPO: 0|
+|AI Engine trả về mã lỗi 400 (Yêu cầu lỗi / Sai lệch Tenant)|Mã phản hồi HTTP 400 từ endpoint `/v1/triage`|CDO Worker ghi nhận lỗi vào log, đánh dấu trạng thái FAILED_INVALID trong DynamoDB, dừng thử lại để ngăn lặp lỗi, cảnh báo cho người vận hành|RTO: N/A / RPO: 0|
+|AI Engine trả về mã lỗi 401 (Lỗi xác thực)|Mã phản hồi HTTP 401 từ endpoint `/v1/triage`|CDO Worker lấy lại thông tin xác thực/token mới từ Secrets Manager, thử lại một lần. Nếu vẫn lỗi, đánh dấu trạng thái AUTH_FAILED|RTO: <2 phút / RPO: 0|
+|AI Engine trả về mã lỗi 429 (Giới hạn tốc độ)|Mã phản hồi HTTP 429 từ endpoint `/v1/triage`|CDO Worker gửi lại tin nhắn về SQS FIFO, thực hiện thử lại với exponential backoff|RTO: <10 phút / RPO: 0|
+|AI Engine trả về mã lỗi 500 (Lỗi hệ thống không xác định)|Mã phản hồi HTTP 500 từ endpoint `/v1/triage`|CDO Worker sử dụng cơ chế fallback dựa trên luật local, tạo ticket fallback với ngữ cảnh cảnh báo thô, đánh dấu sự cố DIAGNOSED_FALLBACK|RTO: <5 phút / RPO: 0|
+|AI Engine trả về mã lỗi 503 / Timeout (AI không khả dụng)|Mã phản hồi HTTP 503 hoặc timeout kết nối|Thử lại qua SQS FIFO. Nếu thời gian sập vượt quá giới hạn timeout, chuyển hướng fallback sang cơ chế triage dựa trên luật để tránh tắc nghẽn pipeline|RTO: <10 phút / RPO: 0|
+|AI Engine ghi lỗi lên S3|Lỗi từ AI, thiếu URI artifact|AI tự thử lại hoặc trả artifact về cho Worker để lưu trữ hộ|RTO: <5 phút / RPO: Minh chứng kiểm toán không đầy đủ|
+|Jira được tạo thành công nhưng Integration Lambda bị sập trước khi gửi tin Slack|DynamoDB đã ghi nhận jira_ticket_id và current_step|Khi thử lại, bỏ qua bước tạo Jira và tiếp tục thực hiện bước gửi tin Slack|RTO: <5 phút / RPO: 0|
+|Lỗi gửi Slack|Lỗi Integration Lambda và ghi last_error trong DynamoDB|Thử lại cập nhật Slack bằng trạng thái sự cố hiện tại|RTO: <5 phút / RPO: 0|
+|DynamoDB bị nghẽn/lỗi|Các metric của DynamoDB trên CloudWatch|Thử lại với cơ chế backoff; điều chỉnh lại capacity/on-demand|RTO: <5 phút (backoff) / RPO: 0|
+|Ghi file lên S3 thất bại|Log của Worker/Lambda, lỗi trên CloudWatch|Thử lại việc ghi log kiểm toán; duy trì trạng thái tối giản trong DynamoDB|RTO: <5 phút / RPO: Minh chứng kiểm toán không đầy đủ|
+|Hàng đợi FIFO DLQ xuất hiện tin nhắn|Số lượng tin nhắn trên DLQ ở CloudWatch|Điều tra lỗi, sửa bug và thực hiện replay thủ công các tin nhắn bị lỗi|RTO: Thủ công / RPO: 0 (thời gian giữ tin nhắn 14 ngày)|
+|Lỗi ghi log CloudWatch|Mất log/dữ liệu metric không được đẩy lên|Kiểm tra log group/retention/quyền hạn IAM|RTO: <15 phút / RPO: Mất dữ liệu log|
+|Lỗi node/Availability Zone (AZ)|Các sự kiện node của EKS, pod được lên lịch lại|Sử dụng nhóm node Multi-AZ nếu được cấu hình|RTO: <5 phút / RPO: 0 (Nhờ các dịch vụ được AWS quản lý)|
+|Sập toàn bộ Region AWS|Giám sát bên ngoài/phát hiện thủ công|Nằm ngoài phạm vi của MVP; kế hoạch DR trong tương lai|RTO: TBD / RPO: TBD (Nằm ngoài phạm vi MVP)|
 
 ---
 
-# 8. Security and access notes
+# 8. Ghi chú bảo mật và quyền truy cập
 
-Detailed security design belongs in `03_security_design.md`, but the infrastructure design assumes these controls:
+- **Bảo mật mạng**: Các worker node EKS chạy trong subnet riêng tư; các kết nối công cộng được giới hạn thông qua ALB. Các NetworkPolicies trong namespace ngăn chặn các luồng traffic trái phép giữa các pod.
+- **Kiểm soát truy cập**: IRSA cấp cho các pod quyền truy cập tối thiểu IAM để giao tiếp với SQS FIFO, DynamoDB, S3 và Secrets Manager.
+- **Bảo vệ dữ liệu**: Các S3 audit buckets sử dụng mã hóa KMS và bucket policies. Các truy vấn giám sát của AI Engine chỉ có quyền đọc (read-only) và được giới hạn phạm vi nghiêm ngặt theo tenant, service và khung thời gian.
 
-```text
-- private EKS worker nodes where possible
-- ALB only for public app/API entry
-- AI Engine endpoint not exposed publicly unless explicitly required
-- IAM least privilege for Lambda, Worker, and Integration Lambda
-- IRSA or EKS Pod Identity for pod access to AWS services
-- Secrets Manager/SSM for Jira, Slack, and AI Engine credentials
-- NetworkPolicy to restrict namespace-to-namespace traffic
-- read-only bounded access for AI Engine to observability data
-- scoped S3 write access for AI Engine if AI writes context/evidence artifacts
-- S3 bucket policy and encryption for audit evidence
-- DynamoDB encryption and least-privilege access
-- CloudWatch log retention policy
-```
+# 9. Phạm vi bản MVP (MVP scope)
 
-Example Ingest Lambda permissions:
+- **Bao gồm**: Nền tảng runtime EKS, ALB ingress, stack Prometheus/Loki/Grafana, Ingest Lambda, hàng đợi cảnh báo SQS FIFO, CDO Correlator, trạng thái sự cố trên DynamoDB, kho lưu trữ audit S3 và tích hợp Jira/Slack.
+- **Không bao gồm**: Quy trình tự động quản lý vòng đời đăng ký tenant SaaS, tương quan nhận biết topology dựa trên trace và khả năng tự động khắc phục sự cố (auto-remediation).
 
-```text
-sqs:SendMessage
-dynamodb:PutItem
-dynamodb:UpdateItem
-s3:PutObject
-logs:CreateLogStream
-logs:PutLogEvents
-```
+# 10. Các cải tiến trong tương lai (Future improvements)
 
-Example Correlator Worker permissions:
+- **Đồ thị phụ thuộc (Dependency Graph)**: Lưu trữ cấu trúc sơ đồ dịch vụ (service topology) để nâng cao chất lượng tương quan cảnh báo cascading.
+- **OTel Tracing**: Bổ sung distributed tracing thông qua OpenTelemetry Collector và Tempo hoặc AWS X-Ray.
+- **Tương quan có AI hỗ trợ**: Cho phép AI đề xuất mối liên hệ giữa các cảnh báo dưới các hàng rào bảo vệ (guardrails) dựa trên quy tắc tĩnh.
 
-```text
-sqs:ReceiveMessage
-sqs:DeleteMessage
-sqs:ChangeMessageVisibility
-dynamodb:GetItem
-dynamodb:PutItem
-dynamodb:UpdateItem
-s3:PutObject
-s3:GetObject
-secretsmanager:GetSecretValue
-```
+# 11. Kết luận cuối cùng (Final takeaway)
 
-Example AI Engine permissions if it writes S3 artifacts:
+CDO xây dựng môi trường chạy ứng dụng EKS, pipeline cảnh báo và hệ thống lưu trữ trạng thái. AI Engine truy vấn dữ liệu telemetry trong phạm vi giới hạn để chạy RCA. Sự phân chia trách nhiệm rõ ràng này bảo vệ AI Engine khỏi các gánh nặng xử lý trong cơn bão cảnh báo trong khi vẫn cung cấp đầy đủ ngữ cảnh để tiến hành phân loại sự cố.
 
-```text
-s3:PutObject on s3://incident-artifacts/{tenant_id}/{service}/{incident_id}/ai/*
-s3:GetObject only if AI needs to read approved incident artifacts
-```
+# Các tài liệu liên quan (Related documents)
 
-Example Integration Lambda permissions:
-
-```text
-dynamodb:GetItem
-dynamodb:UpdateItem
-s3:GetObject
-s3:PutObject
-secretsmanager:GetSecretValue
-logs:CreateLogStream
-logs:PutLogEvents
-```
-
-Important security boundary:
-
-```text
-AI Engine should not have broad write access to DynamoDB incident_state.
-Workflow state should remain controlled by CDO pipeline components.
-```
-
----
-
-# 9. MVP scope
-
-The MVP should implement:
-
-```text
-- EKS runtime for demo app and CDO worker
-- ALB ingress to demo app
-- Prometheus + Grafana + Alertmanager
-- Loki for Kubernetes application logs
-- Ingest Lambda
-- SQS FIFO Raw Alert Queue + FIFO DLQ
-- CDO Incident Correlator Worker
-- DynamoDB incident_state table
-- S3 incident artifact store
-- rule-based alert_fingerprint
-- rule-based correlation_key
-- AI Engine API contract
-- AI artifact contract if AI writes context/evidence to S3
-- Jira/Slack integration if owned by CDO
-- CloudWatch monitoring for Lambda/SQS FIFO/FIFO DLQ/DynamoDB/S3
-```
-
-Do not overclaim:
-
-```text
-- no full SaaS tenant lifecycle unless implemented
-- no benchmark numbers unless measured
-- no topology-aware correlation in MVP unless built
-- no strong tenant isolation through labels alone
-- no claim that CDO performs RCA
-- no claim that SQS FIFO stores metrics/logs
-- no claim that DynamoDB stores full reports or raw logs
-```
-
----
-
-# 10. Future improvements
-
-Possible future work:
-
-```text
-1. Impact Graph
-   Store service dependency metadata to improve correlation and blast-radius analysis.
-
-2. Topology-aware correlation
-   Understand upstream/downstream impact, for example Redis → payment-api → checkout-api → frontend.
-
-3. OpenTelemetry tracing
-   Add distributed tracing through OpenTelemetry Collector and Tempo or AWS X-Ray.
-
-4. Adaptive time windows
-   Replace fixed 5-minute buckets with dynamic incident windows.
-
-5. AI-assisted correlation
-   Let AI suggest whether alerts belong to the same incident, while deterministic rules remain the safety layer.
-
-6. Human feedback loop
-   Allow SRE/admin to mark alerts as related or unrelated and improve future correlation.
-
-7. Query gateway for observability access
-   Enforce tenant/service/env/window restriction before AI queries Prometheus/Loki.
-
-8. Stronger artifact governance
-   Add S3 object tagging, retention policy, lifecycle rules, and artifact schema validation.
-
-9. Event replay UI
-   Build a controlled replay tool for FIFO DLQ messages and stored incident artifacts.
-```
-
----
-
-# 11. Final takeaway
-
-The architecture separates observability data from incident triggers.
-
-```text
-Metrics/logs stay in the observability stack.
-Alert events go through the reliable incident pipeline.
-DynamoDB tracks workflow state and idempotency.
-S3 stores incident artifacts and evidence.
-```
-
-CDO does not send every raw alert directly to AI Engine. CDO first reduces noise through Alertmanager, stores alert events safely in SQS FIFO, deduplicates repeated alerts, correlates related alerts into incident-level triggers, stores workflow state in DynamoDB, stores artifacts in S3, and only calls AI Engine when an incident is new or meaningfully updated.
-
-AI Engine owns RCA. It receives incident-level input, queries Prometheus/Loki through bounded access, builds the context, analyzes metrics/logs, and returns root cause, confidence, evidence, and suggested actions. If scoped S3 access is granted, AI Engine may also store the exact context and evidence it used for analysis.
-
-Integration Lambda or the CDO Integration Layer owns external side effects. It creates or updates Jira/Slack, stores request/response audit artifacts in S3, and updates DynamoDB with integration status.
-
-Final statement:
-
-```text
-CDO builds the reliable EKS-native incident pipeline.
-DynamoDB is the shared state store.
-S3 is the shared artifact and evidence store.
-AIOps builds the RCA intelligence.
-Together, the system turns noisy alerts into bounded, auditable, AI-ready incident workflows.
-```
-
----
-
-# Related documents
-
-- `01_requirements_analysis.md` — explains the problem, NFRs, and why CDO chooses the EKS/K8s-heavy direction.
+- `01_requirements_analysis.md` — giải thích vấn đề, các yêu cầu phi chức năng (NFRs) và lý do CDO chọn hướng đi tập trung vào EKS/K8s.
     
-- `03_security_design.md` — expands IAM, RBAC, NetworkPolicy, Secrets Manager, encryption, and audit security.
+- `03_security_design.md` — mở rộng chi tiết về IAM, RBAC, NetworkPolicy, Secrets Manager, mã hóa và bảo mật kiểm toán.
     
-- `04_deployment_design.md` — describes Terraform, GitOps, CI/CD, rollout, rollback, and environment strategy.
+- `04_deployment_design.md` — mô tả Terraform, GitOps, CI/CD, chiến lược rollout, rollback và môi trường.
     
-- `05_cost_analysis.md` — estimates cost for EKS, ALB, SQS FIFO, DynamoDB, S3, CloudWatch, and observability retention.
+- `05_cost_analysis.md` — ước tính chi phí cho EKS, ALB, SQS FIFO, DynamoDB, S3, CloudWatch và thời gian giữ lại dữ liệu giám sát.
     
-- `07_test_eval_report.md` — records load test, failure test, alert storm test, FIFO DLQ test, and recovery evidence.
+- `07_test_eval_report.md` — ghi lại kết quả kiểm thử tải, kiểm thử lỗi, kiểm thử bão cảnh báo, kiểm thử FIFO DLQ và minh chứng phục hồi.
     
-- `08_adrs.md` — stores decisions such as EKS over ECS, SQS FIFO for alert events, DynamoDB for idempotency, and S3 for audit.
+- `08_adrs.md` — lưu trữ các quyết định thiết kế cốt lõi như chọn EKS thay vì ECS, SQS FIFO cho sự kiện cảnh báo, DynamoDB cho idempotency và S3 cho kiểm toán.
