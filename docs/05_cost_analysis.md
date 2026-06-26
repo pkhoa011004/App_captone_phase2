@@ -9,6 +9,7 @@
 ## 1. Cost model per tenant (forecast)
 
 CDO-05 chọn EKS-native angle. Chi phí chia làm 2 loại:
+
 - **Fixed cost**: cluster EKS, ALB, VPC Interface Endpoints, observability stack — chia đều cho tất cả tenant.
 - **Variable cost**: DynamoDB, SQS, S3, Lambda, CloudWatch — tăng theo số lượng incident/alert thực tế.
 
@@ -33,7 +34,6 @@ CDO-05 chọn EKS-native angle. Chi phí chia làm 2 loại:
 >
 > ⚠️ **TODO (fill W12)**: WAF chỉ enable nếu ALB public internet. SQ-01 trong security design chưa confirm: "Public API/ALB có cần public internet thật không, hay chỉ demo internal?" Nếu internal only → WAF cost = $0.
 
-
 ---
 
 ## 2. Cost at scale
@@ -56,11 +56,7 @@ Fixed cost (EKS control plane, ALB, VPC Interface Endpoints, observability stack
 
 ### Đã áp dụng trong MVP
 
-<<<<<<< HEAD
-- ✅ **2 environment thay vì 3** (sandbox + prod): Tiết kiệm ~$130.80/tháng so với chạy 3 cluster đầy đủ. Sandbox environment đóng vai trò staging, giảm fixed cost trong budget $100–150 / 2 tuần. (ADR-004 §0.4)
-=======
 - ✅ **3 environment theo chuẩn** (sandbox, staging, prod): Hỗ trợ tách biệt quy trình CI/CD. Đảm bảo testing an toàn trên staging trước khi lên production.
->>>>>>> 40d957a (lua tam thoi)
 - ✅ **DynamoDB on-demand**: Không cần ước lượng provisioned capacity trước — phù hợp với workload alert-driven không đều. Tránh overpay khi idle.
 - ✅ **Prometheus + Loki in-cluster**: Chạy trực tiếp trong cụm EKS — không tốn thêm managed service cost. Dùng lại tài nguyên cụm có sẵn.
 - ✅ **Lambda cho Ingest**: Chỉ tốn tiền khi có alert webhook thật — không chạy liên tục như ECS task.
@@ -88,6 +84,7 @@ TF1 có 2 CDO với angle khác nhau. CDO-05 chọn EKS-native, CDO còn lại c
 | **CDO khác: Serverless-first** | chưa biết | chưa biết | chưa biết | CDO khác chưa biết |
 
 **Trade-off rõ ràng**:
+
 - EKS-native có fixed cost cao hơn ($130.80/tháng cluster) nhưng per-invocation cost thấp hơn khi alert volume tăng. Break-even điểm khoảng 50–100 tenant.
 - Serverless-first có fixed cost $0 nhưng per-alert cost cao hơn, đặc biệt khi alert storm xảy ra (50+ alert/phút × Lambda invocation cost).
 
