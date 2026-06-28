@@ -21,4 +21,4 @@ images:
   newTag: sandbox-4bb0ea9
 - name: platform-service
   newName: 856862064226.dkr.ecr.us-east-1.amazonaws.com/xbrain-cdo5-sandbox-tf1-platform-service
-  newTag: sandbox-4bb0ea9
+  newTag: sandbox-a993a71
