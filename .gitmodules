@@ -1,4 +1,0 @@
-[submodule "aio"]
-	path = aio
-	url = https://github.com/c0mmie-b0msh3ll/xBrain-capstone2
-	branch = main
