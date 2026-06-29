@@ -16,6 +16,12 @@ variable "environment" {
   type = string
 }
 
+variable "image_tag_mutability" {
+  type        = string
+  description = "The tag mutability setting for the repository (MUTABLE or IMMUTABLE)"
+  default     = "MUTABLE"
+}
+
 variable "tags" {
   type    = map(string)
   default = {}

@@ -10,7 +10,6 @@ variable "environment" {
 
 variable "aws_region" {
   type    = string
-  default = "us-east-1"
 }
 
 variable "tags" {
@@ -37,10 +36,7 @@ variable "private_subnet_cidrs" {
   default = ["10.0.3.0/24", "10.0.4.0/24"]
 }
 
-variable "availability_zones" {
-  type    = list(string)
-  default = ["us-east-1a", "us-east-1b"]
-}
+
 
 variable "cluster_version" {
   type    = string
@@ -49,7 +45,21 @@ variable "cluster_version" {
 
 variable "instance_type" {
   type    = string
-  default = "t3.medium"
+  default = "t3a.large"
+}
+
+variable "eks_scaling_config" {
+  description = "Scaling configuration for EKS node group"
+  type = object({
+    min_size     = number
+    max_size     = number
+    desired_size = number
+  })
+  default = {
+    min_size     = 1
+    max_size     = 2
+    desired_size = 1
+  }
 }
 
 variable "github_repo" {
@@ -73,5 +83,5 @@ variable "backend_devs_role_arn" {
 
 variable "ecr_repositories" {
   type    = list(string)
-  default = ["tf1-platform-service", "tf1-ai-engine"]
+  default = ["tf1-platform-service", "tf1-ai-engine", "tf1-simulator"]
 }

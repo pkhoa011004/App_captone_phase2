@@ -13,19 +13,19 @@ module "vpc" {
   public_subnets  = var.public_subnet_cidrs
 
   enable_nat_gateway   = true
-  single_nat_gateway   = var.environment == "sandbox" ? true : false
+  single_nat_gateway   = var.single_nat_gateway
   enable_dns_hostnames = true
   enable_dns_support   = true
 
   public_subnet_tags = {
-    "kubernetes.io/role/elb"                    = "1"
-    "kubernetes.io/cluster/${local.prefix}-eks" = "shared"
+    "kubernetes.io/role/elb"                        = "1"
+    "kubernetes.io/cluster/${var.eks_cluster_name}" = "shared"
   }
 
   private_subnet_tags = {
-    "kubernetes.io/role/internal-elb"           = "1"
-    "kubernetes.io/cluster/${local.prefix}-eks" = "shared"
-    "karpenter.sh/discovery"                    = "${local.prefix}-eks"
+    "kubernetes.io/role/internal-elb"               = "1"
+    "kubernetes.io/cluster/${var.eks_cluster_name}" = "shared"
+    "karpenter.sh/discovery"                        = var.eks_cluster_name
   }
 
   tags = merge(var.tags, { "Name" = "${local.prefix}-vpc" }, )
