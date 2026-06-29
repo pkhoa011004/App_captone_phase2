@@ -4,7 +4,7 @@ defaultRules:
 
 # 2. Alertmanager (Tắt nếu chưa cần test gửi cảnh báo qua Slack/Email)
 alertmanager:
-  enabled: false
+  enabled: true
 
 # 3. Cấu hình Grafana
 grafana:
