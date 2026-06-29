@@ -17,16 +17,51 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-from models.incident import TriageRequest
+import uuid
+from datetime import datetime
+from models.incident import TriageRequest, Alert
 
 # --- SQS alert handler (bridge SQS message → IncidentService) ---
 async def handle_alert(body: dict) -> None:
     """
     Adapter chuyển dict từ SQS thành TriageRequest và gọi service.
+    Hỗ trợ payload raw từ Alertmanager Webhook.
     """
-    request = TriageRequest(**body)
     service = get_incident_service()
-    await service.handle(request)
+    
+    if "alerts" in body and isinstance(body.get("alerts"), list):
+        # Đây là Alertmanager Webhook payload
+        for am_alert in body["alerts"]:
+            if am_alert.get("status") != "firing":
+                continue
+                
+            labels = am_alert.get("labels", {})
+            annotations = am_alert.get("annotations", {})
+            
+            alert = Alert(
+                alert_id=labels.get("alertname", "UnknownAlert"),
+                source="prometheus",
+                service=labels.get("service", "unknown"),
+                severity=labels.get("severity", "high"),
+                title=annotations.get("summary", labels.get("alertname", "Alert")),
+                description=annotations.get("description", ""),
+                started_at=am_alert.get("startsAt", ""),
+                labels=labels
+            )
+            
+            request = TriageRequest(
+                correlation_id=str(uuid.uuid4()),
+                tenant_id=labels.get("tenant_id", "unknown"),
+                incident_id=f"INC-{uuid.uuid4().hex[:8].upper()}",
+                environment=labels.get("environment", "sandbox"),
+                received_at=datetime.utcnow().isoformat() + "Z",
+                alert=alert
+            )
+            await service.handle(request)
+    else:
+        # Nếu payload đã là TriageRequest chuẩn
+        request = TriageRequest(**body)
+        await service.handle(request)
 
 
 @asynccontextmanager
