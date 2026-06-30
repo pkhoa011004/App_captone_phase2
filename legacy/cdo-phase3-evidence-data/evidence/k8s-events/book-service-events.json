@@ -1,0 +1,52 @@
+[
+  {
+    "timestamp": "2026-06-29T10:00:30Z",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "pod": "book-service-7d9f6c8d9f-abcd1",
+    "container": "book-service",
+    "reason": "Unhealthy",
+    "type": "Warning",
+    "message": "Readiness probe failed: HTTP probe failed with statuscode: 500"
+  },
+  {
+    "timestamp": "2026-06-29T10:01:15Z",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "pod": "book-service-7d9f6c8d9f-abcd1",
+    "container": "book-service",
+    "reason": "Unhealthy",
+    "type": "Warning",
+    "message": "Liveness probe failed: connection refused"
+  },
+  {
+    "timestamp": "2026-06-29T10:02:00Z",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "pod": "book-service-7d9f6c8d9f-abcd1",
+    "container": "book-service",
+    "reason": "Killing",
+    "type": "Normal",
+    "message": "Killing container book-service after failed liveness probe"
+  },
+  {
+    "timestamp": "2026-06-29T10:03:20Z",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "pod": "book-service-7d9f6c8d9f-abcd1",
+    "container": "book-service",
+    "reason": "BackOff",
+    "type": "Warning",
+    "message": "Back-off restarting failed container book-service"
+  },
+  {
+    "timestamp": "2026-06-29T10:04:10Z",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "pod": "book-service-7d9f6c8d9f-abcd1",
+    "container": "book-service",
+    "reason": "CrashLoopBackOff",
+    "type": "Warning",
+    "message": "Pod is in CrashLoopBackOff for container book-service"
+  }
+]

@@ -1,0 +1,23 @@
+book-service:
+  owner_team: team-book
+  jira_project: BOOK
+  jira_component: book-service
+  runbook_url: runbook://book-service/high-5xx
+
+order-service:
+  owner_team: team-order
+  jira_project: ORDER
+  jira_component: order-service
+  runbook_url: runbook://order-service/upstream-timeout
+
+frontend:
+  owner_team: team-web
+  jira_project: WEB
+  jira_component: frontend
+  runbook_url: runbook://frontend/checkout-latency
+
+reader-service:
+  owner_team: team-reader
+  jira_project: READ
+  jira_component: reader-service
+  runbook_url: runbook://reader-service/latency

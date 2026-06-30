@@ -1,0 +1,198 @@
+{
+  "incident_id": "inc-tenant-a-prod-book-service-202606291000",
+  "correlation_id": "corr-tenant-a-prod-book-service-202606291000",
+  "tenant_id": "tenant-a",
+  "environment": "prod",
+  "cluster": "eks-prod",
+  "namespace": "bookhub-prod",
+  "service": "book-service",
+  "evidence_window": {
+    "start": "2026-06-29T09:45:00Z",
+    "end": "2026-06-29T10:10:00Z"
+  },
+  "metrics": [
+    {
+      "metric_name": "http_5xx_rate",
+      "service": "book-service",
+      "unit": "req/sec",
+      "points": [
+        {
+          "ts": "2026-06-29T09:45:00Z",
+          "value": 0.0
+        },
+        {
+          "ts": "2026-06-29T09:50:00Z",
+          "value": 0.0
+        },
+        {
+          "ts": "2026-06-29T09:55:00Z",
+          "value": 0.1
+        },
+        {
+          "ts": "2026-06-29T09:56:00Z",
+          "value": 0.5
+        },
+        {
+          "ts": "2026-06-29T09:58:00Z",
+          "value": 1.2
+        },
+        {
+          "ts": "2026-06-29T10:00:00Z",
+          "value": 8.5
+        },
+        {
+          "ts": "2026-06-29T10:05:00Z",
+          "value": 12.0
+        },
+        {
+          "ts": "2026-06-29T10:10:00Z",
+          "value": 0.0
+        }
+      ],
+      "labels": {
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod"
+      }
+    },
+    {
+      "metric_name": "http_latency_p95_ms",
+      "service": "book-service",
+      "unit": "ms",
+      "points": [
+        {
+          "ts": "2026-06-29T09:45:00Z",
+          "value": 45.0
+        },
+        {
+          "ts": "2026-06-29T09:50:00Z",
+          "value": 50.0
+        },
+        {
+          "ts": "2026-06-29T09:55:00Z",
+          "value": 120.0
+        },
+        {
+          "ts": "2026-06-29T09:58:00Z",
+          "value": 450.0
+        },
+        {
+          "ts": "2026-06-29T10:00:00Z",
+          "value": 2100.0
+        },
+        {
+          "ts": "2026-06-29T10:05:00Z",
+          "value": 3500.0
+        },
+        {
+          "ts": "2026-06-29T10:10:00Z",
+          "value": 0.0
+        }
+      ],
+      "labels": {
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod"
+      }
+    }
+  ],
+  "logs": [
+    {
+      "service": "book-service",
+      "ts": "2026-06-29T09:45:00Z",
+      "level": "info",
+      "message": "Starting request handler on book-service..."
+    },
+    {
+      "service": "book-service",
+      "ts": "2026-06-29T09:56:00Z",
+      "level": "warning",
+      "message": "Database query latency high (1200ms)"
+    },
+    {
+      "service": "book-service",
+      "ts": "2026-06-29T10:00:00Z",
+      "level": "error",
+      "message": "HTTP 500: Database connection timeout on POST /v1/books"
+    },
+    {
+      "service": "book-service",
+      "ts": "2026-06-29T10:02:00Z",
+      "level": "error",
+      "message": "Healthcheck endpoint /health failed: connection refused"
+    },
+    {
+      "service": "book-service",
+      "ts": "2026-06-29T10:04:00Z",
+      "level": "info",
+      "message": "Container restarted. Terminating process..."
+    },
+    {
+      "service": "book-service",
+      "ts": "2026-06-29T10:05:00Z",
+      "level": "error",
+      "message": "CrashLoopBackOff: back-off 5m0s restarting failed container=book-service pod=book-service-7d9f6c8d9f-abcd1"
+    }
+  ],
+  "traces": [
+    {
+      "trace_id": "trace-checkout-001",
+      "span_id": "span-001",
+      "parent_span_id": null,
+      "service": "book-service",
+      "operation": "POST /v1/books",
+      "ts": "2026-06-29T10:00:00Z",
+      "duration_ms": 3200,
+      "status_code": "500",
+      "labels": {
+        "db": "postgres-book-db"
+      }
+    }
+  ],
+  "k8s_events": [
+    {
+      "ts": "2026-06-29T10:02:00Z",
+      "reason": "Unhealthy",
+      "type": "Warning",
+      "message": "Readiness probe failed: HTTP probe failed with statuscode: 500"
+    },
+    {
+      "ts": "2026-06-29T10:03:00Z",
+      "reason": "BackOff",
+      "type": "Warning",
+      "message": "Back-off restarting failed container"
+    },
+    {
+      "ts": "2026-06-29T10:04:00Z",
+      "reason": "CrashLoopBackOff",
+      "type": "Warning",
+      "message": "Pod book-service-7d9f6c8d9f-abcd1 is in CrashLoopBackOff state"
+    }
+  ],
+  "recent_deploys": [
+    {
+      "service": "book-service",
+      "version": "v1.4.2",
+      "git_sha": "sha-a1b2c3d4",
+      "image_digest": "sha256:abc123digest...",
+      "deployed_at": "2026-06-29T09:30:00Z",
+      "deployed_by": "jenkins-ci",
+      "change_summary": "Upgraded postgres client connection pool settings",
+      "rollback_ref": "v1.4.1"
+    }
+  ],
+  "ownership": {
+    "service": "book-service",
+    "owner_team": "team-book",
+    "slack_channel": "#oncall-book",
+    "jira_project": "BOOK",
+    "jira_component": "book-service",
+    "runbooks": [
+      {
+        "title": "High 5xx rate on book-service runbook",
+        "url": "runbook://book-service/high-5xx",
+        "excerpt": "Check database connection limits and scaling settings. Revert back to previous deployment version if latency persists."
+      }
+    ]
+  },
+  "context_quality": "COMPLETE",
+  "missing_context": []
+}

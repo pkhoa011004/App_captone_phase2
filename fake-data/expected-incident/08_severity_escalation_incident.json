@@ -1,0 +1,132 @@
+{
+  "status": "CORRELATED",
+  "incident": {
+    "incident_id": "inc-tenant-a-prod-book-service-202606291000",
+    "correlation_id": "corr-tenant-a-prod-book-service-202606291000",
+    "group_key": "tenant-a:prod:eks-prod:bookhub-prod:book-service:202606291000",
+    "bucket_start": "2026-06-29T10:00:00Z",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "service": "book-service",
+    "severity": "critical",
+    "status": "ACTIVE",
+    "correlation_metadata": {
+      "total_alerts": 3,
+      "first_alert_received": "2026-06-29T10:00:05Z",
+      "last_alert_received": "2026-06-29T10:00:05Z",
+      "correlation_rules_applied": [
+        "same-service-10m-bucket"
+      ]
+    },
+    "alerts": [
+      {
+        "alert_id": "alert-book-service-escalation-012",
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "source": "prometheus",
+        "service": "book-service",
+        "severity": "low",
+        "title": "Low memory warning on book-service",
+        "description": "book-service container memory usage is slightly high",
+        "started_at": "2026-06-29T10:00:00Z",
+        "labels": {
+          "region": "ap-southeast-1",
+          "pod": "book-service-7d9f6c8d9f-abcd1",
+          "deployment": "book-service",
+          "container": "book-service"
+        }
+      },
+      {
+        "alert_id": "alert-book-service-latency-002",
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "source": "prometheus",
+        "service": "book-service",
+        "severity": "medium",
+        "title": "High latency on book-service",
+        "description": "book-service p95 latency is above 500ms",
+        "started_at": "2026-06-29T10:02:00Z",
+        "labels": {
+          "region": "ap-southeast-1",
+          "pod": "book-service-7d9f6c8d9f-abcd1",
+          "deployment": "book-service",
+          "container": "book-service",
+          "metric_names": [
+            "http_latency_p95_ms"
+          ],
+          "trace_id": "trace-checkout-002",
+          "reason": "high_latency",
+          "jira_project": "BOOK",
+          "jira_component": "book-service",
+          "runbook_url": "runbook://book-service/high-latency"
+        }
+      },
+      {
+        "alert_id": "alert-book-service-5xx-001",
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "source": "prometheus",
+        "service": "book-service",
+        "severity": "critical",
+        "title": "High 5xx rate on book-service",
+        "description": "book-service 5xx rate is above threshold",
+        "started_at": "2026-06-29T10:00:00Z",
+        "labels": {
+          "region": "ap-southeast-1",
+          "pod": "book-service-7d9f6c8d9f-abcd1",
+          "deployment": "book-service",
+          "container": "book-service",
+          "metric_names": [
+            "http_5xx_rate",
+            "request_rate"
+          ],
+          "trace_id": "trace-checkout-001",
+          "status_code": "500",
+          "reason": "high_5xx_rate",
+          "jira_project": "BOOK",
+          "jira_component": "book-service",
+          "runbook_url": "runbook://book-service/high-5xx"
+        }
+      }
+    ],
+    "alert_ids": [
+      "alert-book-service-escalation-012",
+      "alert-book-service-latency-002",
+      "alert-book-service-5xx-001"
+    ],
+    "deduped_alert_ids": [
+      "alert-book-service-escalation-012",
+      "alert-book-service-latency-002",
+      "alert-book-service-5xx-001"
+    ],
+    "signals": [
+      "unknown_signal",
+      "latency_high",
+      "http_5xx_high"
+    ],
+    "related_entities": {
+      "deployments": [
+        "book-service"
+      ],
+      "pods": [
+        "book-service-7d9f6c8d9f-abcd1"
+      ],
+      "containers": [
+        "book-service"
+      ]
+    },
+    "time_window": {
+      "start": "2026-06-29T10:00:00Z",
+      "end": "2026-06-29T10:02:00Z"
+    },
+    "next_step": "BUILD_EVIDENCE"
+  }
+}

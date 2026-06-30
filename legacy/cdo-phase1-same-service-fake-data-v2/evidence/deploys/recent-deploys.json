@@ -1,0 +1,17 @@
+{
+  "tenant_id": "tenant-a",
+  "environment": "prod",
+  "recent_deploys": [
+    {
+      "service": "book-service",
+      "version": "v2",
+      "git_sha": "a1b2c3d",
+      "image_digest": "sha256:badc0ffee000111222333444555666777888999aaa",
+      "deployed_at": "2026-06-29T09:55:00Z",
+      "deployed_by": "github-actions",
+      "change_summary": "Changed database query path and healthcheck dependency check.",
+      "rollback_ref": "v1",
+      "previous_git_sha": "f9e8d7c"
+    }
+  ]
+}

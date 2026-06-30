@@ -1,0 +1,25 @@
+{
+  "alert_id": "alert-book-service-healthcheck-001",
+  "source": "prometheus",
+  "service": "book-service",
+  "severity": "critical",
+  "title": "Healthcheck failed on book-service",
+  "description": "healthcheck endpoint returned non-200 response",
+  "started_at": "2026-06-29T10:02:00Z",
+  "labels": {
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "region": "ap-southeast-1",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "pod": "book-service-7d9f6c8d9f-abcd1",
+    "deployment": "book-service",
+    "container": "book-service",
+    "metric_names": [
+      "healthcheck_failures"
+    ],
+    "reason": "healthcheck_failed",
+    "jira_project": "BOOK",
+    "jira_component": "book-service"
+  }
+}

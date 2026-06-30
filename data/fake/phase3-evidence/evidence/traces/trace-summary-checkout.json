@@ -1,0 +1,47 @@
+[
+  {
+    "trace_id": "trace-checkout-001",
+    "span_id": "span-frontend-checkout",
+    "parent_span_id": null,
+    "service": "frontend",
+    "operation": "GET /checkout",
+    "ts": "2026-06-29T10:00:05Z",
+    "duration_ms": 2600,
+    "status_code": "500",
+    "labels": {
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "dependency": "order-service"
+    }
+  },
+  {
+    "trace_id": "trace-checkout-001",
+    "span_id": "span-order-create",
+    "parent_span_id": "span-frontend-checkout",
+    "service": "order-service",
+    "operation": "POST /orders",
+    "ts": "2026-06-29T10:00:06Z",
+    "duration_ms": 2400,
+    "status_code": "504",
+    "labels": {
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "dependency": "book-service"
+    }
+  },
+  {
+    "trace_id": "trace-checkout-001",
+    "span_id": "span-book-lookup",
+    "parent_span_id": "span-order-create",
+    "service": "book-service",
+    "operation": "GET /books/{id}",
+    "ts": "2026-06-29T10:00:07Z",
+    "duration_ms": 2200,
+    "status_code": "500",
+    "labels": {
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "dependency": "database"
+    }
+  }
+]

@@ -1,0 +1,136 @@
+{
+  "alerts": [
+    {
+      "alert_id": "alert-book-high-5xx-001",
+      "source": "prometheus",
+      "service": "book-service",
+      "severity": "critical",
+      "title": "High 5xx rate on book-service",
+      "description": "book-service 5xx rate is above threshold for 5 minutes.",
+      "started_at": "2026-06-29T10:00:00Z",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "region": "ap-southeast-1",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "jira_project": "BOOK",
+        "jira_component": "book-service",
+        "owner_team": "team-book",
+        "runbook_url": "runbook://book-service/high-5xx-healthcheck-crashloop",
+        "alertname": "HighHttp5xxRate",
+        "signal": "http_5xx_high",
+        "metric_names": [
+          "http_5xx_rate_percent",
+          "http_requests_total"
+        ],
+        "status_code": "500",
+        "endpoint": "/books/{id}",
+        "trace_id": "trace-book-fail-001"
+      }
+    },
+    {
+      "alert_id": "alert-book-high-5xx-001-duplicate",
+      "source": "prometheus",
+      "service": "book-service",
+      "severity": "critical",
+      "title": "High 5xx rate on book-service",
+      "description": "book-service 5xx rate is above threshold for 5 minutes.",
+      "started_at": "2026-06-29T10:00:00Z",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "region": "ap-southeast-1",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "jira_project": "BOOK",
+        "jira_component": "book-service",
+        "owner_team": "team-book",
+        "runbook_url": "runbook://book-service/high-5xx-healthcheck-crashloop",
+        "alertname": "HighHttp5xxRate",
+        "signal": "http_5xx_high",
+        "metric_names": [
+          "http_5xx_rate_percent",
+          "http_requests_total"
+        ],
+        "status_code": "500",
+        "endpoint": "/books/{id}",
+        "trace_id": "trace-book-fail-001",
+        "duplicate_of": "alert-book-high-5xx-001"
+      }
+    },
+    {
+      "alert_id": "alert-book-high-latency-001",
+      "source": "prometheus",
+      "service": "book-service",
+      "severity": "warning",
+      "title": "High latency on book-service",
+      "description": "book-service p95 latency increased above 2 seconds.",
+      "started_at": "2026-06-29T10:00:20Z",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "region": "ap-southeast-1",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "jira_project": "BOOK",
+        "jira_component": "book-service",
+        "owner_team": "team-book",
+        "runbook_url": "runbook://book-service/high-5xx-healthcheck-crashloop",
+        "alertname": "HighLatencyP95",
+        "signal": "latency_high",
+        "metric_names": [
+          "http_latency_p95_ms",
+          "http_request_duration_seconds_bucket"
+        ],
+        "endpoint": "/books/{id}",
+        "trace_id": "trace-book-fail-001"
+      }
+    },
+    {
+      "alert_id": "alert-book-high-latency-001-duplicate",
+      "source": "prometheus",
+      "service": "book-service",
+      "severity": "warning",
+      "title": "High latency on book-service",
+      "description": "book-service p95 latency increased above 2 seconds.",
+      "started_at": "2026-06-29T10:00:20Z",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "region": "ap-southeast-1",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "jira_project": "BOOK",
+        "jira_component": "book-service",
+        "owner_team": "team-book",
+        "runbook_url": "runbook://book-service/high-5xx-healthcheck-crashloop",
+        "alertname": "HighLatencyP95",
+        "signal": "latency_high",
+        "metric_names": [
+          "http_latency_p95_ms",
+          "http_request_duration_seconds_bucket"
+        ],
+        "endpoint": "/books/{id}",
+        "trace_id": "trace-book-fail-001",
+        "duplicate_of": "alert-book-high-latency-001"
+      }
+    }
+  ]
+}

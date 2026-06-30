@@ -1,0 +1,46 @@
+{
+  "receiver": "webhook",
+  "status": "firing",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "High5xxrateonorder-service",
+        "service": "order-service",
+        "severity": "critical",
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "region": "ap-southeast-1",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "order-service-5c4d3e2f1a-xyz98",
+        "deployment": "order-service",
+        "container": "order-service",
+        "metric_names": "http_5xx_rate",
+        "reason": "high_5xx_rate",
+        "jira_project": "ORDER",
+        "jira_component": "order-service",
+        "runbook_url": "runbook://order-service/high-5xx"
+      },
+      "annotations": {
+        "summary": "High 5xx rate on order-service",
+        "description": "order-service 5xx rate is above threshold"
+      },
+      "startsAt": "2026-06-29T10:01:00Z",
+      "endsAt": "0001-01-01T00:00:00Z",
+      "generatorURL": "http://prometheus/graph"
+    }
+  ],
+  "groupLabels": {
+    "alertname": "High5xxrateonorder-service"
+  },
+  "commonLabels": {
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "service": "order-service"
+  },
+  "commonAnnotations": {},
+  "externalURL": "http://alertmanager:9093",
+  "version": "4",
+  "groupKey": "order-service-alert"
+}

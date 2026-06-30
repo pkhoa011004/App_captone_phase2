@@ -1,0 +1,72 @@
+name: Sandbox - Platform Service
+
+on:
+  push:
+    branches:
+      - develop
+      - "feat/**"
+    paths:
+      - "apps/platform-service/**"
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ap-southeast-1
+  ECR_REGISTRY: 458580846647.dkr.ecr.ap-southeast-1.amazonaws.com
+  PLATFORM_REPO: xbrain-cdo5-sandbox-tf1-platform-service
+
+jobs:
+  build-and-deploy-platform:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set Image Tag
+        id: vars
+        run: echo "IMAGE_TAG=sandbox-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::458580846647:role/xbrain-cdo5-sandbox-ci
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and Push Platform Service
+        working-directory: apps/platform-service
+        run: |
+          IMAGE=$ECR_REGISTRY/$PLATFORM_REPO:$IMAGE_TAG
+          docker build -t $IMAGE .
+          docker push $IMAGE
+
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v2
+
+      - name: Update Kustomize & Push to Github
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Di chuyển vào thư mục sandbox để sửa file
+          cd manifests/overlays/sandbox
+          kustomize edit set image platform-service=$ECR_REGISTRY/$PLATFORM_REPO:$IMAGE_TAG
+
+          # Quay lại root để commit
+          cd ../../../
+          git add manifests/overlays/sandbox/kustomization.yaml
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🚀 deploy(platform-service): update sandbox to $IMAGE_TAG"
+            git pull --rebase origin ${GITHUB_REF_NAME}
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi

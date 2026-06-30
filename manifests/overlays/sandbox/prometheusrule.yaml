@@ -1,0 +1,81 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cdo-pipeline-alerts
+  namespace: xbrain-cdo5-sandbox
+  labels:
+    role: alert-rules
+    release: monitoring-sandbox
+spec:
+  groups:
+    - name: cdo-workload-alerts
+      rules:
+        # 1. High 5xx Rate Alert
+        - alert: High5xxRate
+          expr: sum(rate(http_requests_total{status=~"5.."}[5m])) by (tenant_id, environment, cluster, namespace, service, pod, deployment, container) > 0.05
+          for: 1m
+          labels:
+            severity: critical
+            source: prometheus
+            jira_project: BOOK
+            jira_component: book-service
+          annotations:
+            summary: "High 5xx rate on {{ $labels.service }}"
+            description: "{{ $labels.service }} is returning high rate of 5xx errors (current: {{ $value }} rps)."
+            runbook_url: "runbook://book-service/high-5xx"
+
+        # 2. High Latency Alert
+        - alert: HighLatency
+          expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, tenant_id, environment, cluster, namespace, service, pod, deployment, container)) > 0.5
+          for: 2m
+          labels:
+            severity: warning
+            source: prometheus
+            jira_project: BOOK
+            jira_component: book-service
+          annotations:
+            summary: "High latency on {{ $labels.service }}"
+            description: "{{ $labels.service }} p95 response latency is above 500ms (current: {{ $value }}s)."
+            runbook_url: "runbook://book-service/high-latency"
+
+        # 3. Pod CrashLoopBackOff Alert
+        - alert: PodCrashLoop
+          expr: kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff"} == 1
+          for: 1m
+          labels:
+            severity: critical
+            source: prometheus
+            jira_project: BOOK
+            jira_component: book-service
+          annotations:
+            summary: "Pod CrashLoopBackOff on {{ $labels.pod }}"
+            description: "Pod {{ $labels.pod }} is in CrashLoopBackOff status (restarting repeatedly)."
+            runbook_url: "runbook://book-service/pod-crashloop"
+
+        # 4. Container Restart Alert
+        - alert: ContainerRestart
+          expr: increase(kube_pod_container_status_restarts_total[10m]) > 0
+          for: 1m
+          labels:
+            severity: critical
+            source: prometheus
+            jira_project: BOOK
+            jira_component: book-service
+          annotations:
+            summary: "Container restart on {{ $labels.pod }}"
+            description: "Container in pod {{ $labels.pod }} restarted unexpectedly (increase of {{ $value }} restarts in last 10m)."
+            runbook_url: "runbook://book-service/container-restart"
+
+        # 5. Healthcheck Failed Alert
+        - alert: HealthcheckFailed
+          expr: healthcheck_failures > 0 or up == 0
+          for: 1m
+          labels:
+            severity: critical
+            source: prometheus
+            jira_project: BOOK
+            jira_component: book-service
+          annotations:
+            summary: "Healthcheck failed on {{ $labels.service }}"
+            description: "Healthcheck probe or up metric returned failure for {{ $labels.service }}."
+            runbook_url: "runbook://book-service/healthcheck"

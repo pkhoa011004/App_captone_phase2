@@ -1,0 +1,24 @@
+{
+  "tenant_id": "tenant-a",
+  "environment": "prod",
+  "services": [
+    {
+      "service": "book-service",
+      "owner_team": "team-book",
+      "slack_channel": "#oncall-book",
+      "jira_project": "BOOK",
+      "jira_component": "book-service",
+      "runbooks": [
+        {
+          "title": "book-service high 5xx / healthcheck failure",
+          "url": "runbook://book-service/high-5xx-healthcheck-crashloop",
+          "excerpt": "Check recent deploys, healthcheck dependency, pod restart reason, DB timeout, and consider rollback if deploy correlated."
+        }
+      ],
+      "oncall": {
+        "schedule": "book-service-primary",
+        "escalation_policy": "book-service-sev1"
+      }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: platform-service
+  labels:
+    app: platform-service
+spec:
+  selector:
+    matchLabels:
+      app: platform-service
+  template:
+    metadata:
+      labels:
+        app: platform-service
+    spec:
+      serviceAccountName: platform-sa
+      containers:
+        - name: platform-service
+          # Image này sẽ bị Kustomize ghi đè ở thư mục overlays/
+          image: platform-service:latest
+          ports:
+            - containerPort: 8080
+
+          # Hút toàn bộ biến môi trường từ ConfigMap (không bảo mật) và Secret (bảo mật)
+          envFrom:
+            - configMapRef:
+                name: platform-config
+            - secretRef:
+                name: platform-secrets-synced
+
+          # K8s gọi API /health để kiểm tra ứng dụng có sống không
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10

@@ -1,0 +1,41 @@
+{
+  "receiver": "webhook",
+  "status": "firing",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "CPUwarningonauth-service",
+        "service": "auth-service",
+        "severity": "warning",
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "region": "ap-southeast-1",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "auth-service-78fc5b6d-xyz88",
+        "deployment": "auth-service",
+        "container": "auth-service"
+      },
+      "annotations": {
+        "summary": "CPU warning on auth-service",
+        "description": "auth-service CPU is slightly high (78%)"
+      },
+      "startsAt": "2026-06-29T10:01:00Z",
+      "endsAt": "0001-01-01T00:00:00Z",
+      "generatorURL": "http://prometheus/graph"
+    }
+  ],
+  "groupLabels": {
+    "alertname": "CPUwarningonauth-service"
+  },
+  "commonLabels": {
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "service": "auth-service"
+  },
+  "commonAnnotations": {},
+  "externalURL": "http://alertmanager:9093",
+  "version": "4",
+  "groupKey": "auth-service-alert"
+}

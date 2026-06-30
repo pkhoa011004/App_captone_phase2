@@ -1,0 +1,31 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: platform-service-monitor
+  namespace: xbrain-cdo5-sandbox
+  labels:
+    release: monitoring-sandbox
+spec:
+  selector:
+    matchLabels:
+      app: platform-service
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ai-engine-monitor
+  namespace: xbrain-cdo5-sandbox
+  labels:
+    release: monitoring-sandbox
+spec:
+  selector:
+    matchLabels:
+      app: ai-engine
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s

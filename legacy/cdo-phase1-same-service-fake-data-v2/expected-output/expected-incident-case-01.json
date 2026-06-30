@@ -1,0 +1,114 @@
+{
+  "incident_id": "INC-20260629-0001",
+  "correlation_id": "corr-tenant-a-prod-book-service-20260629-0001",
+  "tenant_id": "tenant-a",
+  "environment": "prod",
+  "cluster": "eks-prod",
+  "namespace": "bookhub-prod",
+  "service": "book-service",
+  "severity": "critical",
+  "status": "OPEN",
+  "correlation_type": "same-service-multi-signal",
+  "correlation_key": "tenant-a|prod|eks-prod|bookhub-prod|book-service|2026-06-29T10:00",
+  "signals": [
+    "http_5xx_high",
+    "latency_high",
+    "healthcheck_failed",
+    "pod_crashloop",
+    "container_restart_high",
+    "dependency_timeout"
+  ],
+  "alert_ids": [
+    "alert-book-high-5xx-001",
+    "alert-book-high-latency-001",
+    "alert-book-healthcheck-failed-001",
+    "alert-book-pod-crashloop-001",
+    "alert-book-container-restart-001",
+    "alert-book-timeout-from-order-001"
+  ],
+  "source_alerts": [
+    {
+      "alert_id": "alert-book-high-5xx-001",
+      "source": "prometheus",
+      "service": "book-service",
+      "severity": "critical",
+      "title": "High 5xx rate on book-service",
+      "started_at": "2026-06-29T10:00:00Z",
+      "signal": "http_5xx_high"
+    },
+    {
+      "alert_id": "alert-book-high-latency-001",
+      "source": "prometheus",
+      "service": "book-service",
+      "severity": "warning",
+      "title": "High latency on book-service",
+      "started_at": "2026-06-29T10:00:20Z",
+      "signal": "latency_high"
+    },
+    {
+      "alert_id": "alert-book-healthcheck-failed-001",
+      "source": "synthetic-healthcheck",
+      "service": "book-service",
+      "severity": "critical",
+      "title": "Healthcheck failed on book-service",
+      "started_at": "2026-06-29T09:59:30Z",
+      "signal": "healthcheck_failed"
+    },
+    {
+      "alert_id": "alert-book-pod-crashloop-001",
+      "source": "kubernetes",
+      "service": "book-service",
+      "severity": "critical",
+      "title": "Pod CrashLoopBackOff for book-service",
+      "started_at": "2026-06-29T10:01:30Z",
+      "signal": "pod_crashloop"
+    },
+    {
+      "alert_id": "alert-book-container-restart-001",
+      "source": "kube-state-metrics",
+      "service": "book-service",
+      "severity": "warning",
+      "title": "Container restart count increased for book-service",
+      "started_at": "2026-06-29T10:02:00Z",
+      "signal": "container_restart_high"
+    },
+    {
+      "alert_id": "alert-book-timeout-from-order-001",
+      "source": "prometheus",
+      "service": "book-service",
+      "severity": "warning",
+      "title": "Timeouts when order-service calls book-service",
+      "started_at": "2026-06-29T10:02:30Z",
+      "signal": "dependency_timeout"
+    }
+  ],
+  "primary_entity": {
+    "type": "service",
+    "name": "book-service"
+  },
+  "related_entities": [
+    {
+      "type": "deployment",
+      "name": "book-service"
+    },
+    {
+      "type": "pod",
+      "name": "book-service-7d9f6c8d9f-abcd1"
+    },
+    {
+      "type": "container",
+      "name": "book-service"
+    },
+    {
+      "type": "caller_service",
+      "name": "order-service"
+    }
+  ],
+  "time_window": {
+    "alert_start": "2026-06-29T09:59:30Z",
+    "alert_end": "2026-06-29T10:02:30Z",
+    "evidence_start": "2026-06-29T09:45:00Z",
+    "evidence_end": "2026-06-29T10:05:00Z"
+  },
+  "correlation_reason": "Multiple alerts from Prometheus, synthetic healthcheck, Kubernetes, and kube-state-metrics share tenant/environment/cluster/namespace/service and occur in the same 10-minute correlation window."
+}

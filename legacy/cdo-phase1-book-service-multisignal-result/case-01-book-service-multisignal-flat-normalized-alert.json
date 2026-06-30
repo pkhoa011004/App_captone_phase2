@@ -1,0 +1,45 @@
+{
+  "ingest_id": "ingest-20260629-100100",
+  "schema_version": "cdo.alert.v1",
+  "received_at": "2026-06-29T10:01:00Z",
+  "raw_source": "prometheus",
+  "normalized_alert": {
+    "alert_id": "alert-book-service-multisignal-flat-001",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "source": "prometheus",
+    "service": "book-service",
+    "severity": "critical",
+    "title": "Book service checkout multi-signal alert",
+    "description": "book-service has elevated 5xx, latency, and trace errors in the same window",
+    "started_at": "2026-06-29T10:00:00Z",
+    "labels": {
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "deployment": "book-service",
+      "container": "book-service",
+      "metric_names": [
+        "http_5xx_rate",
+        "http_latency_p95_ms",
+        "request_rate"
+      ],
+      "trace_id": "trace-checkout-001",
+      "status_code": "500",
+      "reason": "high_5xx_rate",
+      "runbook_url": "runbook://book-service/high-5xx",
+      "jira_project": "BOOK",
+      "jira_component": "book-service"
+    }
+  },
+  "validation": {
+    "status": "VALID",
+    "missing_fields": [],
+    "missing_optional_fields": []
+  },
+  "enrichment": {
+    "status": "NOT_NEEDED",
+    "source": null,
+    "enriched_fields": []
+  }
+}

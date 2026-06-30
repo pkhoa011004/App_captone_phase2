@@ -1,0 +1,12 @@
+[
+  {
+    "service": "book-service",
+    "version": "v1.4.2",
+    "git_sha": "sha-a1b2c3d4",
+    "image_digest": "sha256:abc123digest...",
+    "deployed_at": "2026-06-29T09:30:00Z",
+    "deployed_by": "jenkins-ci",
+    "change_summary": "Upgraded postgres client connection pool settings",
+    "rollback_ref": "v1.4.1"
+  }
+]

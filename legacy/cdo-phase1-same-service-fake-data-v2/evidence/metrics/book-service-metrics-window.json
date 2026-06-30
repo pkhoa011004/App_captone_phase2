@@ -1,0 +1,354 @@
+{
+  "tenant_id": "tenant-a",
+  "environment": "prod",
+  "service": "book-service",
+  "evidence_window": {
+    "start": "2026-06-29T09:45:00Z",
+    "end": "2026-06-29T10:05:00Z"
+  },
+  "metrics": [
+    {
+      "metric_name": "http_5xx_rate_percent",
+      "service": "book-service",
+      "unit": "percent",
+      "window": {
+        "start": "2026-06-29T09:45:00Z",
+        "end": "2026-06-29T10:05:00Z"
+      },
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service"
+      },
+      "points": [
+        {
+          "ts": "2026-06-29T09:45:00Z",
+          "value": 0.2
+        },
+        {
+          "ts": "2026-06-29T09:50:00Z",
+          "value": 0.3
+        },
+        {
+          "ts": "2026-06-29T09:55:00Z",
+          "value": 0.8
+        },
+        {
+          "ts": "2026-06-29T09:59:00Z",
+          "value": 8.5
+        },
+        {
+          "ts": "2026-06-29T10:00:00Z",
+          "value": 35.0
+        },
+        {
+          "ts": "2026-06-29T10:05:00Z",
+          "value": 42.0
+        }
+      ]
+    },
+    {
+      "metric_name": "http_latency_p95_ms",
+      "service": "book-service",
+      "unit": "ms",
+      "window": {
+        "start": "2026-06-29T09:45:00Z",
+        "end": "2026-06-29T10:05:00Z"
+      },
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service"
+      },
+      "points": [
+        {
+          "ts": "2026-06-29T09:45:00Z",
+          "value": 180
+        },
+        {
+          "ts": "2026-06-29T09:50:00Z",
+          "value": 195
+        },
+        {
+          "ts": "2026-06-29T09:55:00Z",
+          "value": 260
+        },
+        {
+          "ts": "2026-06-29T09:59:00Z",
+          "value": 950
+        },
+        {
+          "ts": "2026-06-29T10:00:00Z",
+          "value": 2500
+        },
+        {
+          "ts": "2026-06-29T10:05:00Z",
+          "value": 3200
+        }
+      ]
+    },
+    {
+      "metric_name": "request_rate_rps",
+      "service": "book-service",
+      "unit": "rps",
+      "window": {
+        "start": "2026-06-29T09:45:00Z",
+        "end": "2026-06-29T10:05:00Z"
+      },
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service"
+      },
+      "points": [
+        {
+          "ts": "2026-06-29T09:45:00Z",
+          "value": 120
+        },
+        {
+          "ts": "2026-06-29T09:50:00Z",
+          "value": 125
+        },
+        {
+          "ts": "2026-06-29T09:55:00Z",
+          "value": 123
+        },
+        {
+          "ts": "2026-06-29T09:59:00Z",
+          "value": 118
+        },
+        {
+          "ts": "2026-06-29T10:00:00Z",
+          "value": 110
+        },
+        {
+          "ts": "2026-06-29T10:05:00Z",
+          "value": 95
+        }
+      ]
+    },
+    {
+      "metric_name": "healthcheck_status",
+      "service": "book-service",
+      "unit": "boolean",
+      "window": {
+        "start": "2026-06-29T09:45:00Z",
+        "end": "2026-06-29T10:05:00Z"
+      },
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service"
+      },
+      "points": [
+        {
+          "ts": "2026-06-29T09:45:00Z",
+          "value": 1
+        },
+        {
+          "ts": "2026-06-29T09:50:00Z",
+          "value": 1
+        },
+        {
+          "ts": "2026-06-29T09:55:00Z",
+          "value": 1
+        },
+        {
+          "ts": "2026-06-29T09:59:00Z",
+          "value": 0
+        },
+        {
+          "ts": "2026-06-29T10:00:00Z",
+          "value": 0
+        },
+        {
+          "ts": "2026-06-29T10:05:00Z",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "metric_name": "kube_pod_container_status_restarts_total",
+      "service": "book-service",
+      "unit": "count",
+      "window": {
+        "start": "2026-06-29T09:45:00Z",
+        "end": "2026-06-29T10:05:00Z"
+      },
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service"
+      },
+      "points": [
+        {
+          "ts": "2026-06-29T09:45:00Z",
+          "value": 0
+        },
+        {
+          "ts": "2026-06-29T09:50:00Z",
+          "value": 0
+        },
+        {
+          "ts": "2026-06-29T09:55:00Z",
+          "value": 0
+        },
+        {
+          "ts": "2026-06-29T10:00:00Z",
+          "value": 0
+        },
+        {
+          "ts": "2026-06-29T10:01:00Z",
+          "value": 1
+        },
+        {
+          "ts": "2026-06-29T10:03:00Z",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "metric_name": "container_cpu_usage_percent",
+      "service": "book-service",
+      "unit": "percent",
+      "window": {
+        "start": "2026-06-29T09:45:00Z",
+        "end": "2026-06-29T10:05:00Z"
+      },
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service"
+      },
+      "points": [
+        {
+          "ts": "2026-06-29T09:45:00Z",
+          "value": 34
+        },
+        {
+          "ts": "2026-06-29T09:50:00Z",
+          "value": 38
+        },
+        {
+          "ts": "2026-06-29T09:55:00Z",
+          "value": 44
+        },
+        {
+          "ts": "2026-06-29T10:00:00Z",
+          "value": 66
+        },
+        {
+          "ts": "2026-06-29T10:05:00Z",
+          "value": 72
+        }
+      ]
+    },
+    {
+      "metric_name": "container_memory_working_set_mb",
+      "service": "book-service",
+      "unit": "MB",
+      "window": {
+        "start": "2026-06-29T09:45:00Z",
+        "end": "2026-06-29T10:05:00Z"
+      },
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service"
+      },
+      "points": [
+        {
+          "ts": "2026-06-29T09:45:00Z",
+          "value": 180
+        },
+        {
+          "ts": "2026-06-29T09:50:00Z",
+          "value": 195
+        },
+        {
+          "ts": "2026-06-29T09:55:00Z",
+          "value": 225
+        },
+        {
+          "ts": "2026-06-29T10:00:00Z",
+          "value": 410
+        },
+        {
+          "ts": "2026-06-29T10:05:00Z",
+          "value": 220
+        }
+      ]
+    },
+    {
+      "metric_name": "dependency_timeout_total",
+      "service": "book-service",
+      "unit": "count",
+      "window": {
+        "start": "2026-06-29T09:45:00Z",
+        "end": "2026-06-29T10:05:00Z"
+      },
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service",
+        "caller_service": "order-service",
+        "target_service": "book-service",
+        "dependency": "book-service"
+      },
+      "points": [
+        {
+          "ts": "2026-06-29T09:45:00Z",
+          "value": 0
+        },
+        {
+          "ts": "2026-06-29T09:50:00Z",
+          "value": 0
+        },
+        {
+          "ts": "2026-06-29T09:55:00Z",
+          "value": 1
+        },
+        {
+          "ts": "2026-06-29T10:00:00Z",
+          "value": 22
+        },
+        {
+          "ts": "2026-06-29T10:05:00Z",
+          "value": 45
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "correlation_id": "corr-tenant-a-prod-book-service-20260629-0001",
+  "tenant_id": "tenant-a",
+  "incident_id": "INC-20260629-0001",
+  "environment": "prod",
+  "received_at": "2026-06-29T10:01:05Z",
+  "alert": {
+    "alert_id": "alert-book-service-summary-001",
+    "source": "cdo-correlator",
+    "service": "book-service",
+    "severity": "critical",
+    "title": "Multiple signals detected on book-service",
+    "description": "book-service has high 5xx, high latency, healthcheck failure, pod CrashLoopBackOff, container restarts, and timeout reports from order-service in the same service window.",
+    "started_at": "2026-06-29T09:59:30Z",
+    "labels": {
+      "region": "ap-southeast-1",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "deployment": "book-service",
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "container": "book-service",
+      "signals": [
+        "http_5xx_high",
+        "latency_high",
+        "healthcheck_failed",
+        "pod_crashloop",
+        "container_restart_high",
+        "dependency_timeout"
+      ],
+      "source_alert_ids": [
+        "alert-book-high-5xx-001",
+        "alert-book-high-latency-001",
+        "alert-book-healthcheck-failed-001",
+        "alert-book-pod-crashloop-001",
+        "alert-book-container-restart-001",
+        "alert-book-timeout-from-order-001"
+      ],
+      "metric_names": [
+        "http_5xx_rate_percent",
+        "http_latency_p95_ms",
+        "request_rate_rps",
+        "healthcheck_status",
+        "kube_pod_container_status_restarts_total",
+        "dependency_timeout_total"
+      ],
+      "jira_project": "BOOK",
+      "jira_component": "book-service",
+      "evidence_uri": "s3://cdo-evidence/tenant-a/prod/INC-20260629-0001/evidence_bundle.json"
+    }
+  },
+  "metrics": [],
+  "logs": [],
+  "traces": [],
+  "recent_deploys": [],
+  "ownership": {}
+}

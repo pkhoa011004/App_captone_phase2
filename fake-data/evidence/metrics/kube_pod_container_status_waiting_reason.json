@@ -1,0 +1,114 @@
+{
+  "metric_name": "kube_pod_container_status_waiting_reason",
+  "tenant_id": "tenant-a",
+  "environment": "prod",
+  "cluster": "eks-prod",
+  "namespace": "bookhub-prod",
+  "service": "book-service",
+  "values": [
+    {
+      "timestamp": "2026-06-29T09:45:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T09:46:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T09:47:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T09:48:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T09:49:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T09:50:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T09:51:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T09:52:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T09:53:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T09:54:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T09:55:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T09:56:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T09:57:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T09:58:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T09:59:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T10:00:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T10:01:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T10:02:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T10:03:00Z",
+      "value": 0
+    },
+    {
+      "timestamp": "2026-06-29T10:04:00Z",
+      "value": 1
+    },
+    {
+      "timestamp": "2026-06-29T10:05:00Z",
+      "value": 1
+    },
+    {
+      "timestamp": "2026-06-29T10:06:00Z",
+      "value": 1
+    },
+    {
+      "timestamp": "2026-06-29T10:07:00Z",
+      "value": 1
+    },
+    {
+      "timestamp": "2026-06-29T10:08:00Z",
+      "value": 1
+    },
+    {
+      "timestamp": "2026-06-29T10:09:00Z",
+      "value": 1
+    },
+    {
+      "timestamp": "2026-06-29T10:10:00Z",
+      "value": 1
+    }
+  ]
+}

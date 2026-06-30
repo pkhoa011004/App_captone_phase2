@@ -1,0 +1,58 @@
+[
+  {
+    "ts": "2026-06-29T10:00:08Z",
+    "service": "book-service",
+    "level": "ERROR",
+    "message": "database timeout after 3000ms while fetching book details",
+    "trace_id": "trace-checkout-001",
+    "curation_reason": "dependency_timeout",
+    "labels": {
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "version": "v2",
+      "tenant_id": "tenant-a",
+      "environment": "prod"
+    }
+  },
+  {
+    "ts": "2026-06-29T10:00:11Z",
+    "service": "book-service",
+    "level": "ERROR",
+    "message": "failed to execute query get_book_by_id: context deadline exceeded",
+    "trace_id": "trace-checkout-001",
+    "curation_reason": "db_query_error",
+    "labels": {
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "version": "v2",
+      "tenant_id": "tenant-a",
+      "environment": "prod"
+    }
+  },
+  {
+    "ts": "2026-06-29T10:00:15Z",
+    "service": "order-service",
+    "level": "WARN",
+    "message": "upstream call to book-service timed out after 2500ms",
+    "trace_id": "trace-checkout-001",
+    "curation_reason": "upstream_timeout",
+    "labels": {
+      "pod": "order-service-6b4b9dfc77-efgh2",
+      "version": "v1",
+      "tenant_id": "tenant-a",
+      "environment": "prod"
+    }
+  },
+  {
+    "ts": "2026-06-29T10:00:19Z",
+    "service": "frontend",
+    "level": "WARN",
+    "message": "checkout request latency exceeded threshold",
+    "trace_id": "trace-checkout-001",
+    "curation_reason": "downstream_latency",
+    "labels": {
+      "pod": "frontend-77f5f9f77b-ijkl3",
+      "version": "v1",
+      "tenant_id": "tenant-a",
+      "environment": "prod"
+    }
+  }
+]

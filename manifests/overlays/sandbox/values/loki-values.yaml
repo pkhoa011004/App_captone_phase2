@@ -1,0 +1,25 @@
+# 1. Loki spec (Động cơ lưu trữ logs)
+loki:
+  enabled: true
+  persistence:
+    enabled: true
+    storageClassName: gp2
+    size: 5Gi
+  config:
+    limits_config:
+      max_entries_limit_per_query: 5000
+    # Cắt giảm thời gian lưu trữ logs trong sandbox còn 3 ngày để tiết kiệm tài nguyên
+    table_manager:
+      retention_deletes_enabled: true
+      retention_period: 72h
+
+# 2. Promtail spec (Bộ thu thập logs từ các node của EKS)
+promtail:
+  enabled: true
+  config:
+    log_level: info
+    server:
+      http_listen_port: 3101
+    # Cấu hình đẩy logs về Loki local service
+    clients:
+      - url: http://loki-sandbox:3100/loki/api/v1/push

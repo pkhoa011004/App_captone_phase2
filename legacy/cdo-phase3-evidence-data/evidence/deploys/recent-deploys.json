@@ -1,0 +1,22 @@
+[
+  {
+    "service": "book-service",
+    "version": "v2",
+    "git_sha": "a1b2c3d",
+    "image_digest": "sha256:new-bad-version",
+    "deployed_at": "2026-06-29T09:55:00Z",
+    "deployed_by": "github-actions",
+    "change_summary": "changed database query path for book detail API",
+    "rollback_ref": "v1"
+  },
+  {
+    "service": "order-service",
+    "version": "v1",
+    "git_sha": "d4e5f6g",
+    "image_digest": "sha256:stable-order-version",
+    "deployed_at": "2026-06-28T15:20:00Z",
+    "deployed_by": "github-actions",
+    "change_summary": "stable release",
+    "rollback_ref": "v0"
+  }
+]

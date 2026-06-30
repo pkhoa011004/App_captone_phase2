@@ -1,0 +1,31 @@
+{
+  "alert_id": "alert-book-service-post-deploy-001",
+  "source": "prometheus",
+  "service": "book-service",
+  "severity": "critical",
+  "title": "High 5xx rate after book-service deployment",
+  "description": "book-service 5xx increased shortly after v2 deployment",
+  "started_at": "2026-06-29T10:00:00Z",
+  "labels": {
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "region": "ap-southeast-1",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "pod": "book-service-7d9f6c8d9f-abcd1",
+    "container": "book-service",
+    "metric_names": [
+      "http_5xx_rate",
+      "http_latency_p95_ms",
+      "request_rate"
+    ],
+    "trace_id": "trace-checkout-001",
+    "suspected_dependency": "database",
+    "jira_project": "BOOK",
+    "jira_component": "book-service",
+    "runbook_url": "runbook://book-service/high-5xx",
+    "image_digest": "sha256:new-bad-version",
+    "git_sha": "a1b2c3d",
+    "deployment_version": "v2"
+  }
+}

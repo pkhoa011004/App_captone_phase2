@@ -1,0 +1,41 @@
+{
+  "receiver": "webhook",
+  "status": "firing",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "Lowmemorywarningonbook-service",
+        "service": "book-service",
+        "severity": "low",
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "region": "ap-southeast-1",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "deployment": "book-service",
+        "container": "book-service"
+      },
+      "annotations": {
+        "summary": "Low memory warning on book-service",
+        "description": "book-service container memory usage is slightly high"
+      },
+      "startsAt": "2026-06-29T10:00:00Z",
+      "endsAt": "0001-01-01T00:00:00Z",
+      "generatorURL": "http://prometheus/graph"
+    }
+  ],
+  "groupLabels": {
+    "alertname": "Lowmemorywarningonbook-service"
+  },
+  "commonLabels": {
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "service": "book-service"
+  },
+  "commonAnnotations": {},
+  "externalURL": "http://alertmanager:9093",
+  "version": "4",
+  "groupKey": "book-service-alert"
+}

@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: simulator-alerts
+  labels:
+    app: simulator
+spec:
+  groups:
+    - name: simulator.rules
+      rules:
+        - alert: HighLatencySimulated
+          expr: http_latency_p95_ms > 2000
+          for: 0m
+          labels:
+            severity: critical
+            team: core-payments
+          annotations:
+            summary: "High Latency Detected in Payment Gateway"
+            description: "The 99th percentile latency of the payment-gateway service has exceeded 2000ms. This might indicate a degradation in downstream processing."

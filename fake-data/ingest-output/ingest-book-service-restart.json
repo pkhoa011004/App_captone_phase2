@@ -1,0 +1,42 @@
+{
+  "ingest_id": "ingest-20260629-100100-0005",
+  "schema_version": "cdo.alert.v1",
+  "received_at": "2026-06-29T10:01:00Z",
+  "raw_source": "kubernetes",
+  "normalized_alert": {
+    "alert_id": "alert-book-service-restart-001",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "source": "kubernetes",
+    "service": "book-service",
+    "severity": "high",
+    "title": "Container restart on book-service",
+    "description": "Container book-service has restarted multiple times",
+    "started_at": "2026-06-29T10:04:00Z",
+    "labels": {
+      "region": "ap-southeast-1",
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "deployment": "book-service",
+      "container": "book-service",
+      "reason": "container_restart",
+      "jira_project": "BOOK",
+      "jira_component": "book-service"
+    }
+  },
+  "validation": {
+    "status": "VALID_WITH_WARNINGS",
+    "missing_fields": [],
+    "missing_optional_fields": [
+      "trace_id",
+      "metric_names",
+      "runbook_url"
+    ]
+  },
+  "enrichment": {
+    "status": "NOT_NEEDED",
+    "source": null,
+    "enriched_fields": []
+  }
+}

@@ -1,0 +1,17 @@
+frontend:
+  depends_on:
+    - order-service
+    - book-service
+
+order-service:
+  depends_on:
+    - book-service
+    - reader-service
+
+book-service:
+  depends_on:
+    - database
+
+reader-service:
+  depends_on:
+    - database

@@ -1,0 +1,35 @@
+{
+  "ingest_id": "ingest-20260629-100000-0015",
+  "schema_version": "cdo.alert.v1",
+  "received_at": "2026-06-29T10:00:30.500Z",
+  "raw_source": "prometheus",
+  "normalized_alert": {
+    "alert_id": "alert-jitter-noise-015",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "source": "prometheus",
+    "service": "book-service",
+    "severity": "low",
+    "title": "Latency jitter on book-service",
+    "description": "book-service p95 latency fluctuated briefly to 201ms",
+    "started_at": "2026-06-29T10:00:30Z",
+    "labels": {
+      "region": "ap-southeast-1",
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "deployment": "book-service",
+      "container": "book-service"
+    }
+  },
+  "validation": {
+    "status": "VALID",
+    "missing_fields": [],
+    "missing_optional_fields": []
+  },
+  "enrichment": {
+    "status": "NOT_NEEDED",
+    "source": null,
+    "enriched_fields": []
+  }
+}

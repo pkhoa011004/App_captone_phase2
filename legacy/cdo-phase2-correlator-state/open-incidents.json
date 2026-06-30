@@ -1,0 +1,170 @@
+{
+  "open_incidents": {
+    "tenant-a|prod|eks-prod|bookhub-prod|book-service|202606291000": {
+      "incident_id": "inc-tenant-a-prod-book-service-202606291000",
+      "correlation_id": "corr-tenant-a-prod-book-service-202606291000",
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "service": "book-service",
+      "severity": "critical",
+      "status": "OPEN",
+      "correlation": {
+        "type": "same_service_multi_signal",
+        "window_minutes": 10,
+        "group_by": [
+          "tenant_id",
+          "environment",
+          "cluster",
+          "namespace",
+          "service"
+        ],
+        "reason": "Multiple valid alerts for the same service occurred within the correlation window."
+      },
+      "alerts": [
+        {
+          "alert_id": "alert-book-service-5xx-001",
+          "source": "prometheus",
+          "title": "High 5xx rate on book-service",
+          "severity": "critical",
+          "started_at": "2026-06-29T10:00:00Z",
+          "labels": {
+            "pod": "book-service-7d9f6c8d9f-abcd1",
+            "deployment": "book-service",
+            "container": "book-service",
+            "metric_names": [
+              "http_5xx_rate",
+              "request_rate"
+            ],
+            "trace_id": "trace-checkout-001",
+            "status_code": "500",
+            "reason": "high_5xx_rate",
+            "jira_project": "BOOK",
+            "jira_component": "book-service",
+            "runbook_url": "runbook://book-service/high-5xx"
+          }
+        },
+        {
+          "alert_id": "alert-book-service-latency-001",
+          "source": "prometheus",
+          "title": "High latency on book-service",
+          "severity": "warning",
+          "started_at": "2026-06-29T10:02:00Z",
+          "labels": {
+            "pod": "book-service-7d9f6c8d9f-abcd1",
+            "deployment": "book-service",
+            "container": "book-service",
+            "metric_names": [
+              "http_latency_p95_ms"
+            ],
+            "trace_id": "trace-checkout-001",
+            "status_code": "200",
+            "reason": "latency_high",
+            "jira_project": "BOOK",
+            "jira_component": "book-service",
+            "runbook_url": "runbook://book-service/high-latency"
+          }
+        },
+        {
+          "alert_id": "alert-book-service-healthcheck-001",
+          "source": "prometheus",
+          "title": "Healthcheck failed on book-service",
+          "severity": "warning",
+          "started_at": "2026-06-29T10:03:00Z",
+          "labels": {
+            "pod": "book-service-7d9f6c8d9f-abcd1",
+            "deployment": "book-service",
+            "container": "book-service",
+            "metric_names": [
+              "healthcheck_failures"
+            ],
+            "trace_id": "trace-checkout-001",
+            "status_code": "503",
+            "reason": "healthcheck_failed",
+            "jira_project": "BOOK",
+            "jira_component": "book-service",
+            "runbook_url": "runbook://book-service/healthcheck"
+          }
+        },
+        {
+          "alert_id": "alert-book-service-crashloop-001",
+          "source": "prometheus",
+          "title": "Pod CrashLoopBackOff on book-service",
+          "severity": "critical",
+          "started_at": "2026-06-29T10:04:00Z",
+          "labels": {
+            "pod": "book-service-7d9f6c8d9f-abcd1",
+            "deployment": "book-service",
+            "container": "book-service",
+            "metric_names": [
+              "kube_pod_container_status_waiting_reason"
+            ],
+            "trace_id": "trace-checkout-001",
+            "status_code": "",
+            "reason": "CrashLoopBackOff",
+            "jira_project": "BOOK",
+            "jira_component": "book-service",
+            "runbook_url": "runbook://book-service/crashloop"
+          }
+        },
+        {
+          "alert_id": "alert-book-service-restart-001",
+          "source": "prometheus",
+          "title": "Container restart on book-service",
+          "severity": "warning",
+          "started_at": "2026-06-29T10:05:00Z",
+          "labels": {
+            "pod": "book-service-7d9f6c8d9f-abcd1",
+            "deployment": "book-service",
+            "container": "book-service",
+            "metric_names": [
+              "container_restart_count"
+            ],
+            "trace_id": "trace-checkout-001",
+            "status_code": "",
+            "reason": "container_restart",
+            "jira_project": "BOOK",
+            "jira_component": "book-service",
+            "runbook_url": "runbook://book-service/restart"
+          }
+        }
+      ],
+      "alert_ids": [
+        "alert-book-service-5xx-001",
+        "alert-book-service-latency-001",
+        "alert-book-service-healthcheck-001",
+        "alert-book-service-crashloop-001",
+        "alert-book-service-restart-001"
+      ],
+      "deduped_alert_ids": [],
+      "signals": [
+        "http_5xx_high",
+        "latency_high",
+        "healthcheck_failed",
+        "pod_crashloop",
+        "container_restart"
+      ],
+      "related_entities": {
+        "pods": [
+          "book-service-7d9f6c8d9f-abcd1"
+        ],
+        "deployments": [
+          "book-service"
+        ],
+        "containers": [
+          "book-service"
+        ]
+      },
+      "time_window": {
+        "alert_start": "2026-06-29T10:00:00Z",
+        "alert_end": "2026-06-29T10:05:00Z",
+        "evidence_start": "2026-06-29T09:45:00Z",
+        "evidence_end": "2026-06-29T10:10:00Z"
+      },
+      "next_step": "BUILD_EVIDENCE",
+      "started_at": "2026-06-29T10:00:00Z",
+      "updated_at": "2026-06-29T10:06:00Z"
+    }
+  }
+}

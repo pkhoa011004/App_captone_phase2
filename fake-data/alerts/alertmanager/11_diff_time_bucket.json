@@ -1,0 +1,41 @@
+{
+  "receiver": "webhook",
+  "status": "firing",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "Latealertonbook-service",
+        "service": "book-service",
+        "severity": "critical",
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "region": "ap-southeast-1",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "deployment": "book-service",
+        "container": "book-service"
+      },
+      "annotations": {
+        "summary": "Late alert on book-service",
+        "description": "High latency in next correlation window"
+      },
+      "startsAt": "2026-06-29T10:15:00Z",
+      "endsAt": "0001-01-01T00:00:00Z",
+      "generatorURL": "http://prometheus/graph"
+    }
+  ],
+  "groupLabels": {
+    "alertname": "Latealertonbook-service"
+  },
+  "commonLabels": {
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "service": "book-service"
+  },
+  "commonAnnotations": {},
+  "externalURL": "http://alertmanager:9093",
+  "version": "4",
+  "groupKey": "book-service-alert"
+}

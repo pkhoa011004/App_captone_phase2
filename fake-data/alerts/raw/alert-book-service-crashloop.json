@@ -1,0 +1,22 @@
+{
+  "alert_id": "alert-book-service-crashloop-001",
+  "source": "kubernetes",
+  "service": "book-service",
+  "severity": "critical",
+  "title": "Pod CrashLoopBackOff on book-service",
+  "description": "Pod is in CrashLoopBackOff state",
+  "started_at": "2026-06-29T10:03:00Z",
+  "labels": {
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "region": "ap-southeast-1",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "pod": "book-service-7d9f6c8d9f-abcd1",
+    "deployment": "book-service",
+    "container": "book-service",
+    "reason": "pod_crashloop",
+    "jira_project": "BOOK",
+    "jira_component": "book-service"
+  }
+}

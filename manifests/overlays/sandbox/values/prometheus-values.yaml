@@ -1,0 +1,35 @@
+# 1. Tắt bớt các cảnh báo mặc định (Giảm nhiễu cho Sandbox)
+defaultRules:
+  create: false
+
+# 2. Alertmanager (Tắt nếu chưa cần test gửi cảnh báo qua Slack/Email)
+alertmanager:
+  enabled: true
+
+# 3. Cấu hình Grafana
+grafana:
+  enabled: true
+  adminPassword: "admin" # Mật khẩu mặc định để test nội bộ
+  ingress:
+    enabled: false # Đổi thành true nếu bạn đã cài Nginx/AWS ALB Ingress Controller
+  # Tắt HA (High Availability) cho Grafana ở Sandbox
+  replicas: 1
+
+# 4. Cấu hình Prometheus cốt lõi (Cắt giảm tài nguyên)
+prometheus:
+  prometheusSpec:
+    # Ở Sandbox, chỉ cần lưu dữ liệu trong 3 ngày là đủ (Mặc định là 15 ngày)
+    retention: 3d
+
+    # Ép mức sử dụng RAM tối đa để không làm sập cụm K8s
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+    # Tự động quét (Scrape) các ServiceMonitor từ namespace của ứng dụng (VD: tf1-ai)
+    serviceMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false

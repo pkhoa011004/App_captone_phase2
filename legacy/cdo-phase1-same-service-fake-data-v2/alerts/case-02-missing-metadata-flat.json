@@ -1,0 +1,55 @@
+{
+  "alerts": [
+    {
+      "alert_id": "alert-missing-tenant-001",
+      "source": "prometheus",
+      "service": "book-service",
+      "severity": "critical",
+      "title": "High 5xx rate on book-service",
+      "description": "Missing tenant_id should fail ingest validation.",
+      "started_at": "2026-06-29T10:00:00Z",
+      "labels": {
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "metric_names": [
+          "http_5xx_rate_percent"
+        ]
+      }
+    },
+    {
+      "alert_id": "alert-missing-environment-001",
+      "source": "prometheus",
+      "service": "book-service",
+      "severity": "critical",
+      "title": "High latency on book-service",
+      "description": "Missing environment should fail ingest validation.",
+      "started_at": "2026-06-29T10:00:20Z",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "metric_names": [
+          "http_latency_p95_ms"
+        ]
+      }
+    },
+    {
+      "alert_id": "alert-missing-service-001",
+      "source": "prometheus",
+      "severity": "critical",
+      "title": "Healthcheck failed",
+      "description": "Missing service should fail ingest validation.",
+      "started_at": "2026-06-29T09:59:30Z",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "metric_names": [
+          "healthcheck_status"
+        ]
+      }
+    }
+  ]
+}

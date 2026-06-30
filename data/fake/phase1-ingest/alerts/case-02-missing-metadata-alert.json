@@ -1,0 +1,16 @@
+{
+  "alert_id": "alert-missing-metadata-001",
+  "source": "prometheus",
+  "service": "book-service",
+  "severity": "critical",
+  "title": "High 5xx rate on book-service",
+  "description": "This alert intentionally misses tenant_id and environment",
+  "started_at": "2026-06-29T10:00:00Z",
+  "labels": {
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "metric_names": [
+      "http_5xx_rate"
+    ]
+  }
+}

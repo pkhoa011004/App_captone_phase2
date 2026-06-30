@@ -1,0 +1,1032 @@
+{
+  "incident_id": "inc-tenant-a-prod-book-service-202606291000",
+  "correlation_id": "corr-tenant-a-prod-book-service-202606291000",
+  "tenant_id": "tenant-a",
+  "environment": "prod",
+  "cluster": "eks-prod",
+  "namespace": "bookhub-prod",
+  "service": "book-service",
+  "evidence_window": {
+    "start": "2026-06-29T09:45:00Z",
+    "end": "2026-06-29T10:10:00Z"
+  },
+  "metrics": [
+    {
+      "metric_name": "http_5xx_rate",
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "service": "book-service",
+      "values": [
+        {
+          "timestamp": "2026-06-29T09:45:00Z",
+          "value": 0.01
+        },
+        {
+          "timestamp": "2026-06-29T09:46:00Z",
+          "value": 0.02
+        },
+        {
+          "timestamp": "2026-06-29T09:47:00Z",
+          "value": 0.01
+        },
+        {
+          "timestamp": "2026-06-29T09:48:00Z",
+          "value": 0.02
+        },
+        {
+          "timestamp": "2026-06-29T09:49:00Z",
+          "value": 0.01
+        },
+        {
+          "timestamp": "2026-06-29T09:50:00Z",
+          "value": 0.03
+        },
+        {
+          "timestamp": "2026-06-29T09:51:00Z",
+          "value": 0.02
+        },
+        {
+          "timestamp": "2026-06-29T09:52:00Z",
+          "value": 0.01
+        },
+        {
+          "timestamp": "2026-06-29T09:53:00Z",
+          "value": 0.02
+        },
+        {
+          "timestamp": "2026-06-29T09:54:00Z",
+          "value": 0.01
+        },
+        {
+          "timestamp": "2026-06-29T09:55:00Z",
+          "value": 0.02
+        },
+        {
+          "timestamp": "2026-06-29T09:56:00Z",
+          "value": 0.05
+        },
+        {
+          "timestamp": "2026-06-29T09:57:00Z",
+          "value": 0.09
+        },
+        {
+          "timestamp": "2026-06-29T09:58:00Z",
+          "value": 0.15
+        },
+        {
+          "timestamp": "2026-06-29T09:59:00Z",
+          "value": 0.12
+        },
+        {
+          "timestamp": "2026-06-29T10:00:00Z",
+          "value": 2.5
+        },
+        {
+          "timestamp": "2026-06-29T10:01:00Z",
+          "value": 4.8
+        },
+        {
+          "timestamp": "2026-06-29T10:02:00Z",
+          "value": 12.5
+        },
+        {
+          "timestamp": "2026-06-29T10:03:00Z",
+          "value": 12.0
+        },
+        {
+          "timestamp": "2026-06-29T10:04:00Z",
+          "value": 10.5
+        },
+        {
+          "timestamp": "2026-06-29T10:05:00Z",
+          "value": 11.2
+        },
+        {
+          "timestamp": "2026-06-29T10:06:00Z",
+          "value": 8.4
+        },
+        {
+          "timestamp": "2026-06-29T10:07:00Z",
+          "value": 6.2
+        },
+        {
+          "timestamp": "2026-06-29T10:08:00Z",
+          "value": 5.0
+        },
+        {
+          "timestamp": "2026-06-29T10:09:00Z",
+          "value": 4.8
+        },
+        {
+          "timestamp": "2026-06-29T10:10:00Z",
+          "value": 4.5
+        }
+      ]
+    },
+    {
+      "metric_name": "http_latency_p95_ms",
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "service": "book-service",
+      "values": [
+        {
+          "timestamp": "2026-06-29T09:45:00Z",
+          "value": 55.2
+        },
+        {
+          "timestamp": "2026-06-29T09:46:00Z",
+          "value": 60.1
+        },
+        {
+          "timestamp": "2026-06-29T09:47:00Z",
+          "value": 58.4
+        },
+        {
+          "timestamp": "2026-06-29T09:48:00Z",
+          "value": 61.2
+        },
+        {
+          "timestamp": "2026-06-29T09:49:00Z",
+          "value": 59.0
+        },
+        {
+          "timestamp": "2026-06-29T09:50:00Z",
+          "value": 62.5
+        },
+        {
+          "timestamp": "2026-06-29T09:51:00Z",
+          "value": 61.1
+        },
+        {
+          "timestamp": "2026-06-29T09:52:00Z",
+          "value": 60.2
+        },
+        {
+          "timestamp": "2026-06-29T09:53:00Z",
+          "value": 59.8
+        },
+        {
+          "timestamp": "2026-06-29T09:54:00Z",
+          "value": 60.5
+        },
+        {
+          "timestamp": "2026-06-29T09:55:00Z",
+          "value": 120.4
+        },
+        {
+          "timestamp": "2026-06-29T09:56:00Z",
+          "value": 320.1
+        },
+        {
+          "timestamp": "2026-06-29T09:57:00Z",
+          "value": 480.5
+        },
+        {
+          "timestamp": "2026-06-29T09:58:00Z",
+          "value": 520.2
+        },
+        {
+          "timestamp": "2026-06-29T09:59:00Z",
+          "value": 490.4
+        },
+        {
+          "timestamp": "2026-06-29T10:00:00Z",
+          "value": 1250.0
+        },
+        {
+          "timestamp": "2026-06-29T10:01:00Z",
+          "value": 1850.2
+        },
+        {
+          "timestamp": "2026-06-29T10:02:00Z",
+          "value": 2200.5
+        },
+        {
+          "timestamp": "2026-06-29T10:03:00Z",
+          "value": 2350.0
+        },
+        {
+          "timestamp": "2026-06-29T10:04:00Z",
+          "value": 2100.8
+        },
+        {
+          "timestamp": "2026-06-29T10:05:00Z",
+          "value": 2050.4
+        },
+        {
+          "timestamp": "2026-06-29T10:06:00Z",
+          "value": 1980.0
+        },
+        {
+          "timestamp": "2026-06-29T10:07:00Z",
+          "value": 1820.5
+        },
+        {
+          "timestamp": "2026-06-29T10:08:00Z",
+          "value": 1750.1
+        },
+        {
+          "timestamp": "2026-06-29T10:09:00Z",
+          "value": 1680.0
+        },
+        {
+          "timestamp": "2026-06-29T10:10:00Z",
+          "value": 1650.0
+        }
+      ]
+    },
+    {
+      "metric_name": "request_rate",
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "service": "book-service",
+      "values": [
+        {
+          "timestamp": "2026-06-29T09:45:00Z",
+          "value": 178
+        },
+        {
+          "timestamp": "2026-06-29T09:46:00Z",
+          "value": 182
+        },
+        {
+          "timestamp": "2026-06-29T09:47:00Z",
+          "value": 180
+        },
+        {
+          "timestamp": "2026-06-29T09:48:00Z",
+          "value": 185
+        },
+        {
+          "timestamp": "2026-06-29T09:49:00Z",
+          "value": 179
+        },
+        {
+          "timestamp": "2026-06-29T09:50:00Z",
+          "value": 181
+        },
+        {
+          "timestamp": "2026-06-29T09:51:00Z",
+          "value": 180
+        },
+        {
+          "timestamp": "2026-06-29T09:52:00Z",
+          "value": 183
+        },
+        {
+          "timestamp": "2026-06-29T09:53:00Z",
+          "value": 182
+        },
+        {
+          "timestamp": "2026-06-29T09:54:00Z",
+          "value": 180
+        },
+        {
+          "timestamp": "2026-06-29T09:55:00Z",
+          "value": 181
+        },
+        {
+          "timestamp": "2026-06-29T09:56:00Z",
+          "value": 184
+        },
+        {
+          "timestamp": "2026-06-29T09:57:00Z",
+          "value": 175
+        },
+        {
+          "timestamp": "2026-06-29T09:58:00Z",
+          "value": 170
+        },
+        {
+          "timestamp": "2026-06-29T09:59:00Z",
+          "value": 165
+        },
+        {
+          "timestamp": "2026-06-29T10:00:00Z",
+          "value": 168
+        },
+        {
+          "timestamp": "2026-06-29T10:01:00Z",
+          "value": 170
+        },
+        {
+          "timestamp": "2026-06-29T10:02:00Z",
+          "value": 155
+        },
+        {
+          "timestamp": "2026-06-29T10:03:00Z",
+          "value": 150
+        },
+        {
+          "timestamp": "2026-06-29T10:04:00Z",
+          "value": 142
+        },
+        {
+          "timestamp": "2026-06-29T10:05:00Z",
+          "value": 140
+        },
+        {
+          "timestamp": "2026-06-29T10:06:00Z",
+          "value": 145
+        },
+        {
+          "timestamp": "2026-06-29T10:07:00Z",
+          "value": 148
+        },
+        {
+          "timestamp": "2026-06-29T10:08:00Z",
+          "value": 150
+        },
+        {
+          "timestamp": "2026-06-29T10:09:00Z",
+          "value": 152
+        },
+        {
+          "timestamp": "2026-06-29T10:10:00Z",
+          "value": 155
+        }
+      ]
+    },
+    {
+      "metric_name": "healthcheck_failures",
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "service": "book-service",
+      "values": [
+        {
+          "timestamp": "2026-06-29T09:45:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:46:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:47:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:48:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:49:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:50:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:51:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:52:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:53:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:54:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:55:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:56:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:57:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:58:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:59:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T10:00:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T10:01:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T10:02:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T10:03:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:04:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:05:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:06:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:07:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:08:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:09:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:10:00Z",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "metric_name": "container_restart_count",
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "service": "book-service",
+      "values": [
+        {
+          "timestamp": "2026-06-29T09:45:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:46:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:47:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:48:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:49:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:50:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:51:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:52:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:53:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:54:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:55:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:56:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:57:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:58:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:59:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T10:00:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T10:01:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T10:02:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T10:03:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T10:04:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T10:05:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:06:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:07:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:08:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:09:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:10:00Z",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "metric_name": "kube_pod_container_status_waiting_reason",
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "service": "book-service",
+      "values": [
+        {
+          "timestamp": "2026-06-29T09:45:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:46:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:47:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:48:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:49:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:50:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:51:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:52:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:53:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:54:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:55:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:56:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:57:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:58:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T09:59:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T10:00:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T10:01:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T10:02:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T10:03:00Z",
+          "value": 0
+        },
+        {
+          "timestamp": "2026-06-29T10:04:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:05:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:06:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:07:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:08:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:09:00Z",
+          "value": 1
+        },
+        {
+          "timestamp": "2026-06-29T10:10:00Z",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "metric_name": "cpu_usage_percent",
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "service": "book-service",
+      "values": [
+        {
+          "timestamp": "2026-06-29T09:45:00Z",
+          "value": 32.1
+        },
+        {
+          "timestamp": "2026-06-29T09:46:00Z",
+          "value": 35.0
+        },
+        {
+          "timestamp": "2026-06-29T09:47:00Z",
+          "value": 34.2
+        },
+        {
+          "timestamp": "2026-06-29T09:48:00Z",
+          "value": 33.9
+        },
+        {
+          "timestamp": "2026-06-29T09:49:00Z",
+          "value": 35.5
+        },
+        {
+          "timestamp": "2026-06-29T09:50:00Z",
+          "value": 36.0
+        },
+        {
+          "timestamp": "2026-06-29T09:51:00Z",
+          "value": 34.8
+        },
+        {
+          "timestamp": "2026-06-29T09:52:00Z",
+          "value": 35.1
+        },
+        {
+          "timestamp": "2026-06-29T09:53:00Z",
+          "value": 33.0
+        },
+        {
+          "timestamp": "2026-06-29T09:54:00Z",
+          "value": 34.5
+        },
+        {
+          "timestamp": "2026-06-29T09:55:00Z",
+          "value": 55.4
+        },
+        {
+          "timestamp": "2026-06-29T09:56:00Z",
+          "value": 78.2
+        },
+        {
+          "timestamp": "2026-06-29T09:57:00Z",
+          "value": 92.5
+        },
+        {
+          "timestamp": "2026-06-29T09:58:00Z",
+          "value": 95.0
+        },
+        {
+          "timestamp": "2026-06-29T09:59:00Z",
+          "value": 94.8
+        },
+        {
+          "timestamp": "2026-06-29T10:00:00Z",
+          "value": 98.5
+        },
+        {
+          "timestamp": "2026-06-29T10:01:00Z",
+          "value": 99.1
+        },
+        {
+          "timestamp": "2026-06-29T10:02:00Z",
+          "value": 99.5
+        },
+        {
+          "timestamp": "2026-06-29T10:03:00Z",
+          "value": 99.8
+        },
+        {
+          "timestamp": "2026-06-29T10:04:00Z",
+          "value": 80.2
+        },
+        {
+          "timestamp": "2026-06-29T10:05:00Z",
+          "value": 45.1
+        },
+        {
+          "timestamp": "2026-06-29T10:06:00Z",
+          "value": 95.0
+        },
+        {
+          "timestamp": "2026-06-29T10:07:00Z",
+          "value": 98.2
+        },
+        {
+          "timestamp": "2026-06-29T10:08:00Z",
+          "value": 99.0
+        },
+        {
+          "timestamp": "2026-06-29T10:09:00Z",
+          "value": 99.1
+        },
+        {
+          "timestamp": "2026-06-29T10:10:00Z",
+          "value": 98.8
+        }
+      ]
+    },
+    {
+      "metric_name": "memory_usage_mb",
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "service": "book-service",
+      "values": [
+        {
+          "timestamp": "2026-06-29T09:45:00Z",
+          "value": 410
+        },
+        {
+          "timestamp": "2026-06-29T09:46:00Z",
+          "value": 412
+        },
+        {
+          "timestamp": "2026-06-29T09:47:00Z",
+          "value": 415
+        },
+        {
+          "timestamp": "2026-06-29T09:48:00Z",
+          "value": 420
+        },
+        {
+          "timestamp": "2026-06-29T09:49:00Z",
+          "value": 430
+        },
+        {
+          "timestamp": "2026-06-29T09:50:00Z",
+          "value": 450
+        },
+        {
+          "timestamp": "2026-06-29T09:51:00Z",
+          "value": 480
+        },
+        {
+          "timestamp": "2026-06-29T09:52:00Z",
+          "value": 520
+        },
+        {
+          "timestamp": "2026-06-29T09:53:00Z",
+          "value": 580
+        },
+        {
+          "timestamp": "2026-06-29T09:54:00Z",
+          "value": 650
+        },
+        {
+          "timestamp": "2026-06-29T09:55:00Z",
+          "value": 720
+        },
+        {
+          "timestamp": "2026-06-29T09:56:00Z",
+          "value": 810
+        },
+        {
+          "timestamp": "2026-06-29T09:57:00Z",
+          "value": 900
+        },
+        {
+          "timestamp": "2026-06-29T09:58:00Z",
+          "value": 950
+        },
+        {
+          "timestamp": "2026-06-29T09:59:00Z",
+          "value": 980
+        },
+        {
+          "timestamp": "2026-06-29T10:00:00Z",
+          "value": 1010
+        },
+        {
+          "timestamp": "2026-06-29T10:01:00Z",
+          "value": 1020
+        },
+        {
+          "timestamp": "2026-06-29T10:02:00Z",
+          "value": 1035
+        },
+        {
+          "timestamp": "2026-06-29T10:03:00Z",
+          "value": 1040
+        },
+        {
+          "timestamp": "2026-06-29T10:04:00Z",
+          "value": 450
+        },
+        {
+          "timestamp": "2026-06-29T10:05:00Z",
+          "value": 480
+        },
+        {
+          "timestamp": "2026-06-29T10:06:00Z",
+          "value": 680
+        },
+        {
+          "timestamp": "2026-06-29T10:07:00Z",
+          "value": 850
+        },
+        {
+          "timestamp": "2026-06-29T10:08:00Z",
+          "value": 980
+        },
+        {
+          "timestamp": "2026-06-29T10:09:00Z",
+          "value": 1015
+        },
+        {
+          "timestamp": "2026-06-29T10:10:00Z",
+          "value": 1030
+        }
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "service": "book-service",
+      "log_file": "book-service.log",
+      "content": "2026-06-29T09:45:00.123Z INFO [book-service] Request processed: GET /books/123 status=200 duration_ms=45\n2026-06-29T09:50:00.543Z INFO [book-service] Request processed: POST /checkout status=201 duration_ms=88\n2026-06-29T09:56:10.987Z WARN [book-service] Request processing time exceeded threshold: GET /checkout duration_ms=320\n2026-06-29T09:57:15.111Z WARN [book-service] Request processing time exceeded threshold: GET /books/456 duration_ms=480\n2026-06-29T09:58:30.456Z WARN [book-service] Slow response detected: DB query 'SELECT * FROM books WHERE id = ?' took 410ms\n2026-06-29T09:59:45.789Z ERROR [book-service] Connection pool capacity reached (max=50). Active connections=50, Pending=12\n2026-06-29T10:00:01.002Z ERROR [book-service] HTTP 500 - Internal Server Error on POST /checkout: Connection timeout obtaining connection from pool\n2026-06-29T10:00:15.345Z ERROR [book-service] DB connection timeout. Failed to acquire connection in 1000ms.\n2026-06-29T10:01:05.678Z ERROR [book-service] HTTP 500 - Internal Server Error on GET /books/789: Connection pool exhausted.\n2026-06-29T10:02:12.901Z ERROR [book-service] Fail-fast triggered. Rejecting request to prevent complete lockup.\n2026-06-29T10:03:00.005Z ERROR [book-service] Healthcheck failed: db connection is unreachable\n2026-06-29T10:04:10.432Z FATAL [book-service] OutOfMemoryError: Metaspace limit exceeded. JVM exiting.\n2026-06-29T10:04:11.000Z INFO [book-service] Received SIGTERM, shutting down connection pool.\n2026-06-29T10:05:00.123Z INFO [book-service] JVM starting up. Version v1.2.3, active profile: prod\n2026-06-29T10:05:05.987Z ERROR [book-service] Initialization failed: database port 5432 connection refused\n2026-06-29T10:05:06.000Z INFO [book-service] Received SIGTERM, shutting down.\n2026-06-29T10:06:30.456Z INFO [book-service] JVM starting up. Version v1.2.3, active profile: prod\n2026-06-29T10:07:00.789Z INFO [book-service] Database connection established successfully.\n2026-06-29T10:08:12.123Z INFO [book-service] Request processed: GET /books/123 status=200 duration_ms=42\n"
+    }
+  ],
+  "traces": [
+    {
+      "trace_id": "trace-checkout-001",
+      "root_span": {
+        "span_id": "span-parent-001",
+        "service": "book-service",
+        "operation": "POST /checkout",
+        "start_time": "2026-06-29T10:00:00.100Z",
+        "duration_ms": 2500,
+        "status": "ERROR",
+        "tags": {
+          "http.status_code": "500",
+          "error": "true"
+        }
+      },
+      "child_spans": [
+        {
+          "span_id": "span-db-001",
+          "service": "book-service-db",
+          "operation": "SELECT OR UPDATE",
+          "start_time": "2026-06-29T10:00:01.200Z",
+          "duration_ms": 1000,
+          "status": "ERROR",
+          "tags": {
+            "db.type": "postgres",
+            "error.message": "connection timeout"
+          }
+        }
+      ]
+    }
+  ],
+  "k8s_events": [
+    {
+      "event_time": "2026-06-29T10:03:00Z",
+      "type": "Warning",
+      "reason": "Unhealthy",
+      "object": "Pod/book-service-7d9f6c8d9f-abcd1",
+      "message": "Readiness probe failed: HTTP probe failed with statuscode: 503"
+    },
+    {
+      "event_time": "2026-06-29T10:03:30Z",
+      "type": "Warning",
+      "reason": "Unhealthy",
+      "object": "Pod/book-service-7d9f6c8d9f-abcd1",
+      "message": "Liveness probe failed: HTTP probe failed with statuscode: 503"
+    },
+    {
+      "event_time": "2026-06-29T10:04:15Z",
+      "type": "Normal",
+      "reason": "Killing",
+      "object": "Pod/book-service-7d9f6c8d9f-abcd1",
+      "message": "Container book-service failed liveness probe, will be restarted"
+    },
+    {
+      "event_time": "2026-06-29T10:04:45Z",
+      "type": "Warning",
+      "reason": "BackOff",
+      "object": "Pod/book-service-7d9f6c8d9f-abcd1",
+      "message": "Back-off restarting failed container"
+    },
+    {
+      "event_time": "2026-06-29T10:05:00Z",
+      "type": "Normal",
+      "reason": "Started",
+      "object": "Pod/book-service-7d9f6c8d9f-abcd1",
+      "message": "Started container book-service"
+    }
+  ],
+  "recent_deploys": [
+    {
+      "service": "book-service",
+      "version": "v1.2.3",
+      "git_sha": "7d9f6c8d9f1234567890abcdef1234567890abcd",
+      "image_digest": "sha256:abcd1234efgh5678ijkl9012mnop3456qrst7890uvwx1234yz",
+      "deployed_at": "2026-06-29T09:30:00Z",
+      "deployed_by": "john.doe@company.com",
+      "change_summary": "Optimized database connections and added connection pooling",
+      "rollback_ref": "v1.2.2"
+    }
+  ],
+  "ownership": {
+    "owner_team": "team-book",
+    "slack_channel": "#oncall-book",
+    "jira_project": "BOOK",
+    "jira_component": "book-service",
+    "runbooks": [
+      {
+        "trigger_reason": "high_5xx_rate",
+        "runbook_url": "runbook://book-service/high-5xx"
+      },
+      {
+        "trigger_reason": "high_latency",
+        "runbook_url": "runbook://book-service/high-latency"
+      }
+    ]
+  },
+  "context_quality": "COMPLETE",
+  "missing_context": []
+}

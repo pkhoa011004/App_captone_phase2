@@ -1,0 +1,37 @@
+[
+  {
+    "event_time": "2026-06-29T10:03:00Z",
+    "type": "Warning",
+    "reason": "Unhealthy",
+    "object": "Pod/book-service-7d9f6c8d9f-abcd1",
+    "message": "Readiness probe failed: HTTP probe failed with statuscode: 503"
+  },
+  {
+    "event_time": "2026-06-29T10:03:30Z",
+    "type": "Warning",
+    "reason": "Unhealthy",
+    "object": "Pod/book-service-7d9f6c8d9f-abcd1",
+    "message": "Liveness probe failed: HTTP probe failed with statuscode: 503"
+  },
+  {
+    "event_time": "2026-06-29T10:04:15Z",
+    "type": "Normal",
+    "reason": "Killing",
+    "object": "Pod/book-service-7d9f6c8d9f-abcd1",
+    "message": "Container book-service failed liveness probe, will be restarted"
+  },
+  {
+    "event_time": "2026-06-29T10:04:45Z",
+    "type": "Warning",
+    "reason": "BackOff",
+    "object": "Pod/book-service-7d9f6c8d9f-abcd1",
+    "message": "Back-off restarting failed container"
+  },
+  {
+    "event_time": "2026-06-29T10:05:00Z",
+    "type": "Normal",
+    "reason": "Started",
+    "object": "Pod/book-service-7d9f6c8d9f-abcd1",
+    "message": "Started container book-service"
+  }
+]

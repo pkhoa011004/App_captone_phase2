@@ -1,0 +1,111 @@
+{
+  "tenant_id": "tenant-a",
+  "environment": "prod",
+  "service": "book-service",
+  "evidence_window": {
+    "start": "2026-06-29T09:45:00Z",
+    "end": "2026-06-29T10:05:00Z"
+  },
+  "traces": [
+    {
+      "trace_id": "trace-book-ok-001",
+      "phase": "baseline",
+      "root_service": "frontend",
+      "spans": [
+        {
+          "span_id": "span-ok-frontend",
+          "parent_span_id": null,
+          "service": "frontend",
+          "operation": "GET /books/123",
+          "ts": "2026-06-29T09:45:12Z",
+          "duration_ms": 180,
+          "status_code": "200"
+        },
+        {
+          "span_id": "span-ok-book",
+          "parent_span_id": "span-ok-frontend",
+          "service": "book-service",
+          "operation": "GET /books/{id}",
+          "ts": "2026-06-29T09:45:12Z",
+          "duration_ms": 142,
+          "status_code": "200"
+        },
+        {
+          "span_id": "span-ok-db",
+          "parent_span_id": "span-ok-book",
+          "service": "database",
+          "operation": "SELECT book",
+          "ts": "2026-06-29T09:45:12Z",
+          "duration_ms": 48,
+          "status_code": "OK"
+        }
+      ]
+    },
+    {
+      "trace_id": "trace-book-fail-001",
+      "phase": "around_alert",
+      "root_service": "frontend",
+      "spans": [
+        {
+          "span_id": "span-fail-frontend",
+          "parent_span_id": null,
+          "service": "frontend",
+          "operation": "GET /books/123",
+          "ts": "2026-06-29T10:00:03Z",
+          "duration_ms": 3050,
+          "status_code": "500"
+        },
+        {
+          "span_id": "span-fail-book",
+          "parent_span_id": "span-fail-frontend",
+          "service": "book-service",
+          "operation": "GET /books/{id}",
+          "ts": "2026-06-29T10:00:03Z",
+          "duration_ms": 3002,
+          "status_code": "500"
+        },
+        {
+          "span_id": "span-fail-db",
+          "parent_span_id": "span-fail-book",
+          "service": "database",
+          "operation": "SELECT book",
+          "ts": "2026-06-29T10:00:03Z",
+          "duration_ms": 3000,
+          "status_code": "TIMEOUT",
+          "labels": {
+            "dependency": "database"
+          }
+        }
+      ]
+    },
+    {
+      "trace_id": "trace-order-book-timeout-001",
+      "phase": "after_alert",
+      "root_service": "order-service",
+      "spans": [
+        {
+          "span_id": "span-order-root",
+          "parent_span_id": null,
+          "service": "order-service",
+          "operation": "POST /orders",
+          "ts": "2026-06-29T10:02:31Z",
+          "duration_ms": 5000,
+          "status_code": "504"
+        },
+        {
+          "span_id": "span-order-book",
+          "parent_span_id": "span-order-root",
+          "service": "book-service",
+          "operation": "GET /books/{id}",
+          "ts": "2026-06-29T10:02:31Z",
+          "duration_ms": 5000,
+          "status_code": "TIMEOUT",
+          "labels": {
+            "caller_service": "order-service",
+            "target_service": "book-service"
+          }
+        }
+      ]
+    }
+  ]
+}

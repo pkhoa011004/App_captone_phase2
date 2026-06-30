@@ -1,0 +1,352 @@
+Dưới đây là flow hiện tại để sync với team, kèm thuật toán, ngưỡng quyết định, và bounds.
+
+**Flow Triage Hiện Tại**
+
+1. `POST /v1/triage`
+   - Nhận alert metadata và evidence nếu có.
+   - Contract public vẫn giữ nguyên, không đổi schema request.
+
+2. Validate request
+   - Check `X-Tenant-Id` khớp `tenant_id`.
+   - Check `X-Correlation-Id` khớp `correlation_id`.
+   - Nếu có `SERVICE_AUTH_TOKEN`, yêu cầu `Authorization: Bearer ...`.
+
+3. Context enrichment
+   - Inline evidence thắng trước: nếu request đã có `metrics`, `logs`, `traces`, `recent_deploys` thì giữ nguyên.
+   - Nếu có `alert.labels.evidence_uri`, engine load evidence bundle.
+   - Evidence bundle chỉ được dùng nếu đúng scope:
+     - `tenant_id`
+     - `environment`
+     - `service`
+     - thời gian nằm trong alert window
+   - Nếu thiếu field nào, gọi scoped context tools:
+     - `get_metrics`
+     - `get_logs`
+     - `get_traces`
+     - `get_recent_deploys`
+     - `get_ownership`
+   - Tool lỗi thì không fail request, chỉ degrade và ghi missing context.
+
+4. Deterministic RCA
+   - Chạy phân tích không dùng LLM:
+     - metric anomaly detection
+     - log anomaly detection
+     - topology inference
+     - causal hints
+     - RCA candidate ranking
+   - Output gồm:
+     - `anomaly_evidence`
+     - `service_topology`
+     - `causal_hints`
+     - `rca_candidates`
+     - `investigation_summary`
+
+5. Classification
+   - Rule-based classify thành:
+     - `INSUFFICIENT_CONTEXT`
+     - `INVESTIGATE`
+     - `DIAGNOSED`
+   - Classification chính:
+     - `insufficient_context`
+     - `noisy_or_ambiguous_alert`
+     - `critical_service_down`
+     - `latency_degradation`
+     - `general_investigation`
+
+6. Optional LLM investigation
+   - Chỉ chạy nếu enabled qua env.
+   - LLM chỉ được request read-only tools trong allowlist.
+   - Không được chạy PromQL/LogQL tự do, shell command, Jira, Slack, mutation, remediation.
+   - Nếu LLM lỗi, timeout, JSON sai, tool sai allowlist thì fallback deterministic.
+
+7. Jira history enrichment
+   - Read-only lookup `get_jira_history`.
+   - Dùng để gợi ý assignee.
+   - Không tạo Jira ticket.
+
+8. QA stage
+   - Mặc định chạy tối đa 1 QA iteration.
+   - Nếu QA thấy thiếu evidence/unsupported conclusion thì giảm confidence.
+   - Nếu vượt token budget thì trả best available RCA và thêm QA metadata.
+   - Không block triage.
+
+9. Response assembly
+   - Build diagnosis response:
+     - classification
+     - severity
+     - confidence
+     - suspected root cause
+     - recommended actions
+     - ticket payload
+     - audit id
+     - llm metadata + QA metadata
+   - Engine chỉ trả diagnosis data. Jira/Slack execution vẫn thuộc CDO.
+
+**Thuật Toán Đang Dùng**
+
+Metric anomaly detection:
+- Threshold rule
+- Rolling z-score 3 sigma
+- EWMA drift
+- Isolation Forest
+
+Log anomaly detection:
+- Keyword matching theo error tokens:
+  - `error`
+  - `timeout`
+  - `failed`
+  - `refused`
+  - `exhausted`
+  - `down`
+  - `deadline`
+
+Topology inference:
+- Từ metric labels `dependency`
+- Từ log labels `dependency`
+- Từ text log có dependency keywords:
+  - `redis`, `postgres`, `mysql`, `kafka`, `s3`, `checkout`, `payment`, `inventory`
+
+Causal hints:
+- Lag correlation giữa metric series của các service.
+- Chỉ chạy nếu mỗi service có đủ điểm dữ liệu.
+
+RCA ranking:
+- Cộng điểm từ:
+  - anomaly evidence score
+  - dependency relationship
+  - recent deploy
+  - causal hints
+- Trả top 5 RCA candidates.
+
+Classification:
+- Rule-based deterministic classifier.
+
+QA:
+- Deterministic consistency checks, không phải LLM QA hiện tại.
+
+**Decision Thresholds**
+
+Metric thresholds:
+- Latency: metric name chứa `latency`, value `>= 1000`
+- Error/5xx: metric name chứa `error` hoặc `5xx`, value `>= 5`
+- Availability: metric name chứa `availability`, value `< 95`
+- Timeout: metric name chứa `timeout`, value `>= 10`
+- CPU/memory: metric name chứa `cpu` hoặc `memory`, value `>= 85`
+
+Statistical thresholds:
+- Rolling z-score: anomaly nếu `abs(z_score) >= 3.0`
+- EWMA drift: anomaly nếu drift >= max của:
+  - `3 * spread`
+  - `25% expected`
+  - `1.0`
+- Isolation Forest:
+  - chạy khi có ít nhất 8 data points
+  - và ít nhất 3 giá trị khác nhau
+  - contamination = `0.15`
+  - latest point bị classify là outlier thì emit anomaly
+
+Causal hint:
+- Lag correlation cần ít nhất 6 aligned points.
+- Emit hint nếu `abs(correlation) >= 0.7`.
+
+Classification confidence:
+- `INSUFFICIENT_CONTEXT`: `0.25`
+- `noisy_or_ambiguous_alert`: `0.45`
+- `critical_service_down`: `0.86`
+- `latency_degradation`: `0.82`
+- `general_investigation`: `0.55`
+
+LLM investigation trigger:
+- Chạy nếu enabled và:
+  - confidence `< 0.7`, hoặc
+  - status là `INSUFFICIENT_CONTEXT` / `INVESTIGATE`, hoặc
+  - thiếu metrics/logs/recent deploys, hoặc
+  - alert text chứa `ambiguous`, `noisy`, `dependency`, `missing context`.
+
+**Bounds / Guardrails**
+
+Request/API:
+- Public API giữ nguyên: `POST /v1/triage`.
+- Internal endpoints thêm:
+  - `/metrics`
+  - `/readyz`
+  - `/healthz`
+
+Context tools:
+- Read-only only.
+- Scope bắt buộc:
+  - same tenant
+  - same environment
+  - same service
+  - bounded time window
+- Default max window: `60 phút`.
+- Default log limit: `50`.
+- Context tool timeout: `AIOPS_CONTEXT_TOOL_TIMEOUT_SECONDS`, default `3s`.
+- Tool failure không fail request.
+
+LLM tools:
+- Max tool calls: `LLM_TOOL_MAX_CALLS`, default `3`.
+- Tool window max: `LLM_TOOL_MAX_WINDOW_MINUTES`, default `60`.
+- Log limit: `LLM_TOOL_LOG_LIMIT`, default `50`.
+- Token budget: `AIOPS_LLM_MAX_TOKENS_PER_INCIDENT`.
+- Nếu vượt budget thì fallback/degrade.
+- LLM không được mutate hệ thống.
+
+QA:
+- `AIOPS_QA_MAX_ITERATIONS=1`
+- `AIOPS_QA_REPAIR_MAX_ITERATIONS=1`
+- Nếu QA fail hoặc budget exceeded:
+  - trả best available diagnosis
+  - giảm confidence `-0.1`
+  - ghi metadata trong `llm_metadata.qa`
+
+Triage deadline:
+- `AIOPS_TRIAGE_DEADLINE_SECONDS=30`
+- Nếu vượt deadline thì ghi budget exceeded metric.
+
+Observability:
+- Metrics low-cardinality only.
+- Không label theo alert title, trace id, incident id, raw evidence.
+- Logs metadata-only mặc định:
+  - có audit/tenant/service/env/stage/status/duration/counts
+  - không log raw customer evidence.
+
+**Metrics Chính**
+
+Request:
+- `aiops_triage_requests_total{status,classification}`
+- `aiops_triage_request_duration_seconds`
+- `aiops_triage_inflight_requests`
+
+Context:
+- `aiops_context_tool_calls_total{tool,status}`
+- `aiops_context_tool_duration_seconds{tool}`
+- `aiops_context_enrichment_missing_fields_total{field}`
+- `aiops_context_enrichment_result_total{result}`
+
+LLM/QA:
+- `aiops_llm_calls_total{stage,model,status}`
+- `aiops_llm_tokens_total{stage,model,type}`
+- `aiops_llm_estimated_cost_usd_total{stage,model}`
+- `aiops_qa_iterations_total{result}`
+
+Self-protection:
+- `aiops_circuit_breaker_open{dependency}`
+- `aiops_budget_exceeded_total{budget_type}`
+- `aiops_degraded_mode_total{reason}`
+
+**Agent Hiện Đang Làm Gì**
+
+Hiện tại "agent" trong repo không phải là một autonomous agent được host riêng để tự mutate hệ thống. Nó là một pipeline gồm 2 phần chính:
+
+1. Triage engine
+   - FastAPI service: `app.main`.
+   - Endpoint chính: `POST /v1/triage`.
+   - Chạy deterministic RCA trước.
+   - Optional mới gọi LLM/AgentCore để:
+     - viết investigation summary,
+     - reword recommended actions,
+     - đề xuất bounded read-only tool calls.
+   - Engine vẫn là bên validate scope và execute tool local, không để LLM tự chạy lệnh.
+
+2. AIOps worker
+   - Script: `app.aiops_worker`.
+   - Nhiệm vụ:
+     - query Prometheus/Loki/Jaeger hoặc đọc offline datapack,
+     - detect incident candidate,
+     - build normalized triage request,
+     - gọi `/v1/triage`,
+     - ghi report JSON,
+     - publish Slack dry-run hoặc Slack webhook nếu configured.
+   - Worker cũng có SQS mode để consume incident seed từ queue.
+
+**Host Ở Đâu**
+
+Local/dev host:
+- Triage engine chạy ở:
+  - `http://localhost:8080`
+  - health: `http://localhost:8080/healthz`
+  - metrics: `http://localhost:8080/metrics`
+- Report UI:
+  - `http://localhost:5173`
+- Prometheus:
+  - `http://localhost:9090`
+- Loki:
+  - `http://localhost:3100`
+- Jaeger:
+  - `http://localhost:16686`
+- Grafana:
+  - `http://localhost:3000`
+
+Docker Compose host:
+- Service name trong compose: `triage-engine`.
+- Container name: `tf1-triage-engine`.
+- Nội bộ compose gọi qua:
+  - `http://triage-engine:8080/v1/triage`
+- Bên ngoài máy host gọi qua:
+  - `http://localhost:8080/v1/triage`
+
+AWS/AgentCore host:
+- AgentCore không host toàn bộ triage engine.
+- AgentCore chỉ là optional LLM runtime bên AWS Bedrock AgentCore.
+- Triage engine gọi AgentCore qua:
+  - `boto3.client("bedrock-agentcore")`
+  - `invoke_agent_runtime(...)`
+  - `AGENTCORE_RUNTIME_ARN`
+- Nếu không set env AgentCore thì engine chạy deterministic-only.
+
+**Kéo Về / Chạy Lên Như Thế Nào**
+
+Kéo code về:
+- Pull repo bình thường bằng Git.
+- Vào thư mục:
+  - `capstone/tf-1/ai/engine-skeleton`
+
+Chạy full local demo stack:
+- `docker compose -f docker-compose.observability.yml up --build`
+
+Chạy API không Docker:
+- `pip install -r requirements.txt`
+- `python -m uvicorn app.main:app --host 127.0.0.1 --port 8081`
+
+Trigger report offline:
+- `python -m app.aiops_worker --offline-scenario --scenario latency-degradation --service payment-api --triage-url http://127.0.0.1:8081/v1/triage --report-dir reports`
+
+Kéo data observability về:
+- Worker query Prometheus bằng `PROMETHEUS_URL`.
+- Worker query Loki bằng `LOKI_URL`.
+- Worker query Jaeger bằng `JAEGER_URL`.
+- Query đều bounded theo tenant/service/environment/window.
+
+Kéo incident seed từ SQS:
+- Set `SQS_QUEUE_URL`.
+- Worker chạy SQS mode.
+- Worker receive message, validate `IncidentSeed`, build triage request, gọi `/v1/triage`, ghi report, rồi delete message nếu xử lý thành công.
+
+**AgentCore Runtime Có Phải Agent Không**
+
+Đúng, nhưng chỉ là optional LLM runtime, không phải core control plane.
+
+AgentCore runtime dùng cho:
+- `investigation_summary`
+- `action_wording`
+- `tool_calls` read-only
+
+AgentCore runtime không được:
+- tự query Prometheus/Loki bằng query tự do,
+- chạy shell command,
+- mutate app/customer system,
+- tạo Jira,
+- post Slack,
+- rollback/restart/scale service.
+
+Env để bật AgentCore:
+- `AWS_REGION=us-east-1`
+- `AGENTCORE_RUNTIME_ARN=arn:aws:bedrock-agentcore:...:runtime/tf1-investigator`
+- `ENABLE_AGENTCORE_LLM=true`
+- `ENABLE_AGENTCORE_LLM_TOOLS=true`
+
+Nếu AgentCore lỗi:
+- engine fallback deterministic RCA,
+- không fail request,
+- ghi degraded metadata/metrics.

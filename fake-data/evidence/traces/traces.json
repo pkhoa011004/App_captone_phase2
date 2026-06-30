@@ -1,0 +1,31 @@
+[
+  {
+    "trace_id": "trace-checkout-001",
+    "root_span": {
+      "span_id": "span-parent-001",
+      "service": "book-service",
+      "operation": "POST /checkout",
+      "start_time": "2026-06-29T10:00:00.100Z",
+      "duration_ms": 2500,
+      "status": "ERROR",
+      "tags": {
+        "http.status_code": "500",
+        "error": "true"
+      }
+    },
+    "child_spans": [
+      {
+        "span_id": "span-db-001",
+        "service": "book-service-db",
+        "operation": "SELECT OR UPDATE",
+        "start_time": "2026-06-29T10:00:01.200Z",
+        "duration_ms": 1000,
+        "status": "ERROR",
+        "tags": {
+          "db.type": "postgres",
+          "error.message": "connection timeout"
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,114 @@
+{
+  "metric_name": "memory_usage_mb",
+  "tenant_id": "tenant-a",
+  "environment": "prod",
+  "cluster": "eks-prod",
+  "namespace": "bookhub-prod",
+  "service": "book-service",
+  "values": [
+    {
+      "timestamp": "2026-06-29T09:45:00Z",
+      "value": 410
+    },
+    {
+      "timestamp": "2026-06-29T09:46:00Z",
+      "value": 412
+    },
+    {
+      "timestamp": "2026-06-29T09:47:00Z",
+      "value": 415
+    },
+    {
+      "timestamp": "2026-06-29T09:48:00Z",
+      "value": 420
+    },
+    {
+      "timestamp": "2026-06-29T09:49:00Z",
+      "value": 430
+    },
+    {
+      "timestamp": "2026-06-29T09:50:00Z",
+      "value": 450
+    },
+    {
+      "timestamp": "2026-06-29T09:51:00Z",
+      "value": 480
+    },
+    {
+      "timestamp": "2026-06-29T09:52:00Z",
+      "value": 520
+    },
+    {
+      "timestamp": "2026-06-29T09:53:00Z",
+      "value": 580
+    },
+    {
+      "timestamp": "2026-06-29T09:54:00Z",
+      "value": 650
+    },
+    {
+      "timestamp": "2026-06-29T09:55:00Z",
+      "value": 720
+    },
+    {
+      "timestamp": "2026-06-29T09:56:00Z",
+      "value": 810
+    },
+    {
+      "timestamp": "2026-06-29T09:57:00Z",
+      "value": 900
+    },
+    {
+      "timestamp": "2026-06-29T09:58:00Z",
+      "value": 950
+    },
+    {
+      "timestamp": "2026-06-29T09:59:00Z",
+      "value": 980
+    },
+    {
+      "timestamp": "2026-06-29T10:00:00Z",
+      "value": 1010
+    },
+    {
+      "timestamp": "2026-06-29T10:01:00Z",
+      "value": 1020
+    },
+    {
+      "timestamp": "2026-06-29T10:02:00Z",
+      "value": 1035
+    },
+    {
+      "timestamp": "2026-06-29T10:03:00Z",
+      "value": 1040
+    },
+    {
+      "timestamp": "2026-06-29T10:04:00Z",
+      "value": 450
+    },
+    {
+      "timestamp": "2026-06-29T10:05:00Z",
+      "value": 480
+    },
+    {
+      "timestamp": "2026-06-29T10:06:00Z",
+      "value": 680
+    },
+    {
+      "timestamp": "2026-06-29T10:07:00Z",
+      "value": 850
+    },
+    {
+      "timestamp": "2026-06-29T10:08:00Z",
+      "value": 980
+    },
+    {
+      "timestamp": "2026-06-29T10:09:00Z",
+      "value": 1015
+    },
+    {
+      "timestamp": "2026-06-29T10:10:00Z",
+      "value": 1030
+    }
+  ]
+}

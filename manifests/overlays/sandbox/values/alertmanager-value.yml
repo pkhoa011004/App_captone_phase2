@@ -1,0 +1,16 @@
+alertmanager:
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      group_by: ['job']
+      group_wait: 1s
+      group_interval: 1m
+      repeat_interval: 1h
+      receiver: 'platform-service-webhook'
+    receivers:
+      - name: 'null'
+      - name: 'platform-service-webhook'
+        webhook_configs:
+          - url: "https://bcwj3i4rn9.execute-api.ap-southeast-1.amazonaws.com"
+            send_resolved: true

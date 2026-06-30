@@ -1,0 +1,46 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tf1-triage-hub
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: tf1-triage-hub
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/me-dangnhatminh/xbrain-capstone-cdo5.git
+    targetRevision: HEAD
+    path: manifests/argocd/apps
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tf1-platform # namespace is set in kustomization.yaml overlays
+
+  syncPolicy:
+    automated:
+      prune: false # never auto-delete resources (safety)
+      selfHeal: true # revert manual kubectl changes back to Git state
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+  # Health checks override for ExternalSecret (not natively understood by ArgoCD)
+  ignoreDifferences:
+    - group: external-secrets.io
+      kind: ExternalSecret
+      jsonPointers:
+        - /status
+
+  revisionHistoryLimit: 10

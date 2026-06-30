@@ -1,0 +1,118 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: monitoring-set
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - env: sandbox
+  template:
+    metadata:
+      name: "monitoring-{{env}}"
+      annotations:
+        argocd.argoproj.io/sync-wave: "1"
+    spec:
+      project: default
+      sources:
+        - repoURL: https://prometheus-community.github.io/helm-charts
+          targetRevision: 57.0.3
+          chart: kube-prometheus-stack
+          helm:
+            valueFiles:
+              - $values/manifests/overlays/{{env}}/values/prometheus-values.yaml
+              - $values/manifests/overlays/{{env}}/values/alertmanager-value.yml
+              - $values/manifests/overlays/{{env}}/values/grafana-values.yaml
+        - repoURL: "https://github.com/me-dangnhatminh/xbrain-capstone-cdo5.git"
+          targetRevision: HEAD
+          ref: values
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "monitoring-{{env}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: xbrain-appset
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - list:
+        elements:
+          - env: sandbox
+  template:
+    metadata:
+      name: "xbrain-cdo5-{{.env}}"
+      annotations:
+        argocd.argoproj.io/sync-wave: "2"
+    spec:
+      project: default
+      source:
+        repoURL: "https://github.com/me-dangnhatminh/xbrain-capstone-cdo5.git"
+        targetRevision: HEAD
+        path: "manifests/overlays/{{.env}}"
+      destination:
+        server: "https://kubernetes.default.svc"
+        namespace: "xbrain-cdo5-{{.env}}"
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+      ignoreDifferences:
+        - group: external-secrets.io
+          kind: ExternalSecret
+          jsonPointers:
+            - /status
+  templatePatch: |
+    {{- if ne .env "prod" }}
+    spec:
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+    {{- end }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: loki-set
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - env: sandbox
+  template:
+    metadata:
+      name: "loki-{{env}}"
+      annotations:
+        argocd.argoproj.io/sync-wave: "1"
+    spec:
+      project: default
+      sources:
+        - repoURL: https://grafana.github.io/helm-charts
+          targetRevision: 2.10.2
+          chart: loki-stack
+          helm:
+            valueFiles:
+              - $values/manifests/overlays/{{env}}/values/loki-values.yaml
+        - repoURL: "https://github.com/me-dangnhatminh/xbrain-capstone-cdo5.git"
+          targetRevision: HEAD
+          ref: values
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "monitoring-{{env}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

@@ -1,0 +1,32 @@
+# Flask specific
+instance/
+.webassets-cache
+
+# Python environment & dependencies
+.venv/
+venv/
+ENV/
+env/
+bin/
+lib/
+include/
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment variables & secrets
+.env
+.flaskenv
+*.env.local
+
+# Databases
+*.db
+*.sqlite3
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+htmlcov/

@@ -1,0 +1,23 @@
+{
+  "incident_id": "INC-20260629-0001",
+  "correlation_id": "corr-tenant-a-prod-20260629-0001",
+  "tenant_id": "tenant-a",
+  "environment": "prod",
+  "primary_service": "book-service",
+  "affected_services": [
+    "order-service",
+    "frontend"
+  ],
+  "impact_scope": "multi_service",
+  "time_window": {
+    "start": "2026-06-29T09:45:00Z",
+    "end": "2026-06-29T10:05:00Z"
+  },
+  "alert_ids": [
+    "alert-book-service-5xx-001",
+    "alert-order-service-timeout-001",
+    "alert-frontend-latency-001"
+  ],
+  "suspected_dependency": "database",
+  "correlation_reason": "alerts occurred in same tenant/environment/window and dependency map links frontend -> order-service -> book-service -> database"
+}

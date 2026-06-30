@@ -1,0 +1,42 @@
+{
+  "ingest_id": "ingest-20260629-100000-0005",
+  "schema_version": "cdo.alert.v1",
+  "received_at": "2026-06-29T10:05:05Z",
+  "raw_source": "prometheus",
+  "normalized_alert": {
+    "alert_id": "alert-book-service-restart-005",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "source": "prometheus",
+    "service": "book-service",
+    "severity": "critical",
+    "title": "Container restart on book-service",
+    "description": "book-service container restarted unexpectedly",
+    "started_at": "2026-06-29T10:05:00Z",
+    "labels": {
+      "region": "ap-southeast-1",
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "deployment": "book-service",
+      "container": "book-service",
+      "metric_names": [
+        "container_restart_count"
+      ],
+      "reason": "container_restart",
+      "jira_project": "BOOK",
+      "jira_component": "book-service",
+      "runbook_url": "runbook://book-service/container-restart"
+    }
+  },
+  "validation": {
+    "status": "VALID",
+    "missing_fields": [],
+    "missing_optional_fields": []
+  },
+  "enrichment": {
+    "status": "NOT_NEEDED",
+    "source": null,
+    "enriched_fields": []
+  }
+}

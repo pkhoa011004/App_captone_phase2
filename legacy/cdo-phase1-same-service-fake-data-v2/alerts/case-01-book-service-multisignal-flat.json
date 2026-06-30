@@ -1,0 +1,194 @@
+{
+  "alerts": [
+    {
+      "alert_id": "alert-book-high-5xx-001",
+      "source": "prometheus",
+      "service": "book-service",
+      "severity": "critical",
+      "title": "High 5xx rate on book-service",
+      "description": "book-service 5xx rate is above threshold for 5 minutes.",
+      "started_at": "2026-06-29T10:00:00Z",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "region": "ap-southeast-1",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "jira_project": "BOOK",
+        "jira_component": "book-service",
+        "owner_team": "team-book",
+        "runbook_url": "runbook://book-service/high-5xx-healthcheck-crashloop",
+        "alertname": "HighHttp5xxRate",
+        "signal": "http_5xx_high",
+        "metric_names": [
+          "http_5xx_rate_percent",
+          "http_requests_total"
+        ],
+        "status_code": "500",
+        "endpoint": "/books/{id}",
+        "trace_id": "trace-book-fail-001"
+      }
+    },
+    {
+      "alert_id": "alert-book-high-latency-001",
+      "source": "prometheus",
+      "service": "book-service",
+      "severity": "warning",
+      "title": "High latency on book-service",
+      "description": "book-service p95 latency increased above 2 seconds.",
+      "started_at": "2026-06-29T10:00:20Z",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "region": "ap-southeast-1",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "jira_project": "BOOK",
+        "jira_component": "book-service",
+        "owner_team": "team-book",
+        "runbook_url": "runbook://book-service/high-5xx-healthcheck-crashloop",
+        "alertname": "HighLatencyP95",
+        "signal": "latency_high",
+        "metric_names": [
+          "http_latency_p95_ms",
+          "http_request_duration_seconds_bucket"
+        ],
+        "endpoint": "/books/{id}",
+        "trace_id": "trace-book-fail-001"
+      }
+    },
+    {
+      "alert_id": "alert-book-healthcheck-failed-001",
+      "source": "synthetic-healthcheck",
+      "service": "book-service",
+      "severity": "critical",
+      "title": "Healthcheck failed on book-service",
+      "description": "book-service /healthz returned 500 and readiness probe failed.",
+      "started_at": "2026-06-29T09:59:30Z",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "region": "ap-southeast-1",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "jira_project": "BOOK",
+        "jira_component": "book-service",
+        "owner_team": "team-book",
+        "runbook_url": "runbook://book-service/high-5xx-healthcheck-crashloop",
+        "alertname": "HealthcheckFailed",
+        "signal": "healthcheck_failed",
+        "healthcheck_url": "http://book-service.bookhub-prod.svc.cluster.local:8080/healthz",
+        "status_code": "500",
+        "metric_names": [
+          "healthcheck_status"
+        ]
+      }
+    },
+    {
+      "alert_id": "alert-book-pod-crashloop-001",
+      "source": "kubernetes",
+      "service": "book-service",
+      "severity": "critical",
+      "title": "Pod CrashLoopBackOff for book-service",
+      "description": "book-service pod entered CrashLoopBackOff after liveness probe failures.",
+      "started_at": "2026-06-29T10:01:30Z",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "region": "ap-southeast-1",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "jira_project": "BOOK",
+        "jira_component": "book-service",
+        "owner_team": "team-book",
+        "runbook_url": "runbook://book-service/high-5xx-healthcheck-crashloop",
+        "alertname": "PodCrashLoopBackOff",
+        "signal": "pod_crashloop",
+        "reason": "CrashLoopBackOff",
+        "metric_names": [
+          "kube_pod_container_status_waiting_reason"
+        ]
+      }
+    },
+    {
+      "alert_id": "alert-book-container-restart-001",
+      "source": "kube-state-metrics",
+      "service": "book-service",
+      "severity": "warning",
+      "title": "Container restart count increased for book-service",
+      "description": "book-service container restarted multiple times in the last 5 minutes.",
+      "started_at": "2026-06-29T10:02:00Z",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "region": "ap-southeast-1",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "jira_project": "BOOK",
+        "jira_component": "book-service",
+        "owner_team": "team-book",
+        "runbook_url": "runbook://book-service/high-5xx-healthcheck-crashloop",
+        "alertname": "ContainerRestartHigh",
+        "signal": "container_restart_high",
+        "reason": "BackOff",
+        "metric_names": [
+          "kube_pod_container_status_restarts_total"
+        ]
+      }
+    },
+    {
+      "alert_id": "alert-book-timeout-from-order-001",
+      "source": "prometheus",
+      "service": "book-service",
+      "severity": "warning",
+      "title": "Timeouts when order-service calls book-service",
+      "description": "order-service requests to book-service are timing out.",
+      "started_at": "2026-06-29T10:02:30Z",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "region": "ap-southeast-1",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "service": "book-service",
+        "deployment": "book-service",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "jira_project": "BOOK",
+        "jira_component": "book-service",
+        "owner_team": "team-book",
+        "runbook_url": "runbook://book-service/high-5xx-healthcheck-crashloop",
+        "alertname": "DependencyTimeoutToBookService",
+        "signal": "dependency_timeout",
+        "caller_service": "order-service",
+        "target_service": "book-service",
+        "endpoint": "/books/{id}",
+        "metric_names": [
+          "dependency_timeout_total",
+          "upstream_request_duration_ms"
+        ],
+        "trace_id": "trace-order-book-timeout-001"
+      }
+    }
+  ]
+}

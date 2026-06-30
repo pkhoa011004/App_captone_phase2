@@ -1,0 +1,256 @@
+{
+  "tenant_id": "tenant-a",
+  "environment": "prod",
+  "service": "book-service",
+  "evidence_window": {
+    "start": "2026-06-29T09:45:00Z",
+    "end": "2026-06-29T10:05:00Z"
+  },
+  "max_lines_policy": "curated <= 50 lines/service/incident",
+  "logs": [
+    {
+      "ts": "2026-06-29T09:45:12Z",
+      "service": "book-service",
+      "level": "info",
+      "message": "request completed status=200 route=/books/{id} latency_ms=142",
+      "curation_reason": "baseline",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "version": "v2",
+        "git_sha": "a1b2c3d"
+      },
+      "trace_id": "trace-book-ok-001"
+    },
+    {
+      "ts": "2026-06-29T09:50:18Z",
+      "service": "book-service",
+      "level": "info",
+      "message": "healthcheck passed status=200",
+      "curation_reason": "baseline",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "version": "v2",
+        "git_sha": "a1b2c3d"
+      }
+    },
+    {
+      "ts": "2026-06-29T09:55:42Z",
+      "service": "book-service",
+      "level": "warn",
+      "message": "database query latency elevated duration_ms=820 route=/books/{id}",
+      "curation_reason": "pre_alert_degradation",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "version": "v2",
+        "git_sha": "a1b2c3d"
+      },
+      "trace_id": "trace-book-warn-001"
+    },
+    {
+      "ts": "2026-06-29T09:58:30Z",
+      "service": "book-service",
+      "level": "warn",
+      "message": "dependency database timeout threshold approaching duration_ms=1800",
+      "curation_reason": "pre_alert_degradation",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "version": "v2",
+        "git_sha": "a1b2c3d"
+      },
+      "trace_id": "trace-book-warn-002"
+    },
+    {
+      "ts": "2026-06-29T09:59:31Z",
+      "service": "book-service",
+      "level": "error",
+      "message": "readiness probe failed: /healthz returned 500 reason=database_timeout",
+      "curation_reason": "around_alert",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "version": "v2",
+        "git_sha": "a1b2c3d"
+      }
+    },
+    {
+      "ts": "2026-06-29T10:00:03Z",
+      "service": "book-service",
+      "level": "error",
+      "message": "request failed status=500 route=/books/{id} error=database timeout after 3000ms",
+      "curation_reason": "around_alert",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "version": "v2",
+        "git_sha": "a1b2c3d"
+      },
+      "trace_id": "trace-book-fail-001"
+    },
+    {
+      "ts": "2026-06-29T10:00:07Z",
+      "service": "book-service",
+      "level": "error",
+      "message": "healthcheck failed status=500 dependency=database",
+      "curation_reason": "around_alert",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "version": "v2",
+        "git_sha": "a1b2c3d"
+      }
+    },
+    {
+      "ts": "2026-06-29T10:00:24Z",
+      "service": "book-service",
+      "level": "error",
+      "message": "request failed status=500 route=/books/search error=connection pool exhausted",
+      "curation_reason": "around_alert",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "version": "v2",
+        "git_sha": "a1b2c3d"
+      },
+      "trace_id": "trace-book-fail-002"
+    },
+    {
+      "ts": "2026-06-29T10:01:12Z",
+      "service": "book-service",
+      "level": "error",
+      "message": "liveness probe failed, process will terminate",
+      "curation_reason": "after_alert",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "version": "v2",
+        "git_sha": "a1b2c3d"
+      }
+    },
+    {
+      "ts": "2026-06-29T10:01:16Z",
+      "service": "book-service",
+      "level": "error",
+      "message": "process exiting due to repeated healthcheck failures",
+      "curation_reason": "after_alert",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "version": "v2",
+        "git_sha": "a1b2c3d"
+      }
+    },
+    {
+      "ts": "2026-06-29T10:02:03Z",
+      "service": "book-service",
+      "level": "warn",
+      "message": "container restarted by kubelet restart_count=1",
+      "curation_reason": "after_alert",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "version": "v2",
+        "git_sha": "a1b2c3d"
+      }
+    },
+    {
+      "ts": "2026-06-29T10:02:31Z",
+      "service": "book-service",
+      "level": "error",
+      "message": "request from order-service timed out waiting for book-service response",
+      "curation_reason": "after_alert",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "version": "v2",
+        "git_sha": "a1b2c3d"
+      },
+      "trace_id": "trace-order-book-timeout-001"
+    },
+    {
+      "ts": "2026-06-29T10:03:10Z",
+      "service": "book-service",
+      "level": "warn",
+      "message": "BackOff restarting failed container book-service",
+      "curation_reason": "after_alert",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "version": "v2",
+        "git_sha": "a1b2c3d"
+      }
+    },
+    {
+      "ts": "2026-06-29T10:04:35Z",
+      "service": "book-service",
+      "level": "error",
+      "message": "CrashLoopBackOff observed for pod book-service-7d9f6c8d9f-abcd1",
+      "curation_reason": "after_alert",
+      "labels": {
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "container": "book-service",
+        "version": "v2",
+        "git_sha": "a1b2c3d"
+      }
+    }
+  ]
+}
