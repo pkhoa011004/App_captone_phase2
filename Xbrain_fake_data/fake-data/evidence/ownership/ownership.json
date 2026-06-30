@@ -1,4 +1,5 @@
 {
+  "service": "book-service",
   "owner_team": "team-book",
   "slack_channel": "#oncall-book",
   "jira_project": "BOOK",
