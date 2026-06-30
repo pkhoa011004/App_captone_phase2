@@ -1,0 +1,38 @@
+{
+  "correlation_id": "corr-tenant-a-prod-book-service-202606291300",
+  "tenant_id": "tenant-a",
+  "incident_id": "inc-tenant-a-prod-book-service-202606291300",
+  "environment": "prod",
+  "received_at": "2026-06-29T13:00:05Z",
+  "alert": {
+    "alert_id": "alert-book-service-summary-15_api_5xx_spike",
+    "source": "cdo-correlator",
+    "service": "book-service",
+    "severity": "critical",
+    "title": "High 5xx rate on book-service after deployment",
+    "description": "book-service 5xx rate is spiking above 10% following deploy v1.4.3.",
+    "started_at": "2026-06-29T13:00:00Z",
+    "labels": {
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "deployment": "book-service",
+      "container": "book-service",
+      "signals": [
+        "http_5xx_high"
+      ],
+      "evidence_uri": "s3://cdo-evidence/tenant-a/prod/inc-tenant-a-prod-book-service-202606291300/evidence_bundle.json",
+      "jira_project": "BOOK",
+      "jira_component": "book-service"
+    }
+  },
+  "metrics": [],
+  "logs": [],
+  "traces": [],
+  "recent_deploys": [],
+  "ownership": {
+    "service": "book-service",
+    "owner_team": "team-book",
+    "slack_channel": "#oncall-book"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "correlation_id": "corr-tenant-a-prod-book-service-202606291100",
+  "tenant_id": "tenant-a",
+  "incident_id": "inc-tenant-a-prod-book-service-202606291100",
+  "environment": "prod",
+  "received_at": "2026-06-29T11:00:05Z",
+  "alert": {
+    "alert_id": "alert-book-service-summary-13_container_oomkilled",
+    "source": "cdo-correlator",
+    "service": "book-service",
+    "severity": "critical",
+    "title": "Container OOMKilled detected on book-service",
+    "description": "Memory usage reached limit (1024MB), container terminated with exit code 137.",
+    "started_at": "2026-06-29T11:00:00Z",
+    "labels": {
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "deployment": "book-service",
+      "container": "book-service",
+      "signals": [
+        "memory_usage_high",
+        "oom_killed",
+        "pod_crashloop"
+      ],
+      "evidence_uri": "s3://cdo-evidence/tenant-a/prod/inc-tenant-a-prod-book-service-202606291100/evidence_bundle.json",
+      "jira_project": "BOOK",
+      "jira_component": "book-service"
+    }
+  },
+  "metrics": [],
+  "logs": [],
+  "traces": [],
+  "recent_deploys": [],
+  "ownership": {
+    "service": "book-service",
+    "owner_team": "team-book",
+    "slack_channel": "#oncall-book"
+  }
+}

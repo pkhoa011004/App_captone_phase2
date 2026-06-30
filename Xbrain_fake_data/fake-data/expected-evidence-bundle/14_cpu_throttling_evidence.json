@@ -1,0 +1,125 @@
+{
+  "schema_version": "cdo.evidence.v1",
+  "incident_id": "inc-tenant-a-prod-book-service-202606291200",
+  "correlation_id": "corr-tenant-a-prod-book-service-202606291200",
+  "tenant_id": "tenant-a",
+  "environment": "prod",
+  "cluster": "eks-prod",
+  "namespace": "bookhub-prod",
+  "service": "book-service",
+  "evidence_window": {
+    "start": "2026-06-29T11:45:00Z",
+    "end": "2026-06-29T12:10:00Z"
+  },
+  "signals": [
+    "cpu_usage_high",
+    "cpu_throttled"
+  ],
+  "related_entities": {
+    "deployments": [
+      "book-service"
+    ],
+    "pods": [
+      "book-service-7d9f6c8d9f-abcd1"
+    ],
+    "containers": [
+      "book-service"
+    ]
+  },
+  "metrics": [
+    {
+      "metric_name": "cpu_usage_percent",
+      "service": "book-service",
+      "unit": "Percent",
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "points": [
+        {"ts": "2026-06-29T11:45:00Z", "value": 15.0},
+        {"ts": "2026-06-29T11:50:00Z", "value": 35.0},
+        {"ts": "2026-06-29T11:55:00Z", "value": 90.0},
+        {"ts": "2026-06-29T12:00:00Z", "value": 100.0},
+        {"ts": "2026-06-29T12:02:00Z", "value": 100.0},
+        {"ts": "2026-06-29T12:05:00Z", "value": 75.0},
+        {"ts": "2026-06-29T12:10:00Z", "value": 20.0}
+      ]
+    },
+    {
+      "metric_name": "cpu_throttling_percent",
+      "service": "book-service",
+      "unit": "Percent",
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "points": [
+        {"ts": "2026-06-29T11:45:00Z", "value": 0.0},
+        {"ts": "2026-06-29T11:50:00Z", "value": 0.0},
+        {"ts": "2026-06-29T11:55:00Z", "value": 45.0},
+        {"ts": "2026-06-29T12:00:00Z", "value": 65.0},
+        {"ts": "2026-06-29T12:02:00Z", "value": 75.0},
+        {"ts": "2026-06-29T12:05:00Z", "value": 10.0},
+        {"ts": "2026-06-29T12:10:00Z", "value": 0.0}
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "service": "book-service",
+      "ts": "2026-06-29T11:55:00Z",
+      "level": "warning",
+      "message": "Garbage Collection duration exceeds threshold: GC paused for 2100ms"
+    },
+    {
+      "service": "book-service",
+      "ts": "2026-06-29T11:58:00Z",
+      "level": "error",
+      "message": "Task execution rejected: java.util.concurrent.RejectedExecutionException: Task rejected... Queue capacity (500) exceeded."
+    },
+    {
+      "service": "book-service",
+      "ts": "2026-06-29T12:00:00Z",
+      "level": "warning",
+      "message": "Thread pool starved. 50 tasks waiting... CPU throttle time: 1450ms"
+    },
+    {
+      "service": "book-service",
+      "ts": "2026-06-29T12:01:00Z",
+      "level": "error",
+      "message": "HTTP Request timeout on POST /v1/books: client aborted request after 15000ms"
+    }
+  ],
+  "k8s_events": [
+    {
+      "ts": "2026-06-29T11:59:30Z",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "container": "book-service",
+      "reason": "Unhealthy",
+      "type": "Warning",
+      "message": "Liveness probe failed: connection timed out after 5000ms"
+    },
+    {
+      "ts": "2026-06-29T12:00:45Z",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "container": "book-service",
+      "reason": "Unhealthy",
+      "type": "Warning",
+      "message": "Readiness probe failed: connection timed out after 5000ms"
+    }
+  ],
+  "recent_deploys": [],
+  "ownership": {
+    "service": "book-service",
+    "owner_team": "team-book",
+    "slack_channel": "#oncall-book",
+    "jira_project": "BOOK",
+    "jira_component": "book-service"
+  },
+  "context_quality": "COMPLETE",
+  "missing_context": []
+}

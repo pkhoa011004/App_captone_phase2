@@ -26,7 +26,10 @@ const SCENARIOS = [
   { id: '09_flapping_jitter', name: 'Noise Case: Flapping Latency & Ping', desc: 'Jitter/low warnings firing concurrently' },
   { id: '10_alert_storm_multiple_services', name: 'Noise Case: Alert Storm (4 Services)', desc: 'Storm from auth, payment, order & book services' },
   { id: '11_out_of_window', name: 'Noise Case: Out of Time Window', desc: 'Alert at 09:30 mixed with 10:00 alert' },
-  { id: '12_missing_metadata', name: 'Noise Case: Missing Optional Metadata', desc: 'Valid grouping alert missing pod/deploy tags' }
+  { id: '12_missing_metadata', name: 'Noise Case: Missing Optional Metadata', desc: 'Valid grouping alert missing pod/deploy tags' },
+  { id: '13_container_oomkilled', name: 'Scenario 2: Container OOMKilled', desc: 'Pod RAM overload leading to K8s SIGKILL and CrashLoop' },
+  { id: '14_cpu_throttling', name: 'Scenario 6: CPU Throttling', desc: 'High CPU load leading to cgroups throttling and GC pauses' },
+  { id: '15_api_5xx_spike', name: 'Scenario 3: API HTTP 5xx Rate Spike', desc: 'Buggy deployment v1.4.3 causing NullPointerException HTTP 500s' }
 ];
 
 export default function App() {
@@ -76,33 +79,83 @@ export default function App() {
         runBrowserPipeline(inputs);
 
         // Fetch logs
-        const logRes = await fetch('./fake-data/evidence/logs/book-service.log');
-        if (logRes.ok) setLogs(await logRes.text());
+        const logPath = activeScenario === '13_container_oomkilled' ? './fake-data/evidence/logs/scenario_02_oomkilled_logs.json' :
+                        activeScenario === '14_cpu_throttling' ? './fake-data/evidence/logs/scenario_06_cpu_throttling_logs.json' :
+                        activeScenario === '15_api_5xx_spike' ? './fake-data/evidence/logs/scenario_03_api_5xx_spike_logs.json' :
+                        './fake-data/evidence/logs/book-service.log';
+        const logRes = await fetch(logPath);
+        if (logRes.ok) {
+          if (logPath.endsWith('.json')) {
+            const logJson = await logRes.json();
+            const logText = logJson.map((l: any) => `[${l.level.toUpperCase()}] ${l.ts} ${l.message}`).join('\n');
+            setLogs(logText);
+          } else {
+            setLogs(await logRes.text());
+          }
+        }
 
         // Fetch metrics
-        const metricFiles = [
-          'http_5xx_rate', 'http_latency_p95_ms', 'memory_usage_mb', 
-          'cpu_usage_percent', 'container_restart_count', 
-          'kube_pod_container_status_waiting_reason'
-        ];
-        const fetchedMetrics = await Promise.all(
-          metricFiles.map(async (name) => {
-            const res = await fetch(`./fake-data/evidence/metrics/${name}.json`);
-            return res.ok ? res.json() : null;
-          })
-        );
-        setMetrics(fetchedMetrics.filter(Boolean));
+        let fetchedMetrics: any[] = [];
+        if (activeScenario === '13_container_oomkilled') {
+          const res = await fetch('./fake-data/evidence/metrics/scenario_02_oomkilled_metrics.json');
+          if (res.ok) fetchedMetrics = await res.json();
+        } else if (activeScenario === '14_cpu_throttling') {
+          const res = await fetch('./fake-data/evidence/metrics/scenario_06_cpu_throttling_metrics.json');
+          if (res.ok) fetchedMetrics = await res.json();
+        } else if (activeScenario === '15_api_5xx_spike') {
+          const res = await fetch('./fake-data/evidence/metrics/scenario_03_api_5xx_spike_metrics.json');
+          if (res.ok) fetchedMetrics = await res.json();
+        } else {
+          const metricFiles = [
+            'http_5xx_rate', 'http_latency_p95_ms', 'memory_usage_mb', 
+            'cpu_usage_percent', 'container_restart_count', 
+            'kube_pod_container_status_waiting_reason'
+          ];
+          fetchedMetrics = (await Promise.all(
+            metricFiles.map(async (name) => {
+              const res = await fetch(`./fake-data/evidence/metrics/${name}.json`);
+              return res.ok ? res.json() : null;
+            })
+          )).filter(Boolean);
+        }
+        const normalizedMetrics = Array.isArray(fetchedMetrics) ? fetchedMetrics : [fetchedMetrics];
+        const mappedMetrics = normalizedMetrics.map((m: any) => {
+          if (!m) return null;
+          const valuesList = m.values || m.points || [];
+          const mappedValues = valuesList.map((v: any) => ({
+            value: v.value,
+            timestamp: v.timestamp || v.ts
+          }));
+          return { ...m, values: mappedValues };
+        }).filter(Boolean);
+        setMetrics(mappedMetrics);
 
         // Fetch traces
         const traceRes = await fetch('./fake-data/evidence/traces/traces.json');
         if (traceRes.ok) setTraces(await traceRes.json());
 
         // Fetch events
-        const eventRes = await fetch('./fake-data/evidence/k8s-events/events.json');
-        if (eventRes.ok) setEvents(await eventRes.json());
+        const eventPath = activeScenario === '13_container_oomkilled' ? './fake-data/evidence/k8s-events/scenario_02_oomkilled_events.json' :
+                          activeScenario === '14_cpu_throttling' ? './fake-data/evidence/k8s-events/scenario_06_cpu_throttling_events.json' :
+                          activeScenario === '15_api_5xx_spike' ? './fake-data/evidence/k8s-events/scenario_03_api_5xx_spike_events.json' :
+                          './fake-data/evidence/k8s-events/events.json';
+        const eventRes = await fetch(eventPath);
+        if (eventRes.ok) {
+          const rawEvents = await eventRes.json();
+          const mappedEvents = rawEvents.map((e: any) => ({
+            event_time: e.event_time || e.ts,
+            type: e.type,
+            reason: e.reason,
+            object: e.object || `Pod/${e.pod || 'book-service-7d9f6c8d9f-abcd1'} (${e.container || 'book-service'})`,
+            message: e.message
+          }));
+          setEvents(mappedEvents);
+        }
 
         // Fetch deploy
-        const deployRes = await fetch('./fake-data/evidence/deploys/deploy.json');
+        const deployPath = activeScenario === '15_api_5xx_spike' ? './fake-data/evidence/deploys/scenario_03_api_5xx_spike_deploys.json' :
+                           './fake-data/evidence/deploys/deploy.json';
+        const deployRes = await fetch(deployPath);
         if (deployRes.ok) setDeploy(await deployRes.json());
 
         // Fetch ownership
@@ -110,11 +163,19 @@ export default function App() {
         if (ownershipRes.ok) setOwnership(await ownershipRes.json());
 
         // Fetch evidence bundle
-        const bundleRes = await fetch('./fake-data/expected-evidence-bundle/evidence_bundle.json');
+        const bundlePath = activeScenario === '13_container_oomkilled' ? './fake-data/expected-evidence-bundle/13_container_oomkilled_evidence.json' :
+                           activeScenario === '14_cpu_throttling' ? './fake-data/expected-evidence-bundle/14_cpu_throttling_evidence.json' :
+                           activeScenario === '15_api_5xx_spike' ? './fake-data/expected-evidence-bundle/15_api_5xx_spike_evidence.json' :
+                           './fake-data/expected-evidence-bundle/evidence_bundle.json';
+        const bundleRes = await fetch(bundlePath);
         if (bundleRes.ok) setEvidenceBundle(await bundleRes.json());
 
         // Fetch triage context
-        const triageRes = await fetch('./fake-data/expected-triage-context/triage_context.json');
+        const triagePath = activeScenario === '13_container_oomkilled' ? './fake-data/expected-triage-context/13_container_oomkilled_triage.json' :
+                           activeScenario === '14_cpu_throttling' ? './fake-data/expected-triage-context/14_cpu_throttling_triage.json' :
+                           activeScenario === '15_api_5xx_spike' ? './fake-data/expected-triage-context/15_api_5xx_spike_triage.json' :
+                           './fake-data/expected-triage-context/triage_context.json';
+        const triageRes = await fetch(triagePath);
         if (triageRes.ok) setTriageContext(await triageRes.json());
 
       } catch (err: any) {
@@ -213,10 +274,14 @@ export default function App() {
       const checkText = `${title} ${desc}`.toLowerCase();
       if (checkText.includes('5xx') || checkText.includes('status_code 5xx')) return 'http_5xx_high';
       if (checkText.includes('latency')) return 'latency_high';
-      if (checkText.includes('healthcheck') || checkText.includes('health')) return 'healthcheck_failed';
+      if (checkText.includes('healthcheck') || checkText.includes('health') || checkText.includes('blackbox') || checkText.includes('ping')) return 'healthcheck_failed';
       if (checkText.includes('crashloopbackoff') || checkText.includes('crashloop')) return 'pod_crashloop';
       if (checkText.includes('restart')) return 'container_restart';
       if (checkText.includes('timeout')) return 'timeout';
+      if (checkText.includes('oom')) return 'oom_killed';
+      if (checkText.includes('memory_usage_high') || checkText.includes('memory') || checkText.includes('ram')) return 'memory_usage_high';
+      if (checkText.includes('throttle') || checkText.includes('throttled')) return 'cpu_throttled';
+      if (checkText.includes('cpu')) return 'cpu_usage_high';
       return 'unknown_signal';
     };
 
