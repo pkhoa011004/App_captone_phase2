@@ -1,0 +1,72 @@
+[
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T11:45:00Z",
+    "level": "info",
+    "message": "CPU temperature nominal, scheduler latency normal",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "labels": {
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "container": "book-service"
+    }
+  },
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T11:55:00Z",
+    "level": "warning",
+    "message": "Garbage Collection duration exceeds threshold: GC paused for 2100ms",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "labels": {
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "container": "book-service"
+    }
+  },
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T11:58:00Z",
+    "level": "error",
+    "message": "Task execution rejected: java.util.concurrent.RejectedExecutionException: Task rejected from java.util.concurrent.ThreadPoolExecutor. Queue capacity (500) exceeded.",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "labels": {
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "container": "book-service"
+    }
+  },
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T12:00:00Z",
+    "level": "warning",
+    "message": "Thread pool starved. 50 tasks waiting in executor queue. CPU throttle time: 1450ms",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "labels": {
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "container": "book-service"
+    }
+  },
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T12:01:00Z",
+    "level": "error",
+    "message": "HTTP Request timeout on POST /v1/books: client aborted request after 15000ms",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "labels": {
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "container": "book-service"
+    }
+  }
+]

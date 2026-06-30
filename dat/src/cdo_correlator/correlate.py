@@ -306,7 +306,7 @@ def _extract_signals(alert: Mapping[str, Any]) -> list[str]:
         signals.append("http_5xx_high")
     if "latency" in text:
         signals.append("latency_high")
-    if "healthcheck" in text:
+    if "healthcheck" in text or "blackbox" in text or "ping" in text:
         signals.append("healthcheck_failed")
     if "crashloop" in text:
         signals.append("pod_crashloop")
@@ -314,6 +314,14 @@ def _extract_signals(alert: Mapping[str, Any]) -> list[str]:
         signals.append("container_restart")
     if "timeout" in text:
         signals.append("timeout")
+    if "oom" in text:
+        signals.append("oom_killed")
+    if "memory_usage_high" in text or "high memory" in text or "memory_usage_mb" in text:
+        signals.append("memory_usage_high")
+    if "throttle" in text:
+        signals.append("cpu_throttled")
+    elif "cpu" in text:
+        signals.append("cpu_usage_high")
 
     return signals or ["unknown_signal"]
 

@@ -1,0 +1,103 @@
+{
+  "status": "CORRELATED",
+  "incident": {
+    "incident_id": "inc-tenant-a-prod-book-service-202606291200",
+    "correlation_id": "corr-tenant-a-prod-book-service-202606291200",
+    "group_key": "tenant-a:prod:eks-prod:bookhub-prod:book-service:202606291200",
+    "bucket_start": "2026-06-29T12:00:00Z",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "service": "book-service",
+    "severity": "critical",
+    "status": "ACTIVE",
+    "correlation_metadata": {
+      "total_alerts": 2,
+      "first_alert_received": "2026-06-29T12:00:05Z",
+      "last_alert_received": "2026-06-29T12:02:05Z",
+      "correlation_rules_applied": [
+        "same-service-10m-bucket"
+      ]
+    },
+    "alerts": [
+      {
+        "alert_id": "alert-book-service-cpu-high",
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "source": "prometheus",
+        "service": "book-service",
+        "severity": "warning",
+        "title": "High CPU usage on book-service",
+        "description": "book-service CPU usage is above 95%",
+        "started_at": "2026-06-29T12:00:00Z",
+        "labels": {
+          "region": "ap-southeast-1",
+          "pod": "book-service-7d9f6c8d9f-abcd1",
+          "deployment": "book-service",
+          "container": "book-service",
+          "metric_names": [
+            "cpu_usage_percent"
+          ],
+          "reason": "cpu_usage_high",
+          "jira_project": "BOOK",
+          "jira_component": "book-service",
+          "runbook_url": "runbook://book-service/cpu-high"
+        }
+      },
+      {
+        "alert_id": "alert-book-service-cpu-throttled",
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "source": "prometheus",
+        "service": "book-service",
+        "severity": "critical",
+        "title": "High CPU throttling rate on book-service",
+        "description": "book-service container CPU throttling is above 50%",
+        "started_at": "2026-06-29T12:02:00Z",
+        "labels": {
+          "region": "ap-southeast-1",
+          "pod": "book-service-7d9f6c8d9f-abcd1",
+          "deployment": "book-service",
+          "container": "book-service",
+          "reason": "cpu_throttled",
+          "jira_project": "BOOK",
+          "jira_component": "book-service",
+          "runbook_url": "runbook://book-service/cpu-throttled"
+        }
+      }
+    ],
+    "alert_ids": [
+      "alert-book-service-cpu-high",
+      "alert-book-service-cpu-throttled"
+    ],
+    "deduped_alert_ids": [
+      "alert-book-service-cpu-high",
+      "alert-book-service-cpu-throttled"
+    ],
+    "signals": [
+      "cpu_usage_high",
+      "cpu_throttled"
+    ],
+    "related_entities": {
+      "deployments": [
+        "book-service"
+      ],
+      "pods": [
+        "book-service-7d9f6c8d9f-abcd1"
+      ],
+      "containers": [
+        "book-service"
+      ]
+    },
+    "time_window": {
+      "start": "2026-06-29T12:00:00Z",
+      "end": "2026-06-29T12:02:00Z"
+    },
+    "next_step": "BUILD_EVIDENCE"
+  }
+}

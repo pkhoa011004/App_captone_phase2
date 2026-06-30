@@ -1,0 +1,29 @@
+[
+  {
+    "metric_name": "memory_usage_mb",
+    "service": "book-service",
+    "unit": "MB",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "points": [
+      {"ts": "2026-06-29T10:45:00Z", "value": 410.0},
+      {"ts": "2026-06-29T10:50:00Z", "value": 500.0},
+      {"ts": "2026-06-29T10:55:00Z", "value": 850.0},
+      {"ts": "2026-06-29T10:58:00Z", "value": 980.0},
+      {"ts": "2026-06-29T11:00:00Z", "value": 1024.0},
+      {"ts": "2026-06-29T11:01:00Z", "value": 1024.0},
+      {"ts": "2026-06-29T11:02:00Z", "value": 200.0},
+      {"ts": "2026-06-29T11:03:00Z", "value": 420.0},
+      {"ts": "2026-06-29T11:05:00Z", "value": 430.0},
+      {"ts": "2026-06-29T11:10:00Z", "value": 430.0}
+    ],
+    "labels": {
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "container": "book-service"
+    }
+  }
+]
