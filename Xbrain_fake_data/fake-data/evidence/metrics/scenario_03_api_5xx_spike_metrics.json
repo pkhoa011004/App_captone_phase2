@@ -1,0 +1,28 @@
+[
+  {
+    "metric_name": "http_5xx_rate",
+    "service": "book-service",
+    "unit": "req/sec",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "points": [
+      {"ts": "2026-06-29T12:45:00Z", "value": 0.0},
+      {"ts": "2026-06-29T12:50:00Z", "value": 0.0},
+      {"ts": "2026-06-29T12:55:00Z", "value": 0.0},
+      {"ts": "2026-06-29T12:56:00Z", "value": 0.0},
+      {"ts": "2026-06-29T12:58:00Z", "value": 0.1},
+      {"ts": "2026-06-29T13:00:00Z", "value": 15.2},
+      {"ts": "2026-06-29T13:02:00Z", "value": 18.5},
+      {"ts": "2026-06-29T13:05:00Z", "value": 12.0},
+      {"ts": "2026-06-29T13:10:00Z", "value": 0.0}
+    ],
+    "labels": {
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "container": "book-service"
+    }
+  }
+]
