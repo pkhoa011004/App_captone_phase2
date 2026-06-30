@@ -68,8 +68,8 @@ def test_scenario_correlator(scenario_name: str) -> None:
         assert bundle["tenant_id"] == output["tenant_id"]
         assert bundle["environment"] == output["environment"]
 
-        # For OOMKilled and CPU Throttling, context quality should be COMPLETE
-        if scenario_name in ("13_container_oomkilled", "14_cpu_throttling", "01_main_scenario"):
+        # For OOMKilled, CPU Throttling, and API 5xx Spike, context quality should be COMPLETE
+        if scenario_name in ("13_container_oomkilled", "14_cpu_throttling", "15_api_5xx_spike", "01_main_scenario"):
             assert bundle["context_quality"] == "COMPLETE"
             assert bundle["metrics"]
             assert bundle["logs"]
@@ -86,6 +86,12 @@ def test_scenario_correlator(scenario_name: str) -> None:
             if scenario_name == "14_cpu_throttling":
                 assert any(m["metric_name"] == "cpu_throttling_percent" for m in bundle["metrics"])
                 assert any("ThreadPoolExecutor" in log["message"] for log in bundle["logs"])
+
+            # Scenario 3 specific check: make sure metrics and logs contain 5xx/deployment info
+            if scenario_name == "15_api_5xx_spike":
+                assert any(m["metric_name"] == "http_5xx_rate" for m in bundle["metrics"])
+                assert any("NullPointerException" in log["message"] for log in bundle["logs"])
+                assert any(d["version"] == "v1.4.3" for d in bundle["recent_deploys"])
 
     elif expected_status == "MULTIPLE_GROUPS_UNSUPPORTED":
         # The correlator returns a dict with status and skipped details.

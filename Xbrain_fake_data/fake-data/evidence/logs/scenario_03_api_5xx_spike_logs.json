@@ -1,0 +1,58 @@
+[
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T12:56:00Z",
+    "level": "info",
+    "message": "Starting request handler on book-service version v1.4.3...",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "labels": {
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "container": "book-service"
+    }
+  },
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T13:00:01Z",
+    "level": "error",
+    "message": "HTTP 500: Internal Server Error on POST /v1/books/promo: java.lang.NullPointerException at com.bookhub.promo.PromoHandler.applyPromoCode(PromoHandler.java:42)",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "labels": {
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "container": "book-service"
+    }
+  },
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T13:01:30Z",
+    "level": "error",
+    "message": "HTTP 500: Internal Server Error on POST /v1/books/promo: java.lang.NullPointerException at com.bookhub.promo.PromoHandler.applyPromoCode(PromoHandler.java:42)",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "labels": {
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "container": "book-service"
+    }
+  },
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T13:04:15Z",
+    "level": "error",
+    "message": "HTTP 500: Internal Server Error on POST /v1/books/promo: java.lang.NullPointerException at com.bookhub.promo.PromoHandler.applyPromoCode(PromoHandler.java:42)",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "labels": {
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "container": "book-service"
+    }
+  }
+]
