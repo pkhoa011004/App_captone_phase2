@@ -1,0 +1,32 @@
+[
+  {
+    "ts": "2026-06-29T12:55:00Z",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "pod": "book-service-7d9f6c8d9f-abcd1",
+    "container": "book-service",
+    "reason": "Created",
+    "type": "Normal",
+    "message": "Created container book-service"
+  },
+  {
+    "ts": "2026-06-29T12:55:05Z",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "pod": "book-service-7d9f6c8d9f-abcd1",
+    "container": "book-service",
+    "reason": "Started",
+    "type": "Normal",
+    "message": "Started container book-service"
+  },
+  {
+    "ts": "2026-06-29T13:02:15Z",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "pod": "book-service-7d9f6c8d9f-abcd1",
+    "container": "book-service",
+    "reason": "Unhealthy",
+    "type": "Warning",
+    "message": "Readiness probe failed: HTTP probe failed with statuscode: 500"
+  }
+]

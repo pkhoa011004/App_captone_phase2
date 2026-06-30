@@ -1,0 +1,20 @@
+[
+  {
+    "service": "book-service",
+    "version": "v1.4.3",
+    "git_sha": "sha-b2c3d4e5",
+    "image_digest": "sha256:def456digest...",
+    "deployed_at": "2026-06-29T12:55:00Z",
+    "deployed_by": "jenkins-ci",
+    "change_summary": "Deploy checkout page v2 improvements with new promo handler",
+    "rollback_ref": "v1.4.2",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "labels": {
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "container": "book-service"
+    }
+  }
+]
