@@ -1,0 +1,36 @@
+{
+  "receiver": "webhook",
+  "status": "firing",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "region": "ap-southeast-1",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "deployment": "book-service",
+        "container": "book-service"
+      },
+      "annotations": {
+        "summary": "Invalid alert missing tenant and env",
+        "description": "This alert is missing tenant_id and environment fields"
+      },
+      "startsAt": "2026-06-29T10:06:00Z",
+      "endsAt": "0001-01-01T00:00:00Z",
+      "generatorURL": "http://prometheus/graph"
+    }
+  ],
+  "groupLabels": {
+    "alertname": "UnknownAlert"
+  },
+  "commonLabels": {
+    "tenant_id": "",
+    "environment": "",
+    "service": "book-service"
+  },
+  "commonAnnotations": {},
+  "externalURL": "http://alertmanager:9093",
+  "version": "4",
+  "groupKey": "book-service-alert"
+}

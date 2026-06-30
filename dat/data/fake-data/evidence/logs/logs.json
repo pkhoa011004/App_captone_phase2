@@ -1,0 +1,38 @@
+[
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T09:45:00Z",
+    "level": "info",
+    "message": "Starting request handler on book-service..."
+  },
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T09:56:00Z",
+    "level": "warning",
+    "message": "Database query latency high (1200ms)"
+  },
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T10:00:00Z",
+    "level": "error",
+    "message": "HTTP 500: Database connection timeout on POST /v1/books"
+  },
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T10:02:00Z",
+    "level": "error",
+    "message": "Healthcheck endpoint /health failed: connection refused"
+  },
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T10:04:00Z",
+    "level": "info",
+    "message": "Container restarted. Terminating process..."
+  },
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T10:05:00Z",
+    "level": "error",
+    "message": "CrashLoopBackOff: back-off 5m0s restarting failed container=book-service pod=book-service-7d9f6c8d9f-abcd1"
+  }
+]

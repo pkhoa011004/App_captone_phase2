@@ -1,0 +1,8 @@
+{
+  "status": "MULTIPLE_GROUPS_UNSUPPORTED",
+  "incident": null,
+  "group_keys": [
+    "tenant-a:prod:eks-prod:bookhub-prod:book-service:202606291000",
+    "tenant-b:prod:eks-prod:bookhub-prod:book-service:202606291000"
+  ]
+}

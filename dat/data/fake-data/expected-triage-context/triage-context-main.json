@@ -1,0 +1,51 @@
+{
+  "correlation_id": "corr-tenant-a-prod-book-service-202606291000",
+  "tenant_id": "tenant-a",
+  "incident_id": "inc-tenant-a-prod-book-service-202606291000",
+  "environment": "prod",
+  "received_at": "2026-06-29T10:05:00Z",
+  "alert": {
+    "alert_id": "alert-book-service-summary-202606291000",
+    "source": "cdo-correlator",
+    "service": "book-service",
+    "severity": "critical",
+    "title": "Multiple signals detected on book-service",
+    "description": "High 5xx rate, high latency, healthcheck failure, CrashLoopBackOff, and container restart were detected for book-service in the same correlation window.",
+    "started_at": "2026-06-29T10:00:00Z",
+    "labels": {
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "deployment": "book-service",
+      "container": "book-service",
+      "signals": [
+        "http_5xx_high",
+        "latency_high",
+        "healthcheck_failed",
+        "pod_crashloop",
+        "container_restart"
+      ],
+      "evidence_uri": "s3://cdo-evidence/tenant-a/prod/inc-tenant-a-prod-book-service-202606291000/evidence_bundle.json",
+      "jira_project": "BOOK",
+      "jira_component": "book-service"
+    }
+  },
+  "metrics": [],
+  "logs": [],
+  "traces": [],
+  "recent_deploys": [],
+  "ownership": {
+    "service": "book-service",
+    "owner_team": "team-book",
+    "slack_channel": "#oncall-book",
+    "jira_project": "BOOK",
+    "jira_component": "book-service",
+    "runbooks": [
+      {
+        "title": "High 5xx rate on book-service runbook",
+        "url": "runbook://book-service/high-5xx",
+        "excerpt": "Check database connection limits and scaling settings. Revert back to previous deployment version if latency persists."
+      }
+    ]
+  }
+}

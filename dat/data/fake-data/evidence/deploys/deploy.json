@@ -1,0 +1,12 @@
+[
+  {
+    "service": "book-service",
+    "version": "v1.2.3",
+    "git_sha": "7d9f6c8d9f1234567890abcdef1234567890abcd",
+    "image_digest": "sha256:abcd1234efgh5678ijkl9012mnop3456qrst7890uvwx1234yz",
+    "deployed_at": "2026-06-29T09:30:00Z",
+    "deployed_by": "john.doe@company.com",
+    "change_summary": "Optimized database connections and added connection pooling",
+    "rollback_ref": "v1.2.2"
+  }
+]

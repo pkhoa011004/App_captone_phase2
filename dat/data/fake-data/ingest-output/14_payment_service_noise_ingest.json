@@ -1,0 +1,35 @@
+{
+  "ingest_id": "ingest-20260629-100000-0014",
+  "schema_version": "cdo.alert.v1",
+  "received_at": "2026-06-29T10:02:05Z",
+  "raw_source": "prometheus",
+  "normalized_alert": {
+    "alert_id": "alert-payment-noise-014",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "source": "prometheus",
+    "service": "payment-service",
+    "severity": "critical",
+    "title": "Payment gateway timeout",
+    "description": "payment-service failed to connect to third-party bank endpoint",
+    "started_at": "2026-06-29T10:02:00Z",
+    "labels": {
+      "region": "ap-southeast-1",
+      "pod": "payment-service-5c6c7b8d-abc99",
+      "deployment": "payment-service",
+      "container": "payment-service"
+    }
+  },
+  "validation": {
+    "status": "VALID",
+    "missing_fields": [],
+    "missing_optional_fields": []
+  },
+  "enrichment": {
+    "status": "NOT_NEEDED",
+    "source": null,
+    "enriched_fields": []
+  }
+}

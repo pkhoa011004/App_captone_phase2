@@ -1,0 +1,35 @@
+{
+  "ingest_id": "ingest-20260629-100000-0016",
+  "schema_version": "cdo.alert.v1",
+  "received_at": "2026-06-29T09:30:00.500Z",
+  "raw_source": "prometheus",
+  "normalized_alert": {
+    "alert_id": "alert-out-window-016",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "source": "prometheus",
+    "service": "book-service",
+    "severity": "medium",
+    "title": "CPU threshold reached",
+    "description": "book-service CPU usage exceeded 80%",
+    "started_at": "2026-06-29T09:30:00Z",
+    "labels": {
+      "region": "ap-southeast-1",
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "deployment": "book-service",
+      "container": "book-service"
+    }
+  },
+  "validation": {
+    "status": "VALID",
+    "missing_fields": [],
+    "missing_optional_fields": []
+  },
+  "enrichment": {
+    "status": "NOT_NEEDED",
+    "source": null,
+    "enriched_fields": []
+  }
+}

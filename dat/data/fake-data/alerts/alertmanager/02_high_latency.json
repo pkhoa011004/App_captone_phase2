@@ -1,0 +1,47 @@
+{
+  "receiver": "webhook",
+  "status": "firing",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "Highlatencyonbook-service",
+        "service": "book-service",
+        "severity": "warning",
+        "tenant_id": "tenant-a",
+        "environment": "prod",
+        "region": "ap-southeast-1",
+        "cluster": "eks-prod",
+        "namespace": "bookhub-prod",
+        "pod": "book-service-7d9f6c8d9f-abcd1",
+        "deployment": "book-service",
+        "container": "book-service",
+        "metric_names": "http_latency_p95_ms",
+        "trace_id": "trace-checkout-002",
+        "reason": "high_latency",
+        "jira_project": "BOOK",
+        "jira_component": "book-service",
+        "runbook_url": "runbook://book-service/high-latency"
+      },
+      "annotations": {
+        "summary": "High latency on book-service",
+        "description": "book-service p95 latency is above 500ms"
+      },
+      "startsAt": "2026-06-29T10:02:00Z",
+      "endsAt": "0001-01-01T00:00:00Z",
+      "generatorURL": "http://prometheus/graph"
+    }
+  ],
+  "groupLabels": {
+    "alertname": "Highlatencyonbook-service"
+  },
+  "commonLabels": {
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "service": "book-service"
+  },
+  "commonAnnotations": {},
+  "externalURL": "http://alertmanager:9093",
+  "version": "4",
+  "groupKey": "book-service-alert"
+}

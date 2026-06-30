@@ -1,0 +1,42 @@
+{
+  "ingest_id": "ingest-20260629-100000-0004",
+  "schema_version": "cdo.alert.v1",
+  "received_at": "2026-06-29T10:04:05Z",
+  "raw_source": "prometheus",
+  "normalized_alert": {
+    "alert_id": "alert-book-service-crashloop-004",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "source": "prometheus",
+    "service": "book-service",
+    "severity": "critical",
+    "title": "Pod CrashLoopBackOff on book-service",
+    "description": "book-service pod is in CrashLoopBackOff state",
+    "started_at": "2026-06-29T10:04:00Z",
+    "labels": {
+      "region": "ap-southeast-1",
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "deployment": "book-service",
+      "container": "book-service",
+      "metric_names": [
+        "kube_pod_container_status_waiting_reason"
+      ],
+      "reason": "pod_crashloop",
+      "jira_project": "BOOK",
+      "jira_component": "book-service",
+      "runbook_url": "runbook://book-service/pod-crashloop"
+    }
+  },
+  "validation": {
+    "status": "VALID",
+    "missing_fields": [],
+    "missing_optional_fields": []
+  },
+  "enrichment": {
+    "status": "NOT_NEEDED",
+    "source": null,
+    "enriched_fields": []
+  }
+}

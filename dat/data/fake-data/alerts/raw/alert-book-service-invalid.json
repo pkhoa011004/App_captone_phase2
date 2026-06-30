@@ -1,0 +1,12 @@
+{
+  "alert_id": "alert-book-service-invalid-001",
+  "source": "prometheus",
+  "service": "book-service",
+  "severity": "critical",
+  "title": "Missing Tenant Alert",
+  "description": "This alert has no tenant_id or environment",
+  "started_at": "2026-06-29T10:00:00Z",
+  "labels": {
+    "pod": "book-service-7d9f6c8d9f-abcd1"
+  }
+}

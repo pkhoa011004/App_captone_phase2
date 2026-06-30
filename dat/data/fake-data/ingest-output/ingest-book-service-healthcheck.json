@@ -1,0 +1,44 @@
+{
+  "ingest_id": "ingest-20260629-100100-0003",
+  "schema_version": "cdo.alert.v1",
+  "received_at": "2026-06-29T10:01:00Z",
+  "raw_source": "prometheus",
+  "normalized_alert": {
+    "alert_id": "alert-book-service-healthcheck-001",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "source": "prometheus",
+    "service": "book-service",
+    "severity": "critical",
+    "title": "Healthcheck failed on book-service",
+    "description": "healthcheck endpoint returned non-200 response",
+    "started_at": "2026-06-29T10:02:00Z",
+    "labels": {
+      "region": "ap-southeast-1",
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "deployment": "book-service",
+      "container": "book-service",
+      "metric_names": [
+        "healthcheck_failures"
+      ],
+      "reason": "healthcheck_failed",
+      "jira_project": "BOOK",
+      "jira_component": "book-service"
+    }
+  },
+  "validation": {
+    "status": "VALID_WITH_WARNINGS",
+    "missing_fields": [],
+    "missing_optional_fields": [
+      "trace_id",
+      "runbook_url"
+    ]
+  },
+  "enrichment": {
+    "status": "NOT_NEEDED",
+    "source": null,
+    "enriched_fields": []
+  }
+}

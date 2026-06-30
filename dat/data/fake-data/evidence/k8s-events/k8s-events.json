@@ -1,0 +1,20 @@
+[
+  {
+    "ts": "2026-06-29T10:02:00Z",
+    "reason": "Unhealthy",
+    "type": "Warning",
+    "message": "Readiness probe failed: HTTP probe failed with statuscode: 500"
+  },
+  {
+    "ts": "2026-06-29T10:03:00Z",
+    "reason": "BackOff",
+    "type": "Warning",
+    "message": "Back-off restarting failed container"
+  },
+  {
+    "ts": "2026-06-29T10:04:00Z",
+    "reason": "CrashLoopBackOff",
+    "type": "Warning",
+    "message": "Pod book-service-7d9f6c8d9f-abcd1 is in CrashLoopBackOff state"
+  }
+]

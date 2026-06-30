@@ -1,0 +1,22 @@
+{
+  "ingest_id": "ingest-20260629-100100-9999",
+  "schema_version": "cdo.alert.v1",
+  "received_at": "2026-06-29T10:01:00Z",
+  "raw_source": "prometheus",
+  "normalized_alert": null,
+  "validation": {
+    "status": "INVALID_ALERT",
+    "missing_fields": [
+      "tenant_id",
+      "environment",
+      "cluster",
+      "namespace"
+    ],
+    "missing_optional_fields": []
+  },
+  "enrichment": {
+    "status": "NOT_NEEDED",
+    "source": null,
+    "enriched_fields": []
+  }
+}

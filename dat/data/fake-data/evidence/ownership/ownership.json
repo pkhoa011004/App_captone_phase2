@@ -1,0 +1,16 @@
+{
+  "owner_team": "team-book",
+  "slack_channel": "#oncall-book",
+  "jira_project": "BOOK",
+  "jira_component": "book-service",
+  "runbooks": [
+    {
+      "trigger_reason": "high_5xx_rate",
+      "runbook_url": "runbook://book-service/high-5xx"
+    },
+    {
+      "trigger_reason": "high_latency",
+      "runbook_url": "runbook://book-service/high-latency"
+    }
+  ]
+}

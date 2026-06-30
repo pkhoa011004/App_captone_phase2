@@ -1,0 +1,114 @@
+{
+  "metric_name": "http_latency_p95_ms",
+  "tenant_id": "tenant-a",
+  "environment": "prod",
+  "cluster": "eks-prod",
+  "namespace": "bookhub-prod",
+  "service": "book-service",
+  "values": [
+    {
+      "timestamp": "2026-06-29T09:45:00Z",
+      "value": 55.2
+    },
+    {
+      "timestamp": "2026-06-29T09:46:00Z",
+      "value": 60.1
+    },
+    {
+      "timestamp": "2026-06-29T09:47:00Z",
+      "value": 58.4
+    },
+    {
+      "timestamp": "2026-06-29T09:48:00Z",
+      "value": 61.2
+    },
+    {
+      "timestamp": "2026-06-29T09:49:00Z",
+      "value": 59.0
+    },
+    {
+      "timestamp": "2026-06-29T09:50:00Z",
+      "value": 62.5
+    },
+    {
+      "timestamp": "2026-06-29T09:51:00Z",
+      "value": 61.1
+    },
+    {
+      "timestamp": "2026-06-29T09:52:00Z",
+      "value": 60.2
+    },
+    {
+      "timestamp": "2026-06-29T09:53:00Z",
+      "value": 59.8
+    },
+    {
+      "timestamp": "2026-06-29T09:54:00Z",
+      "value": 60.5
+    },
+    {
+      "timestamp": "2026-06-29T09:55:00Z",
+      "value": 120.4
+    },
+    {
+      "timestamp": "2026-06-29T09:56:00Z",
+      "value": 320.1
+    },
+    {
+      "timestamp": "2026-06-29T09:57:00Z",
+      "value": 480.5
+    },
+    {
+      "timestamp": "2026-06-29T09:58:00Z",
+      "value": 520.2
+    },
+    {
+      "timestamp": "2026-06-29T09:59:00Z",
+      "value": 490.4
+    },
+    {
+      "timestamp": "2026-06-29T10:00:00Z",
+      "value": 1250.0
+    },
+    {
+      "timestamp": "2026-06-29T10:01:00Z",
+      "value": 1850.2
+    },
+    {
+      "timestamp": "2026-06-29T10:02:00Z",
+      "value": 2200.5
+    },
+    {
+      "timestamp": "2026-06-29T10:03:00Z",
+      "value": 2350.0
+    },
+    {
+      "timestamp": "2026-06-29T10:04:00Z",
+      "value": 2100.8
+    },
+    {
+      "timestamp": "2026-06-29T10:05:00Z",
+      "value": 2050.4
+    },
+    {
+      "timestamp": "2026-06-29T10:06:00Z",
+      "value": 1980.0
+    },
+    {
+      "timestamp": "2026-06-29T10:07:00Z",
+      "value": 1820.5
+    },
+    {
+      "timestamp": "2026-06-29T10:08:00Z",
+      "value": 1750.1
+    },
+    {
+      "timestamp": "2026-06-29T10:09:00Z",
+      "value": 1680.0
+    },
+    {
+      "timestamp": "2026-06-29T10:10:00Z",
+      "value": 1650.0
+    }
+  ]
+}
