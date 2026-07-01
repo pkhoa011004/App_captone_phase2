@@ -1,9 +1,37 @@
 [
   {
+    "service": "order-service",
+    "ts": "2026-06-29T06:00:00Z",
+    "level": "info",
+    "message": "Service started successfully, watching on port 8082",
+    "trace_id": null
+  },
+  {
+    "service": "order-service",
+    "ts": "2026-06-29T09:30:00Z",
+    "level": "warn",
+    "message": "disk usage at 90%, consider cleanup",
+    "trace_id": null
+  },
+  {
     "service": "book-service",
     "ts": "2026-06-29T09:45:00Z",
     "level": "info",
     "message": "Starting request handler on book-service..."
+  },
+  {
+    "service": "api-gateway",
+    "ts": "2026-06-29T09:45:00Z",
+    "level": "info",
+    "message": "Gateway initialized and listening on port 8080",
+    "trace_id": null
+  },
+  {
+    "service": "order-service",
+    "ts": "2026-06-29T09:55:00Z",
+    "level": "error",
+    "message": "write failed: no space left on device (errno 28)",
+    "trace_id": "trace-disk-001"
   },
   {
     "service": "book-service",
@@ -13,15 +41,57 @@
   },
   {
     "service": "book-service",
+    "ts": "2026-06-29T09:56:00Z",
+    "level": "warn",
+    "message": "connection pool at 90% capacity (18/20 active)",
+    "trace_id": "trace-dbpool-001"
+  },
+  {
+    "service": "order-service",
+    "ts": "2026-06-29T09:59:58Z",
+    "level": "error",
+    "message": "NullPointerException: response object is null after timeout calling payment-service",
+    "trace_id": "trace-gw-timeout-005"
+  },
+  {
+    "service": "book-service",
     "ts": "2026-06-29T10:00:00Z",
     "level": "error",
     "message": "HTTP 500: Database connection timeout on POST /v1/books"
   },
   {
     "service": "book-service",
+    "ts": "2026-06-29T10:00:00Z",
+    "level": "error",
+    "message": "could not obtain connection from pool: timeout after 5000ms, pool exhausted (20/20 active)",
+    "trace_id": "trace-dbpool-002"
+  },
+  {
+    "service": "order-service",
+    "ts": "2026-06-29T10:00:00Z",
+    "level": "fatal",
+    "message": "unable to write audit log, shutting down gracefully to prevent data corruption",
+    "trace_id": "trace-disk-002"
+  },
+  {
+    "service": "api-gateway",
+    "ts": "2026-06-29T10:00:00Z",
+    "level": "error",
+    "message": "upstream request timed out after 5000ms: order-service",
+    "trace_id": "trace-gw-timeout-005"
+  },
+  {
+    "service": "book-service",
     "ts": "2026-06-29T10:02:00Z",
     "level": "error",
     "message": "Healthcheck endpoint /health failed: connection refused"
+  },
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T10:02:00Z",
+    "level": "error",
+    "message": "HikariPool-1 - Connection is not available, request timed out after 30000ms",
+    "trace_id": "trace-dbpool-003"
   },
   {
     "service": "book-service",
