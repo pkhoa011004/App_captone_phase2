@@ -1,0 +1,47 @@
+[
+  {
+    "ts": "2026-06-29T09:56:00Z",
+    "service": "book-service",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "level": "warn",
+    "message": "connection pool at 90% capacity (18/20 active)",
+    "trace_id": "trace-dbpool-001",
+    "labels": {
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "version": "sha-pool111"
+    }
+  },
+  {
+    "ts": "2026-06-29T10:00:05Z",
+    "service": "book-service",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "level": "error",
+    "message": "could not obtain connection from pool: timeout after 5000ms, pool exhausted (20/20 active)",
+    "trace_id": "trace-dbpool-002",
+    "labels": {
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "version": "sha-pool111"
+    }
+  },
+  {
+    "ts": "2026-06-29T10:02:10Z",
+    "service": "book-service",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "level": "error",
+    "message": "HikariPool-1 - Connection is not available, request timed out after 30000ms",
+    "trace_id": "trace-dbpool-003",
+    "labels": {
+      "pod": "book-service-7d9f6c8d9f-abcd1",
+      "version": "sha-pool111"
+    }
+  }
+]

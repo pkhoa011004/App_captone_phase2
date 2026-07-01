@@ -1,0 +1,107 @@
+[
+  {
+    "metric_name": "db_connection_pool_active",
+    "service": "book-service",
+    "unit": "count",
+    "labels": {
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "region": "ap-southeast-1",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    },
+    "points": [
+      { "ts": "2026-06-29T09:45:00Z", "value": 8.0 },
+      { "ts": "2026-06-29T09:50:00Z", "value": 8.0 },
+      { "ts": "2026-06-29T09:55:00Z", "value": 9.0 },
+      { "ts": "2026-06-29T09:58:00Z", "value": 15.0 },
+      { "ts": "2026-06-29T10:00:00Z", "value": 20.0 },
+      { "ts": "2026-06-29T10:05:00Z", "value": 20.0 },
+      { "ts": "2026-06-29T10:10:00Z", "value": 20.0 }
+    ]
+  },
+  {
+    "metric_name": "db_connection_pool_wait_count",
+    "service": "book-service",
+    "unit": "count",
+    "labels": {
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "region": "ap-southeast-1",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    },
+    "points": [
+      { "ts": "2026-06-29T09:45:00Z", "value": 0.0 },
+      { "ts": "2026-06-29T09:50:00Z", "value": 0.0 },
+      { "ts": "2026-06-29T09:55:00Z", "value": 0.0 },
+      { "ts": "2026-06-29T09:58:00Z", "value": 12.0 },
+      { "ts": "2026-06-29T10:00:00Z", "value": 45.0 },
+      { "ts": "2026-06-29T10:05:00Z", "value": 48.0 },
+      { "ts": "2026-06-29T10:10:00Z", "value": 50.0 }
+    ]
+  },
+  {
+    "metric_name": "db_connection_wait_time_ms",
+    "service": "book-service",
+    "unit": "ms",
+    "labels": {
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "region": "ap-southeast-1",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    },
+    "points": [
+      { "ts": "2026-06-29T09:45:00Z", "value": 5.0 },
+      { "ts": "2026-06-29T09:50:00Z", "value": 5.0 },
+      { "ts": "2026-06-29T09:55:00Z", "value": 8.0 },
+      { "ts": "2026-06-29T09:58:00Z", "value": 1200.0 },
+      { "ts": "2026-06-29T10:00:00Z", "value": 4800.0 },
+      { "ts": "2026-06-29T10:05:00Z", "value": 4950.0 },
+      { "ts": "2026-06-29T10:10:00Z", "value": 5000.0 }
+    ]
+  },
+  {
+    "metric_name": "http_latency_p95_ms",
+    "service": "book-service",
+    "unit": "ms",
+    "labels": {
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "region": "ap-southeast-1",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    },
+    "points": [
+      { "ts": "2026-06-29T09:45:00Z", "value": 180.0 },
+      { "ts": "2026-06-29T09:50:00Z", "value": 180.0 },
+      { "ts": "2026-06-29T09:55:00Z", "value": 195.0 },
+      { "ts": "2026-06-29T09:58:00Z", "value": 1500.0 },
+      { "ts": "2026-06-29T10:00:00Z", "value": 5200.0 },
+      { "ts": "2026-06-29T10:05:00Z", "value": 5300.0 },
+      { "ts": "2026-06-29T10:10:00Z", "value": 5350.0 }
+    ]
+  },
+  {
+    "metric_name": "db_query_duration_p95_ms",
+    "service": "book-service",
+    "unit": "ms",
+    "labels": {
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "region": "ap-southeast-1",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    },
+    "points": [
+      { "ts": "2026-06-29T09:45:00Z", "value": 40.0 },
+      { "ts": "2026-06-29T09:50:00Z", "value": 42.0 },
+      { "ts": "2026-06-29T09:55:00Z", "value": 45.0 },
+      { "ts": "2026-06-29T09:58:00Z", "value": 850.0 },
+      { "ts": "2026-06-29T10:00:00Z", "value": 3500.0 },
+      { "ts": "2026-06-29T10:05:00Z", "value": 3650.0 },
+      { "ts": "2026-06-29T10:10:00Z", "value": 3700.0 }
+    ]
+  }
+]

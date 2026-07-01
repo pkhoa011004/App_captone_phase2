@@ -141,7 +141,7 @@ def _extract_valid_alerts(wrappers: Sequence[JsonMap]) -> tuple[list[JsonMap], i
 
         if (
             not isinstance(validation, dict)
-            or validation.get("status") != VALIDATION_STATUS_VALID
+            or validation.get("status") not in (VALIDATION_STATUS_VALID, "VALID_WITH_WARNINGS")
             or not isinstance(normalized_alert, dict)
         ):
             skipped_count += 1

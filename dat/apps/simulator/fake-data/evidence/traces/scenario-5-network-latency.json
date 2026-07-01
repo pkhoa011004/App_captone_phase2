@@ -1,0 +1,44 @@
+[
+  {
+    "trace_id": "trace-gw-timeout-005",
+    "span_id": "span-001",
+    "parent_span_id": null,
+    "service": "api-gateway",
+    "operation": "GET /v1/checkout",
+    "ts": "2026-06-29T10:00:00Z",
+    "duration_ms": 5200,
+    "status_code": "504",
+    "labels": {
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    }
+  },
+  {
+    "trace_id": "trace-gw-timeout-005",
+    "span_id": "span-002",
+    "parent_span_id": "span-001",
+    "service": "order-service",
+    "operation": "POST /internal/validate",
+    "ts": "2026-06-29T10:00:00.100Z",
+    "duration_ms": 5050,
+    "status_code": "timeout",
+    "labels": {
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    }
+  },
+  {
+    "trace_id": "trace-gw-timeout-005",
+    "span_id": "span-003",
+    "parent_span_id": "span-002",
+    "service": "payment-service",
+    "operation": "downstream call",
+    "ts": "2026-06-29T10:00:00.200Z",
+    "duration_ms": 4800,
+    "status_code": "network_latency",
+    "labels": {
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    }
+  }
+]

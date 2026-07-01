@@ -1,0 +1,26 @@
+[
+  {
+    "timestamp": "2026-06-29T09:59:50Z",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "service": "order-service",
+    "type": "Warning",
+    "reason": "DiskPressure",
+    "message": "Node eks-prod-node-3 has disk pressure",
+    "pod": "order-service-7f8a9b-xyz"
+  },
+  {
+    "timestamp": "2026-06-29T10:00:15Z",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "service": "order-service",
+    "type": "Warning",
+    "reason": "Evicted",
+    "message": "Pod evicted because node had condition: DiskPressure",
+    "pod": "order-service-7f8a9b-xyz"
+  }
+]

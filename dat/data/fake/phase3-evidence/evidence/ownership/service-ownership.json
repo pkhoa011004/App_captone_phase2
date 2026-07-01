@@ -37,5 +37,18 @@
         "excerpt": "Check downstream API latency and correlated backend errors."
       }
     ]
+  },
+  "api-gateway": {
+    "owner_team": "team-gateway",
+    "slack_channel": "#oncall-gateway",
+    "jira_project": "GW",
+    "jira_component": "api-gateway",
+    "runbooks": [
+      {
+        "title": "Gateway timeout triage",
+        "url": "runbook://api-gateway/timeout",
+        "excerpt": "Check downstream service health, latency metrics, and network connectivity."
+      }
+    ]
   }
 }

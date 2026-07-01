@@ -1,0 +1,9 @@
+[
+  {
+    "service": "payment-service",
+    "version": "sha-net789",
+    "deployed_at": "2026-06-29T09:50:00Z",
+    "deployed_by": "ci",
+    "change_summary": "updated network policy rules for payment-service egress"
+  }
+]

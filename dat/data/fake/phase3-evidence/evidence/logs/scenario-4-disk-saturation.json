@@ -1,0 +1,44 @@
+[
+  {
+    "ts": "2026-06-29T09:45:00Z",
+    "service": "order-service",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "level": "warn",
+    "message": "disk usage at 90%, consider cleanup",
+    "trace_id": null,
+    "labels": {
+      "pod": "order-service-7f8a9b-xyz"
+    }
+  },
+  {
+    "ts": "2026-06-29T10:00:05Z",
+    "service": "order-service",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "level": "error",
+    "message": "write failed: no space left on device (errno 28)",
+    "trace_id": "trace-disk-001",
+    "labels": {
+      "pod": "order-service-7f8a9b-xyz"
+    }
+  },
+  {
+    "ts": "2026-06-29T10:00:10Z",
+    "service": "order-service",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "level": "fatal",
+    "message": "unable to write audit log, shutting down gracefully to prevent data corruption",
+    "trace_id": "trace-disk-002",
+    "labels": {
+      "pod": "order-service-7f8a9b-xyz"
+    }
+  }
+]
