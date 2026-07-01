@@ -1,17 +1,54 @@
 {
-  "service": "book-service",
-  "owner_team": "team-book",
-  "slack_channel": "#oncall-book",
-  "jira_project": "BOOK",
-  "jira_component": "book-service",
-  "runbooks": [
-    {
-      "trigger_reason": "high_5xx_rate",
-      "runbook_url": "runbook://book-service/high-5xx"
-    },
-    {
-      "trigger_reason": "high_latency",
-      "runbook_url": "runbook://book-service/high-latency"
-    }
-  ]
+  "book-service": {
+    "owner_team": "team-book",
+    "slack_channel": "#oncall-book",
+    "jira_project": "BOOK",
+    "jira_component": "book-service",
+    "runbooks": [
+      {
+        "title": "High 5xx triage",
+        "url": "runbook://book-service/high-5xx",
+        "excerpt": "Check recent deploys, dependency timeouts, database errors, then consider rollback if correlated with new deployment."
+      }
+    ]
+  },
+  "order-service": {
+    "owner_team": "team-order",
+    "slack_channel": "#oncall-order",
+    "jira_project": "ORDER",
+    "jira_component": "order-service",
+    "runbooks": [
+      {
+        "title": "Upstream timeout triage",
+        "url": "runbook://order-service/upstream-timeout",
+        "excerpt": "Check upstream service health, timeout rate, retry pressure, and recent dependency failures."
+      }
+    ]
+  },
+  "frontend": {
+    "owner_team": "team-web",
+    "slack_channel": "#oncall-web",
+    "jira_project": "WEB",
+    "jira_component": "frontend",
+    "runbooks": [
+      {
+        "title": "Checkout latency triage",
+        "url": "runbook://frontend/checkout-latency",
+        "excerpt": "Check downstream API latency and correlated backend errors."
+      }
+    ]
+  },
+  "api-gateway": {
+    "owner_team": "team-gateway",
+    "slack_channel": "#oncall-gateway",
+    "jira_project": "GW",
+    "jira_component": "api-gateway",
+    "runbooks": [
+      {
+        "title": "Gateway timeout triage",
+        "url": "runbook://api-gateway/timeout",
+        "excerpt": "Check downstream service health, latency metrics, and network connectivity."
+      }
+    ]
+  }
 }

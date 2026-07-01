@@ -1,31 +1,84 @@
 [
   {
+    "trace_id": "trace-dbpool-002",
+    "span_id": "span-002",
+    "parent_span_id": "span-001",
+    "service": "book-service",
+    "operation": "db.getConnection()",
+    "ts": "2026-06-29T10:00:00.100Z",
+    "duration_ms": 5000,
+    "status_code": "pool_exhausted",
+    "labels": {
+      "db": "postgres-primary"
+    }
+  },
+  {
+    "trace_id": "trace-gw-timeout-005",
+    "span_id": "span-002",
+    "parent_span_id": "span-001",
+    "service": "order-service",
+    "operation": "POST /internal/validate",
+    "ts": "2026-06-29T10:00:00.100Z",
+    "duration_ms": 5050,
+    "status_code": "timeout",
+    "labels": {
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    }
+  },
+  {
+    "trace_id": "trace-gw-timeout-005",
+    "span_id": "span-003",
+    "parent_span_id": "span-002",
+    "service": "payment-service",
+    "operation": "downstream call",
+    "ts": "2026-06-29T10:00:00.200Z",
+    "duration_ms": 4800,
+    "status_code": "network_latency",
+    "labels": {
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    }
+  },
+  {
     "trace_id": "trace-checkout-001",
-    "root_span": {
-      "span_id": "span-parent-001",
-      "service": "book-service",
-      "operation": "POST /checkout",
-      "start_time": "2026-06-29T10:00:00.100Z",
-      "duration_ms": 2500,
-      "status": "ERROR",
-      "tags": {
-        "http.status_code": "500",
-        "error": "true"
-      }
-    },
-    "child_spans": [
-      {
-        "span_id": "span-db-001",
-        "service": "book-service-db",
-        "operation": "SELECT OR UPDATE",
-        "start_time": "2026-06-29T10:00:01.200Z",
-        "duration_ms": 1000,
-        "status": "ERROR",
-        "tags": {
-          "db.type": "postgres",
-          "error.message": "connection timeout"
-        }
-      }
-    ]
+    "span_id": "span-001",
+    "parent_span_id": null,
+    "service": "book-service",
+    "operation": "POST /v1/books",
+    "ts": "2026-06-29T10:00:00Z",
+    "duration_ms": 3200,
+    "status_code": "500",
+    "labels": {
+      "db": "postgres-book-db"
+    }
+  },
+  {
+    "trace_id": "trace-dbpool-002",
+    "span_id": "span-001",
+    "parent_span_id": null,
+    "service": "book-service",
+    "operation": "GET /v1/books/{id}",
+    "ts": "2026-06-29T10:00:00Z",
+    "duration_ms": 5100,
+    "status_code": "500",
+    "labels": {
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    }
+  },
+  {
+    "trace_id": "trace-gw-timeout-005",
+    "span_id": "span-001",
+    "parent_span_id": null,
+    "service": "api-gateway",
+    "operation": "GET /v1/checkout",
+    "ts": "2026-06-29T10:00:00Z",
+    "duration_ms": 5200,
+    "status_code": "504",
+    "labels": {
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    }
   }
 ]
