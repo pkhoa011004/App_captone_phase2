@@ -1,8 +1,8 @@
 [
   {
-    "ingest_id": "ingest-20260629-130000-0001",
+    "ingest_id": "ingest-20260629-100000-0001",
     "schema_version": "cdo.alert.v1",
-    "received_at": "2026-06-29T13:00:05Z",
+    "received_at": "2026-06-29T10:00:05Z",
     "raw_source": "prometheus",
     "normalized_alert": {
       "alert_id": "alert-book-service-5xx-spike",
@@ -15,7 +15,7 @@
       "severity": "critical",
       "title": "High 5xx rate on book-service after deployment",
       "description": "book-service 5xx rate is spiking above 10%",
-      "started_at": "2026-06-29T13:00:00Z",
+      "started_at": "2026-06-29T10:00:00Z",
       "labels": {
         "region": "us-east-1",
         "pod": "book-service-7d9f6c8d9f-abcd1",

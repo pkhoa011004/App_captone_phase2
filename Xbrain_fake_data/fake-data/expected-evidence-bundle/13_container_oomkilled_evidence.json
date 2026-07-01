@@ -1,15 +1,15 @@
 {
   "schema_version": "cdo.evidence.v1",
-  "incident_id": "inc-tenant-a-prod-book-service-202606291100",
-  "correlation_id": "corr-tenant-a-prod-book-service-202606291100",
+  "incident_id": "inc-tenant-a-prod-book-service-202606291000",
+  "correlation_id": "corr-tenant-a-prod-book-service-202606291000",
   "tenant_id": "tenant-a",
   "environment": "prod",
   "cluster": "eks-prod",
   "namespace": "bookhub-prod",
   "service": "book-service",
   "evidence_window": {
-    "start": "2026-06-29T10:45:00Z",
-    "end": "2026-06-29T11:10:00Z"
+    "start": "2026-06-29T09:45:00Z",
+    "end": "2026-06-29T10:10:00Z"
   },
   "signals": [
     "memory_usage_high",
@@ -37,48 +37,48 @@
       "cluster": "eks-prod",
       "namespace": "bookhub-prod",
       "points": [
-        {"ts": "2026-06-29T10:45:00Z", "value": 410.0},
-        {"ts": "2026-06-29T10:50:00Z", "value": 500.0},
-        {"ts": "2026-06-29T10:55:00Z", "value": 850.0},
-        {"ts": "2026-06-29T10:58:00Z", "value": 980.0},
-        {"ts": "2026-06-29T11:00:00Z", "value": 1024.0},
-        {"ts": "2026-06-29T11:01:00Z", "value": 1024.0},
-        {"ts": "2026-06-29T11:02:00Z", "value": 200.0},
-        {"ts": "2026-06-29T11:03:00Z", "value": 420.0},
-        {"ts": "2026-06-29T11:05:00Z", "value": 430.0},
-        {"ts": "2026-06-29T11:10:00Z", "value": 430.0}
+        {"ts": "2026-06-29T09:45:00Z", "value": 410.0},
+        {"ts": "2026-06-29T09:50:00Z", "value": 500.0},
+        {"ts": "2026-06-29T09:55:00Z", "value": 850.0},
+        {"ts": "2026-06-29T09:58:00Z", "value": 980.0},
+        {"ts": "2026-06-29T10:00:00Z", "value": 1024.0},
+        {"ts": "2026-06-29T10:01:00Z", "value": 1024.0},
+        {"ts": "2026-06-29T10:02:00Z", "value": 200.0},
+        {"ts": "2026-06-29T10:03:00Z", "value": 420.0},
+        {"ts": "2026-06-29T10:05:00Z", "value": 430.0},
+        {"ts": "2026-06-29T10:10:00Z", "value": 430.0}
       ]
     }
   ],
   "logs": [
     {
       "service": "book-service",
-      "ts": "2026-06-29T10:55:00Z",
+      "ts": "2026-06-29T09:55:00Z",
       "level": "warning",
       "message": "High thread count detected: 1800/2000 limits"
     },
     {
       "service": "book-service",
-      "ts": "2026-06-29T10:58:00Z",
+      "ts": "2026-06-29T09:58:00Z",
       "level": "error",
       "message": "Thread pool exhausted. Failed to create new native thread. Active threads: 2000"
     },
     {
       "service": "book-service",
-      "ts": "2026-06-29T11:00:00Z",
+      "ts": "2026-06-29T10:00:00Z",
       "level": "error",
       "message": "java.lang.OutOfMemoryError: unable to create new native thread"
     },
     {
       "service": "book-service",
-      "ts": "2026-06-29T11:01:30Z",
+      "ts": "2026-06-29T10:01:30Z",
       "level": "warning",
       "message": "Container received SIGKILL signal from Kubernetes"
     }
   ],
   "k8s_events": [
     {
-      "ts": "2026-06-29T11:01:45Z",
+      "ts": "2026-06-29T10:01:45Z",
       "cluster": "eks-prod",
       "namespace": "bookhub-prod",
       "pod": "book-service-7d9f6c8d9f-abcd1",
@@ -88,7 +88,7 @@
       "message": "Container book-service in Pod book-service-7d9f6c8d9f-abcd1 terminated with exit code 137 (OOMKilled)"
     },
     {
-      "ts": "2026-06-29T11:03:15Z",
+      "ts": "2026-06-29T10:03:15Z",
       "cluster": "eks-prod",
       "namespace": "bookhub-prod",
       "pod": "book-service-7d9f6c8d9f-abcd1",
@@ -98,7 +98,7 @@
       "message": "Back-off restarting failed container book-service"
     },
     {
-      "ts": "2026-06-29T11:04:10Z",
+      "ts": "2026-06-29T10:04:10Z",
       "cluster": "eks-prod",
       "namespace": "bookhub-prod",
       "pod": "book-service-7d9f6c8d9f-abcd1",

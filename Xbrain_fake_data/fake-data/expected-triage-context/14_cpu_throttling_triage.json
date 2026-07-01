@@ -1,9 +1,9 @@
 {
-  "correlation_id": "corr-tenant-a-prod-book-service-202606291200",
+  "correlation_id": "corr-tenant-a-prod-book-service-202606291000",
   "tenant_id": "tenant-a",
-  "incident_id": "inc-tenant-a-prod-book-service-202606291200",
+  "incident_id": "inc-tenant-a-prod-book-service-202606291000",
   "environment": "prod",
-  "received_at": "2026-06-29T12:00:05Z",
+  "received_at": "2026-06-29T10:00:05Z",
   "alert": {
     "alert_id": "alert-book-service-summary-14_cpu_throttling",
     "source": "cdo-correlator",
@@ -11,7 +11,7 @@
     "severity": "critical",
     "title": "CPU Throttling detected on book-service",
     "description": "CPU utilization reached 100%, throttling active on pod container.",
-    "started_at": "2026-06-29T12:00:00Z",
+    "started_at": "2026-06-29T10:00:00Z",
     "labels": {
       "cluster": "eks-prod",
       "namespace": "bookhub-prod",
@@ -22,7 +22,7 @@
         "cpu_usage_high",
         "cpu_throttled"
       ],
-      "evidence_uri": "s3://cdo-evidence/tenant-a/prod/inc-tenant-a-prod-book-service-202606291200/evidence_bundle.json",
+      "evidence_uri": "s3://cdo-evidence/tenant-a/prod/inc-tenant-a-prod-book-service-202606291000/evidence_bundle.json",
       "jira_project": "BOOK",
       "jira_component": "book-service"
     }

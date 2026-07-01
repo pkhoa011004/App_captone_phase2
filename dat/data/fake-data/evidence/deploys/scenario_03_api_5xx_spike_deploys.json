@@ -4,7 +4,7 @@
     "version": "v1.4.3",
     "git_sha": "sha-b2c3d4e5",
     "image_digest": "sha256:def456digest...",
-    "deployed_at": "2026-06-29T12:55:00Z",
+    "deployed_at": "2026-06-29T09:55:00Z",
     "deployed_by": "jenkins-ci",
     "change_summary": "Deploy checkout page v2 improvements with new promo handler",
     "rollback_ref": "v1.4.2",

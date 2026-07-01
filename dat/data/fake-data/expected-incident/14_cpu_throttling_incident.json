@@ -1,10 +1,10 @@
 {
   "status": "CORRELATED",
   "incident": {
-    "incident_id": "inc-tenant-a-prod-book-service-202606291200",
-    "correlation_id": "corr-tenant-a-prod-book-service-202606291200",
-    "group_key": "tenant-a:prod:eks-prod:bookhub-prod:book-service:202606291200",
-    "bucket_start": "2026-06-29T12:00:00Z",
+    "incident_id": "inc-tenant-a-prod-book-service-202606291000",
+    "correlation_id": "corr-tenant-a-prod-book-service-202606291000",
+    "group_key": "tenant-a:prod:eks-prod:bookhub-prod:book-service:202606291000",
+    "bucket_start": "2026-06-29T10:00:00Z",
     "tenant_id": "tenant-a",
     "environment": "prod",
     "cluster": "eks-prod",
@@ -14,8 +14,8 @@
     "status": "ACTIVE",
     "correlation_metadata": {
       "total_alerts": 2,
-      "first_alert_received": "2026-06-29T12:00:05Z",
-      "last_alert_received": "2026-06-29T12:02:05Z",
+      "first_alert_received": "2026-06-29T10:00:05Z",
+      "last_alert_received": "2026-06-29T10:02:05Z",
       "correlation_rules_applied": [
         "same-service-10m-bucket"
       ]
@@ -32,7 +32,7 @@
         "severity": "warning",
         "title": "High CPU usage on book-service",
         "description": "book-service CPU usage is above 95%",
-        "started_at": "2026-06-29T12:00:00Z",
+        "started_at": "2026-06-29T10:00:00Z",
         "labels": {
           "region": "us-east-1",
           "pod": "book-service-7d9f6c8d9f-abcd1",
@@ -58,7 +58,7 @@
         "severity": "critical",
         "title": "High CPU throttling rate on book-service",
         "description": "book-service container CPU throttling is above 50%",
-        "started_at": "2026-06-29T12:02:00Z",
+        "started_at": "2026-06-29T10:02:00Z",
         "labels": {
           "region": "us-east-1",
           "pod": "book-service-7d9f6c8d9f-abcd1",
@@ -95,8 +95,8 @@
       ]
     },
     "time_window": {
-      "start": "2026-06-29T12:00:00Z",
-      "end": "2026-06-29T12:02:00Z"
+      "start": "2026-06-29T10:00:00Z",
+      "end": "2026-06-29T10:02:00Z"
     },
     "next_step": "BUILD_EVIDENCE"
   }

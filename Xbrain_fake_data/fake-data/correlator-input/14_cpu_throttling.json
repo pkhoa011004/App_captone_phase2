@@ -1,8 +1,8 @@
 [
   {
-    "ingest_id": "ingest-20260629-120000-0001",
+    "ingest_id": "ingest-20260629-100000-0001",
     "schema_version": "cdo.alert.v1",
-    "received_at": "2026-06-29T12:00:05Z",
+    "received_at": "2026-06-29T10:00:05Z",
     "raw_source": "prometheus",
     "normalized_alert": {
       "alert_id": "alert-book-service-cpu-high",
@@ -15,7 +15,7 @@
       "severity": "warning",
       "title": "High CPU usage on book-service",
       "description": "book-service CPU usage is above 95%",
-      "started_at": "2026-06-29T12:00:00Z",
+      "started_at": "2026-06-29T10:00:00Z",
       "labels": {
         "region": "us-east-1",
         "pod": "book-service-7d9f6c8d9f-abcd1",
@@ -42,9 +42,9 @@
     }
   },
   {
-    "ingest_id": "ingest-20260629-120200-0002",
+    "ingest_id": "ingest-20260629-100200-0002",
     "schema_version": "cdo.alert.v1",
-    "received_at": "2026-06-29T12:02:05Z",
+    "received_at": "2026-06-29T10:02:05Z",
     "raw_source": "prometheus",
     "normalized_alert": {
       "alert_id": "alert-book-service-cpu-throttled",
@@ -57,7 +57,7 @@
       "severity": "critical",
       "title": "High CPU throttling rate on book-service",
       "description": "book-service container CPU throttling is above 50%",
-      "started_at": "2026-06-29T12:02:00Z",
+      "started_at": "2026-06-29T10:02:00Z",
       "labels": {
         "region": "us-east-1",
         "pod": "book-service-7d9f6c8d9f-abcd1",

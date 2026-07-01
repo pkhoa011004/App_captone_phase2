@@ -1,7 +1,7 @@
 [
   {
     "service": "book-service",
-    "ts": "2026-06-29T10:45:00Z",
+    "ts": "2026-06-29T09:45:00Z",
     "level": "info",
     "message": "Thread pool initialized with 200 active threads",
     "tenant_id": "tenant-a",
@@ -15,7 +15,7 @@
   },
   {
     "service": "book-service",
-    "ts": "2026-06-29T10:55:00Z",
+    "ts": "2026-06-29T09:55:00Z",
     "level": "warning",
     "message": "High thread count detected: 1800/2000 limits",
     "tenant_id": "tenant-a",
@@ -29,7 +29,7 @@
   },
   {
     "service": "book-service",
-    "ts": "2026-06-29T10:58:00Z",
+    "ts": "2026-06-29T09:58:00Z",
     "level": "error",
     "message": "Thread pool exhausted. Failed to create new native thread. Active threads: 2000",
     "tenant_id": "tenant-a",
@@ -43,7 +43,7 @@
   },
   {
     "service": "book-service",
-    "ts": "2026-06-29T11:00:00Z",
+    "ts": "2026-06-29T10:00:00Z",
     "level": "error",
     "message": "java.lang.OutOfMemoryError: unable to create new native thread",
     "tenant_id": "tenant-a",
@@ -57,7 +57,7 @@
   },
   {
     "service": "book-service",
-    "ts": "2026-06-29T11:01:30Z",
+    "ts": "2026-06-29T10:01:30Z",
     "level": "info",
     "message": "Container received SIGKILL signal from Kubernetes",
     "tenant_id": "tenant-a",
@@ -71,7 +71,7 @@
   },
   {
     "service": "book-service",
-    "ts": "2026-06-29T11:03:00Z",
+    "ts": "2026-06-29T10:03:00Z",
     "level": "info",
     "message": "Starting request handler on book-service...",
     "tenant_id": "tenant-a",

@@ -1,6 +1,6 @@
 [
   {
-    "ts": "2026-06-29T11:59:30Z",
+    "ts": "2026-06-29T09:59:30Z",
     "cluster": "eks-prod",
     "namespace": "bookhub-prod",
     "pod": "book-service-7d9f6c8d9f-abcd1",
@@ -10,7 +10,7 @@
     "message": "Liveness probe failed: connection timed out after 5000ms due to high CPU load"
   },
   {
-    "ts": "2026-06-29T12:00:45Z",
+    "ts": "2026-06-29T10:00:45Z",
     "cluster": "eks-prod",
     "namespace": "bookhub-prod",
     "pod": "book-service-7d9f6c8d9f-abcd1",

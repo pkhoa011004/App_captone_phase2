@@ -1,6 +1,6 @@
 [
   {
-    "ts": "2026-06-29T12:55:00Z",
+    "ts": "2026-06-29T09:55:00Z",
     "cluster": "eks-prod",
     "namespace": "bookhub-prod",
     "pod": "book-service-7d9f6c8d9f-abcd1",
@@ -10,7 +10,7 @@
     "message": "Created container book-service"
   },
   {
-    "ts": "2026-06-29T12:55:05Z",
+    "ts": "2026-06-29T09:55:05Z",
     "cluster": "eks-prod",
     "namespace": "bookhub-prod",
     "pod": "book-service-7d9f6c8d9f-abcd1",
@@ -20,7 +20,7 @@
     "message": "Started container book-service"
   },
   {
-    "ts": "2026-06-29T13:02:15Z",
+    "ts": "2026-06-29T10:02:15Z",
     "cluster": "eks-prod",
     "namespace": "bookhub-prod",
     "pod": "book-service-7d9f6c8d9f-abcd1",

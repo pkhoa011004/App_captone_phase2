@@ -1,7 +1,7 @@
 [
   {
     "service": "book-service",
-    "ts": "2026-06-29T12:56:00Z",
+    "ts": "2026-06-29T09:56:00Z",
     "level": "info",
     "message": "Starting request handler on book-service version v1.4.3...",
     "tenant_id": "tenant-a",
@@ -15,7 +15,7 @@
   },
   {
     "service": "book-service",
-    "ts": "2026-06-29T13:00:01Z",
+    "ts": "2026-06-29T10:00:01Z",
     "level": "error",
     "message": "HTTP 500: Internal Server Error on POST /v1/books/promo: java.lang.NullPointerException at com.bookhub.promo.PromoHandler.applyPromoCode(PromoHandler.java:42)",
     "tenant_id": "tenant-a",
@@ -29,7 +29,7 @@
   },
   {
     "service": "book-service",
-    "ts": "2026-06-29T13:01:30Z",
+    "ts": "2026-06-29T10:01:30Z",
     "level": "error",
     "message": "HTTP 500: Internal Server Error on POST /v1/books/promo: java.lang.NullPointerException at com.bookhub.promo.PromoHandler.applyPromoCode(PromoHandler.java:42)",
     "tenant_id": "tenant-a",
@@ -43,7 +43,7 @@
   },
   {
     "service": "book-service",
-    "ts": "2026-06-29T13:04:15Z",
+    "ts": "2026-06-29T10:04:15Z",
     "level": "error",
     "message": "HTTP 500: Internal Server Error on POST /v1/books/promo: java.lang.NullPointerException at com.bookhub.promo.PromoHandler.applyPromoCode(PromoHandler.java:42)",
     "tenant_id": "tenant-a",
