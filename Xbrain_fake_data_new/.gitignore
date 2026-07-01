@@ -1,0 +1,52 @@
+# Terraform
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info
+.terraform/
+.terraform.lock.hcl
+*.tfvars
+!*.tfvars.example
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets - NEVER commit
+*.pem
+*.key
+.env
+.env.*
+!.env.example
+
+# Build artifacts
+*.zip
+*.tar.gz
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Node
+node_modules/
+package-lock.json
+
+# Logs
+*.log
+
+.obsidian/
+.temp/
+.tmp/
