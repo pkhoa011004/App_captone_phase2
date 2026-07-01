@@ -31,7 +31,7 @@
 |---|---|
 | Provider | <Bedrock / OpenAI / Local> |
 | Model ID | <vd `anthropic.claude-haiku-4-5-20251001`> |
-| Region | <vd `ap-southeast-1`> |
+| Region | <vd `us-east-1`> |
 | Context window | <vd 200k tokens> |
 | Cost/1k input tokens | $X |
 | Cost/1k output tokens | $X |
@@ -239,8 +239,8 @@ Capstone: ≥3 chaos test scenarios chứng minh verify-fail → rollback hoạt
 
 | Model Type | Model Name | Provider | Region | Deployment | Purpose |
 |---|---|---|---|---|---|
-| LLM | <vd Claude Sonnet 4.0> | Anthropic (via Bedrock) | ap-southeast-1 | Serverless | <Reasoning / RCA / NL generation> |
-| Embedding (RAG) | <vd Cohere Embed v4> | Amazon Bedrock | ap-southeast-1 | Serverless | Vector embeddings cho retrieval (1024 dimensions) |
+| LLM | <vd Claude Sonnet 4.0> | Anthropic (via Bedrock) | us-east-1 | Serverless | <Reasoning / RCA / NL generation> |
+| Embedding (RAG) | <vd Cohere Embed v4> | Amazon Bedrock | us-east-1 | Serverless | Vector embeddings cho retrieval (1024 dimensions) |
 
 #### 6.2.2 Prompt Input Controls
 

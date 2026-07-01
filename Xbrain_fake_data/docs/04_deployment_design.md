@@ -9,7 +9,7 @@
 ### 1.1 Tool choice
 
 - **IaC tool**: Terraform v1.9+ (HCL) - justify: Declarative, mature AWS provider, có state drift detection mạnh, plan-before-apply workflow phù hợp cho capstone approval gate. Dễ review hơn so với CDK hay CloudFormation.
-- **State backend**: S3 bucket (`tf1-cdo05-tfstate`) + DynamoDB lock (`tf1-cdo05-tflock`) tại `ap-southeast-1`.
+- **State backend**: S3 bucket (`tf1-cdo05-tfstate`) + DynamoDB lock (`tf1-cdo05-tflock`) tại `us-east-1`.
 - **Modular structure**: shared modules (networking, eks, data-store...) + environment-specific roots (`environments/sandbox`, `environments/staging`, `environments/prod`).
 
 ### 1.2 Module structure

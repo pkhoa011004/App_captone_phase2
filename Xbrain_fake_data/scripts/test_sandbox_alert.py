@@ -6,8 +6,8 @@ from datetime import datetime, timezone
 
 def main():
     parser = argparse.ArgumentParser(description="Inject a simulated alert directly into the Sandbox SQS Queue.")
-    parser.add_argument("--queue-url", default="https://sqs.ap-southeast-1.amazonaws.com/458580846647/xbrain-cdo5-sandbox-incident-queue.fifo", help="SQS Queue URL")
-    parser.add_argument("--region", default="ap-southeast-1", help="AWS Region")
+    parser.add_argument("--queue-url", default="https://sqs.us-east-1.amazonaws.com/458580846647/xbrain-cdo5-sandbox-incident-queue.fifo", help="SQS Queue URL")
+    parser.add_argument("--region", default="us-east-1", help="AWS Region")
     parser.add_argument("--incident-id", default=f"INC-{uuid.uuid4().hex[:8].upper()}", help="Incident ID")
     args = parser.parse_args()
 
@@ -30,7 +30,7 @@ def main():
             "started_at": now_utc,
             "labels": {
                 "team": "core-payments",
-                "region": "ap-southeast-1"
+                "region": "us-east-1"
             }
         },
         "metrics": [

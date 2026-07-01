@@ -34,7 +34,7 @@
         "description": "book-service 5xx rate is above threshold",
         "started_at": "2026-06-29T10:00:00Z",
         "labels": {
-          "region": "ap-southeast-1",
+          "region": "us-east-1",
           "pod": "book-service-7d9f6c8d9f-abcd1",
           "deployment": "book-service",
           "container": "book-service",
@@ -63,7 +63,7 @@
         "description": "book-service p95 latency is above 500ms",
         "started_at": "2026-06-29T10:02:00Z",
         "labels": {
-          "region": "ap-southeast-1",
+          "region": "us-east-1",
           "pod": "book-service-7d9f6c8d9f-abcd1",
           "deployment": "book-service",
           "container": "book-service",
@@ -90,7 +90,7 @@
         "description": "book-service /healthz endpoint returned non-200 status",
         "started_at": "2026-06-29T10:03:00Z",
         "labels": {
-          "region": "ap-southeast-1",
+          "region": "us-east-1",
           "pod": "book-service-7d9f6c8d9f-abcd1",
           "deployment": "book-service",
           "container": "book-service",
@@ -117,7 +117,7 @@
         "description": "book-service pod is in CrashLoopBackOff state",
         "started_at": "2026-06-29T10:04:00Z",
         "labels": {
-          "region": "ap-southeast-1",
+          "region": "us-east-1",
           "pod": "book-service-7d9f6c8d9f-abcd1",
           "deployment": "book-service",
           "container": "book-service",
@@ -143,7 +143,7 @@
         "description": "book-service container restarted unexpectedly",
         "started_at": "2026-06-29T10:05:00Z",
         "labels": {
-          "region": "ap-southeast-1",
+          "region": "us-east-1",
           "pod": "book-service-7d9f6c8d9f-abcd1",
           "deployment": "book-service",
           "container": "book-service",

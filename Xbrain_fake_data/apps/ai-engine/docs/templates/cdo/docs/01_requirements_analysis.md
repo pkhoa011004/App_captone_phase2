@@ -41,7 +41,7 @@
 ## 5. Constraints
 
 - **AWS only** (no multi-cloud)
-- **Region**: <ap-southeast-1 default>
+- **Region**: <us-east-1 default>
 - **Budget**: $X / 2 tuần build
 - **Code freeze**: T4 W12 18h
 

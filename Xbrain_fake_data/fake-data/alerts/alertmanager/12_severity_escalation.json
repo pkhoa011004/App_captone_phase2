@@ -10,7 +10,7 @@
         "severity": "low",
         "tenant_id": "tenant-a",
         "environment": "prod",
-        "region": "ap-southeast-1",
+        "region": "us-east-1",
         "cluster": "eks-prod",
         "namespace": "bookhub-prod",
         "pod": "book-service-7d9f6c8d9f-abcd1",

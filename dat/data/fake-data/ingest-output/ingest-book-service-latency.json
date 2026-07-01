@@ -16,7 +16,7 @@
     "description": "p95 latency exceeded 2000ms",
     "started_at": "2026-06-29T10:01:00Z",
     "labels": {
-      "region": "ap-southeast-1",
+      "region": "us-east-1",
       "pod": "book-service-7d9f6c8d9f-abcd1",
       "deployment": "book-service",
       "container": "book-service",

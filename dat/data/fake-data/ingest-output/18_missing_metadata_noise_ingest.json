@@ -16,7 +16,7 @@
     "description": "book-service configuration does not match current state",
     "started_at": "2026-06-29T10:03:30Z",
     "labels": {
-      "region": "ap-southeast-1"
+      "region": "us-east-1"
     }
   },
   "validation": {

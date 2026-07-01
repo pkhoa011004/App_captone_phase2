@@ -34,7 +34,7 @@
         "description": "book-service memory usage is above 90%",
         "started_at": "2026-06-29T11:00:00Z",
         "labels": {
-          "region": "ap-southeast-1",
+          "region": "us-east-1",
           "pod": "book-service-7d9f6c8d9f-abcd1",
           "deployment": "book-service",
           "container": "book-service",
@@ -60,7 +60,7 @@
         "description": "Container book-service terminated with OOMKilled exit code",
         "started_at": "2026-06-29T11:02:00Z",
         "labels": {
-          "region": "ap-southeast-1",
+          "region": "us-east-1",
           "pod": "book-service-7d9f6c8d9f-abcd1",
           "deployment": "book-service",
           "container": "book-service",
@@ -83,7 +83,7 @@
         "description": "Pod is failing to restart and entered crash loop",
         "started_at": "2026-06-29T11:04:00Z",
         "labels": {
-          "region": "ap-southeast-1",
+          "region": "us-east-1",
           "pod": "book-service-7d9f6c8d9f-abcd1",
           "deployment": "book-service",
           "container": "book-service",

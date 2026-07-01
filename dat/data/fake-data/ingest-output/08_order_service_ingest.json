@@ -16,7 +16,7 @@
     "description": "order-service 5xx rate is above threshold",
     "started_at": "2026-06-29T10:01:00Z",
     "labels": {
-      "region": "ap-southeast-1",
+      "region": "us-east-1",
       "pod": "order-service-5c4d3e2f1a-xyz98",
       "deployment": "order-service",
       "container": "order-service",

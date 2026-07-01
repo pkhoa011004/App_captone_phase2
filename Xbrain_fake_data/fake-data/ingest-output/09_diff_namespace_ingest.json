@@ -16,7 +16,7 @@
     "description": "High 5xx rate in staging environment",
     "started_at": "2026-06-29T10:02:00Z",
     "labels": {
-      "region": "ap-southeast-1",
+      "region": "us-east-1",
       "pod": "book-service-staging-12345",
       "deployment": "book-service-staging",
       "container": "book-service"

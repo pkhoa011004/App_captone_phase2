@@ -25,7 +25,7 @@ async def main():
     default_labels = {
         "tenant_id": "tenant-a",
         "environment": "prod",
-        "region": "ap-southeast-1",
+        "region": "us-east-1",
         "cluster": "eks-prod",
         "namespace": "bookhub-prod"
     }

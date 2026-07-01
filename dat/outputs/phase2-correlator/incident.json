@@ -28,7 +28,7 @@
       "severity": "critical",
       "started_at": "2026-06-29T10:00:00Z",
       "labels": {
-        "region": "ap-southeast-1",
+        "region": "us-east-1",
         "pod": "api-gateway-5c9c9b-xyz",
         "deployment": "api-gateway",
         "container": "api-gateway",

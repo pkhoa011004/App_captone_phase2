@@ -18,17 +18,17 @@ configMapGenerator:
   literals:
   - ENV_NAME=sandbox
   - LOG_LEVEL=DEBUG
-  - AWS_REGION=ap-southeast-1
+  - AWS_REGION=us-east-1
   - AI_ENGINE_URL=http://tf1-ai-engine:8080
   name: platform-config
 
 images:
 - name: ai-engine
-  newName: 458580846647.dkr.ecr.ap-southeast-1.amazonaws.com/xbrain-cdo5-sandbox-tf1-ai-engine
+  newName: 458580846647.dkr.ecr.us-east-1.amazonaws.com/xbrain-cdo5-sandbox-tf1-ai-engine
   newTag: sandbox-820cdbf
 - name: platform-service
-  newName: 458580846647.dkr.ecr.ap-southeast-1.amazonaws.com/xbrain-cdo5-sandbox-tf1-platform-service
+  newName: 458580846647.dkr.ecr.us-east-1.amazonaws.com/xbrain-cdo5-sandbox-tf1-platform-service
   newTag: sandbox-843da53
 - name: simulator
-  newName: 458580846647.dkr.ecr.ap-southeast-1.amazonaws.com/xbrain-cdo5-sandbox-tf1-simulator
+  newName: 458580846647.dkr.ecr.us-east-1.amazonaws.com/xbrain-cdo5-sandbox-tf1-simulator
   newTag: sandbox-171a02e

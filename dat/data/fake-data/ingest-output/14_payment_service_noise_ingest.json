@@ -16,7 +16,7 @@
     "description": "payment-service failed to connect to third-party bank endpoint",
     "started_at": "2026-06-29T10:02:00Z",
     "labels": {
-      "region": "ap-southeast-1",
+      "region": "us-east-1",
       "pod": "payment-service-5c6c7b8d-abc99",
       "deployment": "payment-service",
       "container": "payment-service"

@@ -16,7 +16,7 @@
     "description": "Node disk usage is above 95% on order-service node",
     "started_at": "2026-06-29T10:00:00Z",
     "labels": {
-      "region": "ap-southeast-1",
+      "region": "us-east-1",
       "pod": "order-service-7f8a9b-xyz",
       "deployment": "order-service",
       "container": "order-service",

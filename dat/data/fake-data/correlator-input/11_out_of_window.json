@@ -17,7 +17,7 @@
       "description": "book-service 5xx rate is above threshold",
       "started_at": "2026-06-29T10:00:00Z",
       "labels": {
-        "region": "ap-southeast-1",
+        "region": "us-east-1",
         "pod": "book-service-7d9f6c8d9f-abcd1",
         "deployment": "book-service",
         "container": "book-service",
@@ -62,7 +62,7 @@
       "description": "book-service CPU usage exceeded 80%",
       "started_at": "2026-06-29T09:30:00Z",
       "labels": {
-        "region": "ap-southeast-1",
+        "region": "us-east-1",
         "pod": "book-service-7d9f6c8d9f-abcd1",
         "deployment": "book-service",
         "container": "book-service"

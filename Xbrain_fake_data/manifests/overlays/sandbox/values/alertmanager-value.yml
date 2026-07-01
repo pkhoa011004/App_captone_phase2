@@ -12,5 +12,5 @@ alertmanager:
       - name: 'null'
       - name: 'platform-service-webhook'
         webhook_configs:
-          - url: "https://bcwj3i4rn9.execute-api.ap-southeast-1.amazonaws.com"
+          - url: "https://bcwj3i4rn9.execute-api.us-east-1.amazonaws.com"
             send_resolved: true

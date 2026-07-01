@@ -45,7 +45,7 @@
   "service": "checkout-api",
   "endpoint": "/v1/orders",
   "value": 1250.5,
-  "labels": {"region": "ap-southeast-1"}
+  "labels": {"region": "us-east-1"}
 }
 ```
 

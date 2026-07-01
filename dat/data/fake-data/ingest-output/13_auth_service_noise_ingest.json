@@ -16,7 +16,7 @@
     "description": "auth-service CPU is slightly high (78%)",
     "started_at": "2026-06-29T10:01:00Z",
     "labels": {
-      "region": "ap-southeast-1",
+      "region": "us-east-1",
       "pod": "auth-service-78fc5b6d-xyz88",
       "deployment": "auth-service",
       "container": "auth-service"

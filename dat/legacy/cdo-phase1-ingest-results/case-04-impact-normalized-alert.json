@@ -17,7 +17,7 @@
       "description": "book-service 5xx rate is above threshold for 5 minutes",
       "started_at": "2026-06-29T10:00:00Z",
       "labels": {
-        "region": "ap-southeast-1",
+        "region": "us-east-1",
         "pod": "book-service-7d9f6c8d9f-abcd1",
         "container": "book-service",
         "metric_names": [
@@ -61,7 +61,7 @@
       "description": "order-service has high timeout rate when calling book-service",
       "started_at": "2026-06-29T10:00:20Z",
       "labels": {
-        "region": "ap-southeast-1",
+        "region": "us-east-1",
         "pod": "order-service-6b4b9dfc77-efgh2",
         "container": "order-service",
         "metric_names": [
@@ -104,7 +104,7 @@
       "description": "frontend checkout endpoint p95 latency is high",
       "started_at": "2026-06-29T10:00:40Z",
       "labels": {
-        "region": "ap-southeast-1",
+        "region": "us-east-1",
         "pod": "frontend-77f5f9f77b-ijkl3",
         "container": "frontend",
         "metric_names": [

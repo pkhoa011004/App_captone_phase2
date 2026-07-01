@@ -10,8 +10,8 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: ap-southeast-1
-  ECR_REGISTRY: 458580846647.dkr.ecr.ap-southeast-1.amazonaws.com
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: 458580846647.dkr.ecr.us-east-1.amazonaws.com
   PLATFORM_REPO: xbrain-cdo5-sandbox-tf1-platform-service
 
 jobs:

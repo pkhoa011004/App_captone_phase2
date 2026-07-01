@@ -13,7 +13,7 @@
     "description": "book-service 5xx rate is above threshold for 5 minutes",
     "started_at": "2026-06-29T10:00:00Z",
     "labels": {
-      "region": "ap-southeast-1",
+      "region": "us-east-1",
       "cluster": "eks-prod",
       "namespace": "bookhub-prod",
       "metric_names": [

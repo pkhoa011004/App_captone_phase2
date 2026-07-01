@@ -17,7 +17,7 @@
       "description": "book-service 5xx rate is above threshold",
       "started_at": "2026-06-29T10:00:00Z",
       "labels": {
-        "region": "ap-southeast-1",
+        "region": "us-east-1",
         "pod": "book-service-7d9f6c8d9f-abcd1",
         "deployment": "book-service",
         "container": "book-service",
@@ -62,7 +62,7 @@
       "description": "order-service 5xx rate is above threshold",
       "started_at": "2026-06-29T10:01:00Z",
       "labels": {
-        "region": "ap-southeast-1",
+        "region": "us-east-1",
         "pod": "order-service-5c4d3e2f1a-xyz98",
         "deployment": "order-service",
         "container": "order-service",
@@ -104,7 +104,7 @@
       "description": "auth-service CPU is slightly high (78%)",
       "started_at": "2026-06-29T10:01:00Z",
       "labels": {
-        "region": "ap-southeast-1",
+        "region": "us-east-1",
         "pod": "auth-service-78fc5b6d-xyz88",
         "deployment": "auth-service",
         "container": "auth-service"
@@ -139,7 +139,7 @@
       "description": "payment-service failed to connect to third-party bank endpoint",
       "started_at": "2026-06-29T10:02:00Z",
       "labels": {
-        "region": "ap-southeast-1",
+        "region": "us-east-1",
         "pod": "payment-service-5c6c7b8d-abc99",
         "deployment": "payment-service",
         "container": "payment-service"
