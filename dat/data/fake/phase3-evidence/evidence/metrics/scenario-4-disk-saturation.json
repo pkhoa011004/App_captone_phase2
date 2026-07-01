@@ -1,0 +1,86 @@
+[
+  {
+    "metric_name": "disk_usage_percent",
+    "service": "order-service",
+    "unit": "percent",
+    "labels": {
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "region": "ap-southeast-1",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    },
+    "points": [
+      { "ts": "2026-06-29T06:00:00Z", "value": 62.0 },
+      { "ts": "2026-06-29T07:00:00Z", "value": 70.0 },
+      { "ts": "2026-06-29T08:00:00Z", "value": 78.0 },
+      { "ts": "2026-06-29T09:00:00Z", "value": 85.0 },
+      { "ts": "2026-06-29T09:45:00Z", "value": 90.0 },
+      { "ts": "2026-06-29T09:55:00Z", "value": 93.0 },
+      { "ts": "2026-06-29T10:00:00Z", "value": 97.0 },
+      { "ts": "2026-06-29T10:05:00Z", "value": 97.0 },
+      { "ts": "2026-06-29T10:10:00Z", "value": 97.0 }
+    ]
+  },
+  {
+    "metric_name": "disk_free_bytes",
+    "service": "order-service",
+    "unit": "bytes",
+    "labels": {
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "region": "ap-southeast-1",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    },
+    "points": [
+      { "ts": "2026-06-29T06:00:00Z", "value": 4.08e10 },
+      { "ts": "2026-06-29T07:00:00Z", "value": 3.22e10 },
+      { "ts": "2026-06-29T08:00:00Z", "value": 2.36e10 },
+      { "ts": "2026-06-29T09:00:00Z", "value": 1.61e10 },
+      { "ts": "2026-06-29T09:45:00Z", "value": 1.07e10 },
+      { "ts": "2026-06-29T09:55:00Z", "value": 7.51e9 },
+      { "ts": "2026-06-29T10:00:00Z", "value": 1.28e9 },
+      { "ts": "2026-06-29T10:05:00Z", "value": 1.28e9 },
+      { "ts": "2026-06-29T10:10:00Z", "value": 1.28e9 }
+    ]
+  },
+  {
+    "metric_name": "disk_write_errors_count",
+    "service": "order-service",
+    "unit": "count",
+    "labels": {
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "region": "ap-southeast-1",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    },
+    "points": [
+      { "ts": "2026-06-29T09:45:00Z", "value": 0.0 },
+      { "ts": "2026-06-29T09:55:00Z", "value": 0.0 },
+      { "ts": "2026-06-29T10:00:00Z", "value": 14.0 },
+      { "ts": "2026-06-29T10:05:00Z", "value": 25.0 },
+      { "ts": "2026-06-29T10:10:00Z", "value": 30.0 }
+    ]
+  },
+  {
+    "metric_name": "pod_eviction_count",
+    "service": "order-service",
+    "unit": "count",
+    "labels": {
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "region": "ap-southeast-1",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    },
+    "points": [
+      { "ts": "2026-06-29T09:45:00Z", "value": 0.0 },
+      { "ts": "2026-06-29T09:55:00Z", "value": 0.0 },
+      { "ts": "2026-06-29T10:00:00Z", "value": 1.0 },
+      { "ts": "2026-06-29T10:05:00Z", "value": 1.0 },
+      { "ts": "2026-06-29T10:10:00Z", "value": 1.0 }
+    ]
+  }
+]

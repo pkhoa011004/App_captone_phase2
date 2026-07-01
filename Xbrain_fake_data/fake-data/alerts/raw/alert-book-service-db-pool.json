@@ -1,0 +1,27 @@
+{
+  "alert_id": "alert-book-service-db-pool-001",
+  "source": "prometheus",
+  "service": "book-service",
+  "severity": "critical",
+  "title": "Database Connection Pool Exhaustion on book-service",
+  "description": "book-service database connection pool is cạn kiệt, active connections at max capacity",
+  "started_at": "2026-06-29T10:00:00Z",
+  "labels": {
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "region": "ap-southeast-1",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "pod": "book-service-7d9f6c8d9f-abcd1",
+    "deployment": "book-service",
+    "container": "book-service",
+    "metric_names": [
+      "db_connection_pool_active",
+      "db_connection_pool_wait_count",
+      "db_connection_wait_time_ms"
+    ],
+    "trace_id": "trace-dbpool-002",
+    "status_code": "500",
+    "reason": "db_pool_exhaustion"
+  }
+}

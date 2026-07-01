@@ -1,0 +1,23 @@
+[
+  {
+    "service": "api-gateway",
+    "ts": "2026-06-29T09:45:00Z",
+    "level": "info",
+    "message": "Gateway initialized and listening on port 8080",
+    "trace_id": null
+  },
+  {
+    "service": "order-service",
+    "ts": "2026-06-29T09:59:58Z",
+    "level": "error",
+    "message": "NullPointerException: response object is null after timeout calling payment-service",
+    "trace_id": "trace-gw-timeout-005"
+  },
+  {
+    "service": "api-gateway",
+    "ts": "2026-06-29T10:00:00Z",
+    "level": "error",
+    "message": "upstream request timed out after 5000ms: order-service",
+    "trace_id": "trace-gw-timeout-005"
+  }
+]

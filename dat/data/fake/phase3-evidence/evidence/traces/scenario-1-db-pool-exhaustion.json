@@ -1,0 +1,36 @@
+[
+  {
+    "trace_id": "trace-dbpool-002",
+    "span_id": "span-001",
+    "parent_span_id": null,
+    "service": "book-service",
+    "operation": "GET /v1/books/{id}",
+    "ts": "2026-06-29T10:00:00Z",
+    "duration_ms": 5100.0,
+    "status_code": "500",
+    "labels": {
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "dependency": "database"
+    }
+  },
+  {
+    "trace_id": "trace-dbpool-002",
+    "span_id": "span-002",
+    "parent_span_id": "span-001",
+    "service": "book-service",
+    "operation": "db.getConnection()",
+    "ts": "2026-06-29T10:00:00Z",
+    "duration_ms": 5000.0,
+    "status_code": "pool_exhausted",
+    "labels": {
+      "tenant_id": "tenant-a",
+      "environment": "prod",
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "dependency": "db-pool"
+    }
+  }
+]

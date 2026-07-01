@@ -1,0 +1,30 @@
+[
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T09:45:00Z",
+    "level": "info",
+    "message": "Starting request handler on book-service...",
+    "trace_id": null
+  },
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T09:56:00Z",
+    "level": "warn",
+    "message": "connection pool at 90% capacity (18/20 active)",
+    "trace_id": "trace-dbpool-001"
+  },
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T10:00:00Z",
+    "level": "error",
+    "message": "could not obtain connection from pool: timeout after 5000ms, pool exhausted (20/20 active)",
+    "trace_id": "trace-dbpool-002"
+  },
+  {
+    "service": "book-service",
+    "ts": "2026-06-29T10:02:00Z",
+    "level": "error",
+    "message": "HikariPool-1 - Connection is not available, request timed out after 30000ms",
+    "trace_id": "trace-dbpool-003"
+  }
+]

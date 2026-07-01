@@ -1,0 +1,30 @@
+[
+  {
+    "ts": "2026-06-29T10:00:05Z",
+    "service": "order-service",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "level": "error",
+    "message": "NullPointerException: response object is null after timeout calling payment-service",
+    "trace_id": "trace-gw-timeout-005",
+    "labels": {
+      "pod": "order-service-7f8a9b-xyz"
+    }
+  },
+  {
+    "ts": "2026-06-29T10:00:06Z",
+    "service": "api-gateway",
+    "tenant_id": "tenant-a",
+    "environment": "prod",
+    "cluster": "eks-prod",
+    "namespace": "bookhub-prod",
+    "level": "error",
+    "message": "upstream request timed out after 5000ms: order-service",
+    "trace_id": "trace-gw-timeout-005",
+    "labels": {
+      "pod": "api-gateway-5c9c9b-xyz"
+    }
+  }
+]

@@ -1,0 +1,76 @@
+[
+  {
+    "metric_name": "network_round_trip_ms",
+    "service": "api-gateway",
+    "unit": "ms",
+    "points": [
+      { "ts": "2026-06-29T09:45:00Z", "value": 12.0 },
+      { "ts": "2026-06-29T09:50:00Z", "value": 12.0 },
+      { "ts": "2026-06-29T09:55:00Z", "value": 14.0 },
+      { "ts": "2026-06-29T09:57:00Z", "value": 120.0 },
+      { "ts": "2026-06-29T10:00:00Z", "value": 850.0 },
+      { "ts": "2026-06-29T10:05:00Z", "value": 890.0 },
+      { "ts": "2026-06-29T10:10:00Z", "value": 900.0 }
+    ],
+    "labels": {
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "dest_service": "order-service"
+    }
+  },
+  {
+    "metric_name": "network_round_trip_ms",
+    "service": "order-service",
+    "unit": "ms",
+    "points": [
+      { "ts": "2026-06-29T09:45:00Z", "value": 15.0 },
+      { "ts": "2026-06-29T09:50:00Z", "value": 15.0 },
+      { "ts": "2026-06-29T09:55:00Z", "value": 20.0 },
+      { "ts": "2026-06-29T09:57:00Z", "value": 1100.0 },
+      { "ts": "2026-06-29T10:00:00Z", "value": 4200.0 },
+      { "ts": "2026-06-29T10:05:00Z", "value": 4500.0 },
+      { "ts": "2026-06-29T10:10:00Z", "value": 4600.0 }
+    ],
+    "labels": {
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod",
+      "dest_service": "payment-service"
+    }
+  },
+  {
+    "metric_name": "http_latency_p95_ms",
+    "service": "api-gateway",
+    "unit": "ms",
+    "points": [
+      { "ts": "2026-06-29T09:45:00Z", "value": 90.0 },
+      { "ts": "2026-06-29T09:50:00Z", "value": 90.0 },
+      { "ts": "2026-06-29T09:55:00Z", "value": 110.0 },
+      { "ts": "2026-06-29T09:57:00Z", "value": 1300.0 },
+      { "ts": "2026-06-29T10:00:00Z", "value": 5200.0 },
+      { "ts": "2026-06-29T10:05:00Z", "value": 5500.0 },
+      { "ts": "2026-06-29T10:10:00Z", "value": 5600.0 }
+    ],
+    "labels": {
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    }
+  },
+  {
+    "metric_name": "gateway_timeout_count",
+    "service": "api-gateway",
+    "unit": "count",
+    "points": [
+      { "ts": "2026-06-29T09:45:00Z", "value": 0.0 },
+      { "ts": "2026-06-29T09:50:00Z", "value": 0.0 },
+      { "ts": "2026-06-29T09:55:00Z", "value": 0.0 },
+      { "ts": "2026-06-29T09:57:00Z", "value": 2.0 },
+      { "ts": "2026-06-29T10:00:00Z", "value": 23.0 },
+      { "ts": "2026-06-29T10:05:00Z", "value": 45.0 },
+      { "ts": "2026-06-29T10:10:00Z", "value": 50.0 }
+    ],
+    "labels": {
+      "cluster": "eks-prod",
+      "namespace": "bookhub-prod"
+    }
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "service": "order-service",
+    "ts": "2026-06-29T06:00:00Z",
+    "level": "info",
+    "message": "Service started successfully, watching on port 8082",
+    "trace_id": null
+  },
+  {
+    "service": "order-service",
+    "ts": "2026-06-29T09:30:00Z",
+    "level": "warn",
+    "message": "disk usage at 90%, consider cleanup",
+    "trace_id": null
+  },
+  {
+    "service": "order-service",
+    "ts": "2026-06-29T09:55:00Z",
+    "level": "error",
+    "message": "write failed: no space left on device (errno 28)",
+    "trace_id": "trace-disk-001"
+  },
+  {
+    "service": "order-service",
+    "ts": "2026-06-29T10:00:00Z",
+    "level": "fatal",
+    "message": "unable to write audit log, shutting down gracefully to prevent data corruption",
+    "trace_id": "trace-disk-002"
+  }
+]
